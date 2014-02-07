@@ -215,7 +215,7 @@ void keyPressed(unsigned char key, int x, int y)
 		break;
 
 	case 8:
-		currentShaderIndex = (currentShaderIndex - 4) % (shaders.size() - 2) + 2;
+		currentShaderIndex = (currentShaderIndex + shaders.size() - 6) % (shaders.size() - 2) + 2;
 
 		for(unsigned int i=0; i<rigidBodies.size(); ++i)
 		{
