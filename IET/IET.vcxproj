@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{C1A2C960-1181-4EBC-880E-AF6F45D60FA4}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>IET</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(IncludePath)</IncludePath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>$(SolutionDir)$(SolutionName)\glew-1.10.0\include;$(SolutionDir)$(SolutionName)\fmod\lowlevel\lib;$(SolutionDir)$(SolutionName)\freeglut\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)$(SolutionName)\glew-1.10.0\lib\Release\Win32;$(SolutionDir)$(SolutionName)\freeglut\lib;$(SolutionDir)$(SolutionName)\Assimp\lib\x86;$(SolutionDir)$(SolutionName)\SOIL\lib;$(SolutionDir)$(SolutionName)\fmod\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>freeglut.lib;glew32.lib;assimp.lib;SOIL.lib;fmodexL_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>$(SolutionDir)$(SolutionName)\glew-1.10.0\include;$(SolutionDir)$(SolutionName)\fmod\lowlevel\lib;$(SolutionDir)$(SolutionName)\freeglut\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>$(SolutionDir)$(SolutionName)\glew-1.10.0\lib\Release\Win32;$(SolutionDir)$(SolutionName)\freeglut\lib;$(SolutionDir)$(SolutionName)\Assimp\lib\x86;$(SolutionDir)$(SolutionName)\SOIL\lib;$(SolutionDir)$(SolutionName)\fmod\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>freeglut.lib;glew32.lib;assimp.lib;SOIL.lib;fmodex_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <Text Include="BlinnPhongTextured.frag" />
+    <Text Include="Constant.frag" />
+    <Text Include="BlinnPhong.frag" />
+    <Text Include="Diffuse.frag" />
+    <Text Include="OrenNayarTextured.frag" />
+    <Text Include="ReadMe.txt" />
+    <Text Include="SepiaDiffuse.frag" />
+    <Text Include="Toon.frag" />
+    <Text Include="Default.vert" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AudioListener.h" />
+    <ClInclude Include="AudioManager.h" />
+    <ClInclude Include="AudioEventManager.h" />
+    <ClInclude Include="AudioEvent.h" />
+    <ClInclude Include="Ellipsoid.h" />
+    <ClInclude Include="Box.h" />
+    <ClInclude Include="Ball.h" />
+    <ClInclude Include="Cat.h" />
+    <ClInclude Include="Line.h" />
+    <ClInclude Include="IndexedMesh.h" />
+    <ClInclude Include="SimpleMesh.h" />
+    <ClInclude Include="Camera.h" />
+    <ClInclude Include="Drawable.h" />
+    <ClInclude Include="EntityManager.h" />
+    <ClInclude Include="GenericShader.h" />
+    <ClInclude Include="HelperFunctions.h" />
+    <ClInclude Include="MeshBase.h" />
+    <ClInclude Include="MeshLoader.h" />
+    <ClInclude Include="Particle.h" />
+    <ClInclude Include="RigidBody.h" />
+    <ClInclude Include="RigidBodyModel.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="targetver.h" />
+    <ClInclude Include="TexturedSimpleMesh.h" />
+    <ClInclude Include="TexturedIndexedMesh.h" />
+    <ClInclude Include="Updatable.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="AudioEventManager.cpp" />
+    <ClCompile Include="AudioManager.cpp" />
+    <ClCompile Include="Ball.cpp" />
+    <ClCompile Include="Box.cpp" />
+    <ClCompile Include="Cat.cpp" />
+    <ClCompile Include="Ellipsoid.cpp" />
+    <ClCompile Include="Line.cpp" />
+    <ClCompile Include="IndexedMesh.cpp" />
+    <ClCompile Include="SimpleMesh.cpp" />
+    <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="EntitiyManager.cpp" />
+    <ClCompile Include="GenericShader.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="HelperFunctions.cpp" />
+    <ClCompile Include="MeshLoader.cpp" />
+    <ClCompile Include="Particle.cpp" />
+    <ClCompile Include="RigidBody.cpp" />
+    <ClCompile Include="RigidBodyModel.cpp" />
+    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="TexturedSimpleMesh.cpp" />
+    <ClCompile Include="TexturedIndexedMesh.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Default.frag" />
+    <None Include="DefaultTextured.frag" />
+    <None Include="DiffuseTextured.frag" />
+    <None Include="OrenNayar.frag" />
+    <None Include="Textured.vert" />
+    <None Include="ToonTextured.frag" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

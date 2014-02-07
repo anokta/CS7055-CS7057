@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\Audio">
+      <UniqueIdentifier>{6fda80d0-0c0b-4478-b791-63a75a77643e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Entities">
+      <UniqueIdentifier>{52109466-d136-4eaa-8adc-0904fa2c48cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Graphics">
+      <UniqueIdentifier>{c5b3b9ea-ff35-4fe5-a26d-32315c3c5849}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Graphics\Camera">
+      <UniqueIdentifier>{93e6e3cb-d446-4410-a053-4e842783c416}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Audio">
+      <UniqueIdentifier>{58a7e5e8-8eb1-4d1e-b2c5-83bb2bafc6a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Entities">
+      <UniqueIdentifier>{1d851baa-d634-4c6e-b79c-c7c2449177e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Graphics">
+      <UniqueIdentifier>{4e6dfcb7-e56b-4079-959a-10c2732983e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Graphics\Camera">
+      <UniqueIdentifier>{12bd12e5-7a8c-4adf-bf13-73ca3b1ce658}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Shaders">
+      <UniqueIdentifier>{2e40317e-16e2-432e-975d-ae1c5475103c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Graphics\Meshes">
+      <UniqueIdentifier>{9ced900c-f12a-4ba2-9575-78c5b208404f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Graphics\Meshes">
+      <UniqueIdentifier>{3a411c4b-5d6e-4c4f-b70e-717ee6f0b61c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Shaders\Solid">
+      <UniqueIdentifier>{816c7ddb-4439-4dbe-9f36-1e1a4c1fe916}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Shaders\Textured">
+      <UniqueIdentifier>{c7fbfe2d-3ce5-47bb-8688-28e1e2f7fedb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Entities\RigidBody">
+      <UniqueIdentifier>{72f8b7bc-4a33-4e15-8a15-5e588f2d0876}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Entities\RigidBody">
+      <UniqueIdentifier>{0d0ffce1-d297-4fff-a2b4-90b97dee5301}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+    <Text Include="BlinnPhong.frag">
+      <Filter>Resource Files\Shaders\Solid</Filter>
+    </Text>
+    <Text Include="Constant.frag">
+      <Filter>Resource Files\Shaders\Solid</Filter>
+    </Text>
+    <Text Include="Default.vert">
+      <Filter>Resource Files\Shaders\Solid</Filter>
+    </Text>
+    <Text Include="Diffuse.frag">
+      <Filter>Resource Files\Shaders\Solid</Filter>
+    </Text>
+    <Text Include="SepiaDiffuse.frag">
+      <Filter>Resource Files\Shaders\Solid</Filter>
+    </Text>
+    <Text Include="Toon.frag">
+      <Filter>Resource Files\Shaders\Solid</Filter>
+    </Text>
+    <Text Include="BlinnPhongTextured.frag">
+      <Filter>Resource Files\Shaders\Textured</Filter>
+    </Text>
+    <Text Include="OrenNayarTextured.frag">
+      <Filter>Resource Files\Shaders\Textured</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HelperFunctions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AudioManager.h">
+      <Filter>Header Files\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="AudioListener.h">
+      <Filter>Header Files\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="AudioEventManager.h">
+      <Filter>Header Files\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="AudioEvent.h">
+      <Filter>Header Files\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="Drawable.h">
+      <Filter>Header Files\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="EntityManager.h">
+      <Filter>Header Files\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="Updatable.h">
+      <Filter>Header Files\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="GenericShader.h">
+      <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Header Files\Graphics\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="Particle.h">
+      <Filter>Header Files\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="Line.h">
+      <Filter>Header Files\Graphics\Meshes</Filter>
+    </ClInclude>
+    <ClInclude Include="MeshBase.h">
+      <Filter>Header Files\Graphics\Meshes</Filter>
+    </ClInclude>
+    <ClInclude Include="SimpleMesh.h">
+      <Filter>Header Files\Graphics\Meshes</Filter>
+    </ClInclude>
+    <ClInclude Include="MeshLoader.h">
+      <Filter>Header Files\Graphics\Meshes</Filter>
+    </ClInclude>
+    <ClInclude Include="IndexedMesh.h">
+      <Filter>Header Files\Graphics\Meshes</Filter>
+    </ClInclude>
+    <ClInclude Include="TexturedSimpleMesh.h">
+      <Filter>Header Files\Graphics\Meshes</Filter>
+    </ClInclude>
+    <ClInclude Include="TexturedIndexedMesh.h">
+      <Filter>Header Files\Graphics\Meshes</Filter>
+    </ClInclude>
+    <ClInclude Include="Ball.h">
+      <Filter>Header Files\Entities\RigidBody</Filter>
+    </ClInclude>
+    <ClInclude Include="Box.h">
+      <Filter>Header Files\Entities\RigidBody</Filter>
+    </ClInclude>
+    <ClInclude Include="Cat.h">
+      <Filter>Header Files\Entities\RigidBody</Filter>
+    </ClInclude>
+    <ClInclude Include="RigidBody.h">
+      <Filter>Header Files\Entities\RigidBody</Filter>
+    </ClInclude>
+    <ClInclude Include="RigidBodyModel.h">
+      <Filter>Header Files\Entities\RigidBody</Filter>
+    </ClInclude>
+    <ClInclude Include="Ellipsoid.h">
+      <Filter>Header Files\Entities\RigidBody</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HelperFunctions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AudioEventManager.cpp">
+      <Filter>Source Files\Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="AudioManager.cpp">
+      <Filter>Source Files\Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="EntitiyManager.cpp">
+      <Filter>Source Files\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Source Files\Graphics\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="GenericShader.cpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Particle.cpp">
+      <Filter>Source Files\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="Line.cpp">
+      <Filter>Source Files\Graphics\Meshes</Filter>
+    </ClCompile>
+    <ClCompile Include="MeshLoader.cpp">
+      <Filter>Source Files\Graphics\Meshes</Filter>
+    </ClCompile>
+    <ClCompile Include="SimpleMesh.cpp">
+      <Filter>Source Files\Graphics\Meshes</Filter>
+    </ClCompile>
+    <ClCompile Include="TexturedSimpleMesh.cpp">
+      <Filter>Source Files\Graphics\Meshes</Filter>
+    </ClCompile>
+    <ClCompile Include="IndexedMesh.cpp">
+      <Filter>Source Files\Graphics\Meshes</Filter>
+    </ClCompile>
+    <ClCompile Include="TexturedIndexedMesh.cpp">
+      <Filter>Source Files\Graphics\Meshes</Filter>
+    </ClCompile>
+    <ClCompile Include="Ball.cpp">
+      <Filter>Source Files\Entities\RigidBody</Filter>
+    </ClCompile>
+    <ClCompile Include="Box.cpp">
+      <Filter>Source Files\Entities\RigidBody</Filter>
+    </ClCompile>
+    <ClCompile Include="Cat.cpp">
+      <Filter>Source Files\Entities\RigidBody</Filter>
+    </ClCompile>
+    <ClCompile Include="RigidBody.cpp">
+      <Filter>Source Files\Entities\RigidBody</Filter>
+    </ClCompile>
+    <ClCompile Include="RigidBodyModel.cpp">
+      <Filter>Source Files\Entities\RigidBody</Filter>
+    </ClCompile>
+    <ClCompile Include="Ellipsoid.cpp">
+      <Filter>Source Files\Entities\RigidBody</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Default.frag">
+      <Filter>Resource Files\Shaders\Solid</Filter>
+    </None>
+    <None Include="OrenNayar.frag">
+      <Filter>Resource Files\Shaders\Solid</Filter>
+    </None>
+    <None Include="DefaultTextured.frag">
+      <Filter>Resource Files\Shaders\Textured</Filter>
+    </None>
+    <None Include="DiffuseTextured.frag">
+      <Filter>Resource Files\Shaders\Textured</Filter>
+    </None>
+    <None Include="Textured.vert">
+      <Filter>Resource Files\Shaders\Textured</Filter>
+    </None>
+    <None Include="ToonTextured.frag">
+      <Filter>Resource Files\Shaders\Textured</Filter>
+    </None>
+  </ItemGroup>
+</Project>

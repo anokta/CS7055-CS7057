@@ -1,0 +1,12 @@
+﻿1>------ Build started: Project: Lab1, Configuration: Debug Win32 ------
+1>Build started 06.02.2014 00:30:38.
+1>InitializeBuildStatus:
+1>  Creating "Debug\Lab1.unsuccessfulbuild" because "AlwaysCreate" was specified.
+1>ClCompile:
+1>  main.cpp
+1>c:\users\anokta\google drive\visual studio 2012\projects\cs7055\2\lab4\lab1\main.cpp : fatal error C1033: cannot open program database 'c:\users\anokta\google drive\visual studio 2012\projects\cs7055\2\lab4\lab1\debug\vc110.idb'
+1>
+1>Build FAILED.
+1>
+1>Time Elapsed 00:00:00.20
+========== Build: 0 succeeded, 1 failed, 0 up-to-date, 0 skipped ==========
