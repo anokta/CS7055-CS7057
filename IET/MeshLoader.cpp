@@ -501,3 +501,94 @@ void MeshLoader::normalizeVertices(std::vector<glm::vec3> &vertices)
 		vertices[i] /= vec3(sizeX, sizeY, sizeZ);
 	}
 }
+
+SkyboxMesh * MeshLoader::GenerateCubemapMesh(
+	const string& PosXFilename, const string& NegXFilename,
+	const string& PosYFilename, const string& NegYFilename,
+	const string& PosZFilename, const string& NegZFilename)
+{
+	vec3 vertices[] = {
+		vec3(-10.0f,  10.0f, -10.0f),
+		vec3(-10.0f, -10.0f, -10.0f),
+		vec3(10.0f, -10.0f, -10.0f),
+		vec3(10.0f, -10.0f, -10.0f),
+		vec3(10.0f,  10.0f, -10.0f),
+		vec3(-10.0f,  10.0f, -10.0f),
+
+		vec3(-10.0f, -10.0f,  10.0f),
+		vec3(-10.0f, -10.0f, -10.0f),
+		vec3(-10.0f,  10.0f, -10.0f),
+		vec3(-10.0f,  10.0f, -10.0f),
+		vec3(-10.0f,  10.0f,  10.0f),
+		vec3(-10.0f, -10.0f,  10.0f),
+
+		vec3(10.0f, -10.0f, -10.0f),
+		vec3(10.0f, -10.0f,  10.0f),
+		vec3(10.0f,  10.0f,  10.0f),
+		vec3(10.0f,  10.0f,  10.0f),
+		vec3(10.0f,  10.0f, -10.0f),
+		vec3(10.0f, -10.0f, -10.0f),
+
+		vec3(-10.0f, -10.0f,  10.0f),
+		vec3(-10.0f,  10.0f,  10.0f),
+		vec3(10.0f,  10.0f,  10.0f),
+		vec3(10.0f,  10.0f,  10.0f),
+		vec3(10.0f, -10.0f,  10.0f),
+		vec3(-10.0f, -10.0f,  10.0f),
+
+		vec3(-10.0f,  10.0f, -10.0f),
+		vec3(10.0f,  10.0f, -10.0f),
+		vec3(10.0f,  10.0f,  10.0f),
+		vec3(10.0f,  10.0f,  10.0f),
+		vec3(-10.0f,  10.0f,  10.0f),
+		vec3(-10.0f,  10.0f, -10.0f),
+
+		vec3(-10.0f, -10.0f, -10.0f),
+		vec3(-10.0f, -10.0f,  10.0f),
+		vec3(10.0f, -10.0f, -10.0f),
+		vec3(10.0f, -10.0f, -10.0f),
+		vec3(-10.0f, -10.0f,  10.0f),
+		vec3(10.0f, -10.0f,  10.0)
+	};
+	
+	std::vector<vec3> v(std::begin(vertices), std::end(vertices));
+
+	SkyboxMesh * cubemap = new SkyboxMesh(v);
+	cubemap->SetTexture(loadCubemapTexture(PosXFilename, NegXFilename, PosYFilename, NegYFilename, PosZFilename, NegZFilename));
+
+	return cubemap;
+}
+
+GLuint MeshLoader::loadCubemapTexture(
+	const string& PosXFilename, const string& NegXFilename,
+	const string& PosYFilename, const string& NegYFilename,
+	const string& PosZFilename, const string& NegZFilename)
+{
+	string BaseDir = "..\\IET\\res\\";
+
+	string m_fileNames[6];
+	m_fileNames[0] = BaseDir + PosXFilename;
+	m_fileNames[1] = BaseDir + NegXFilename;
+	m_fileNames[2] = BaseDir + PosYFilename;
+	m_fileNames[3] = BaseDir + NegYFilename;
+	m_fileNames[4] = BaseDir + PosZFilename;
+	m_fileNames[5] = BaseDir + NegZFilename;
+
+	GLuint textureID = SOIL_load_OGL_cubemap (m_fileNames[0].c_str(),m_fileNames[1].c_str(),m_fileNames[2].c_str(),m_fileNames[3].c_str(),m_fileNames[4].c_str(),m_fileNames[5].c_str(),
+		SOIL_LOAD_RGB,
+		SOIL_CREATE_NEW_ID,
+		SOIL_FLAG_COMPRESS_TO_DXT
+		);
+	glTexParameteri (GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri (GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri (GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	glTexParameteri (GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri (GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+	if (0 == textureID) {
+		printf("SOIL loading error: '%s'\n", SOIL_last_result());
+		return -1;
+	}
+
+	return textureID;
+}

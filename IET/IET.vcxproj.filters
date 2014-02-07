@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
@@ -58,6 +58,9 @@
     <Filter Include="Source Files\Entities\RigidBody">
       <UniqueIdentifier>{0d0ffce1-d297-4fff-a2b4-90b97dee5301}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\Shaders\Skybox">
+      <UniqueIdentifier>{c0965ef4-84e4-4c95-9547-0bc5996571ae}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -84,6 +87,9 @@
     </Text>
     <Text Include="OrenNayarTextured.frag">
       <Filter>Resource Files\Shaders\Textured</Filter>
+    </Text>
+    <Text Include="Cubemap.vert">
+      <Filter>Resource Files\Shaders\Skybox</Filter>
     </Text>
   </ItemGroup>
   <ItemGroup>
@@ -159,10 +165,16 @@
     <ClInclude Include="RigidBody.h">
       <Filter>Header Files\Entities\RigidBody</Filter>
     </ClInclude>
-    <ClInclude Include="RigidBodyModel.h">
+    <ClInclude Include="Ellipsoid.h">
       <Filter>Header Files\Entities\RigidBody</Filter>
     </ClInclude>
-    <ClInclude Include="Ellipsoid.h">
+    <ClInclude Include="SkyboxMesh.h">
+      <Filter>Header Files\Graphics\Meshes</Filter>
+    </ClInclude>
+    <ClInclude Include="Skybox.h">
+      <Filter>Header Files\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="RigidBodyModel.h">
       <Filter>Header Files\Entities\RigidBody</Filter>
     </ClInclude>
   </ItemGroup>
@@ -230,6 +242,12 @@
     <ClCompile Include="Ellipsoid.cpp">
       <Filter>Source Files\Entities\RigidBody</Filter>
     </ClCompile>
+    <ClCompile Include="SkyboxMesh.cpp">
+      <Filter>Source Files\Graphics\Meshes</Filter>
+    </ClCompile>
+    <ClCompile Include="Skybox.cpp">
+      <Filter>Source Files\Entities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Default.frag">
@@ -249,6 +267,9 @@
     </None>
     <None Include="ToonTextured.frag">
       <Filter>Resource Files\Shaders\Textured</Filter>
+    </None>
+    <None Include="Cubemap.frag">
+      <Filter>Resource Files\Shaders\Skybox</Filter>
     </None>
   </ItemGroup>
 </Project>

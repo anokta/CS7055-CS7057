@@ -55,6 +55,8 @@ GenericShader::GenericShader(string vShaderFilepath, string fShaderFilepath, str
 
 	vUvID = glGetAttribLocation(programID, "vUv");
 	fTextureID = glGetUniformLocation(programID, "fTexture");
+
+	fCubeTextureID = glGetUniformLocation(programID, "fCubeTexture");
 }
 
 GenericShader::~GenericShader()
@@ -83,6 +85,23 @@ void GenericShader::UnbindTexture()
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	glDisable(GL_TEXTURE_2D);
+}
+
+void GenericShader::BindCubeTexture(GLuint textureID)
+{
+	glEnable(GL_TEXTURE_CUBE_MAP);
+
+	glUniform1i(fCubeTextureID, 0);
+	glActiveTexture(GL_TEXTURE0);
+
+	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+}
+
+void GenericShader::UnbindCubeTexture()
+{
+	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+
+	glDisable(GL_TEXTURE_CUBE_MAP);
 }
 
 void GenericShader::SetViewMatrix(const glm::mat4 &matrix) 

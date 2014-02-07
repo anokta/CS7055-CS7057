@@ -9,9 +9,22 @@ Camera::Camera(std::vector<GenericShader*> &s, glm::vec3 &e, glm::vec3 &t, glm::
 
 void Camera::Update(float deltaTime)
 {
+	glm::mat4 V = glm::lookAt(eye, target, up);
+
 	for(unsigned int i=0; i<shaders.size(); ++i)
 	{
-		shaders[i]->SetViewMatrix(glm::lookAt(eye, target, up));
-		shaders[i]->SetEyeVector(eye);
+		// skybox shader
+		if(shaders[i]->GetName().compare("Skybox") == 0)
+		{
+			glm::mat4 Vcopy(V);
+			Vcopy[3] = shaders[i]->GetViewMatrix()[3];
+			shaders[i]->SetViewMatrix(Vcopy);
+		}
+		// model shaders
+		else
+		{
+			shaders[i]->SetViewMatrix(V);
+			shaders[i]->SetEyeVector(eye);
+		}
 	}
 }

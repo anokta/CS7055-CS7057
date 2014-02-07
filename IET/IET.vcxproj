@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -93,6 +93,7 @@
     <Text Include="OrenNayarTextured.frag" />
     <Text Include="ReadMe.txt" />
     <Text Include="SepiaDiffuse.frag" />
+    <Text Include="Cubemap.vert" />
     <Text Include="Toon.frag" />
     <Text Include="Default.vert" />
   </ItemGroup>
@@ -118,6 +119,8 @@
     <ClInclude Include="Particle.h" />
     <ClInclude Include="RigidBody.h" />
     <ClInclude Include="RigidBodyModel.h" />
+    <ClInclude Include="Skybox.h" />
+    <ClInclude Include="SkyboxMesh.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="TexturedSimpleMesh.h" />
@@ -143,11 +146,14 @@
     <ClCompile Include="Particle.cpp" />
     <ClCompile Include="RigidBody.cpp" />
     <ClCompile Include="RigidBodyModel.cpp" />
+    <ClCompile Include="Skybox.cpp" />
+    <ClCompile Include="SkyboxMesh.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="TexturedSimpleMesh.cpp" />
     <ClCompile Include="TexturedIndexedMesh.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Cubemap.frag" />
     <None Include="Default.frag" />
     <None Include="DefaultTextured.frag" />
     <None Include="DiffuseTextured.frag" />

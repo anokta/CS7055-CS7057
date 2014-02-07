@@ -18,6 +18,8 @@ public:
 	inline glm::vec3 GetTargetVector() const { return target; }
 	inline glm::vec3 GetUpVector() const { return up; }
 
+	inline glm::mat4 GetViewMatrix() const { return glm::lookAt(eye, target, up); }
+
 	inline void SetEyeVector(const glm::vec3 &e) { eye = e; }
 	inline void SetTargetVector(const glm::vec3 &t) { target = t; }
 	inline void SetUpVector(const glm::vec3 &u) { up = u; } 

@@ -15,7 +15,7 @@ RigidBodyModel::RigidBodyModel(RigidBody *b, GenericShader * s, GenericShader * 
 	switch(body->GetType())
 	{
 	case RigidBody::BODY_TYPE::BOX:
-		modelMesh = MeshLoader::GenerateTexturedCubeMesh("..\\IET\\res\\box2.jpg");
+		modelMesh = MeshLoader::LoadMesh("..\\IET\\res\\block.dae", "..\\IET\\res\\block.tga");
 		break;
 
 	case RigidBody::BODY_TYPE::BALL:
@@ -42,12 +42,12 @@ RigidBodyModel::RigidBodyModel(RigidBody *b, GenericShader * s, GenericShader * 
 
 RigidBodyModel::~RigidBodyModel()
 {
+	EntityManager::GetInstance()->RemoveDrawable(this);	
+	EntityManager::GetInstance()->RemoveUpdatable(this);
+
 	delete body;
 	delete modelMesh;
 	delete boundingBox;
-
-	EntityManager::GetInstance()->RemoveDrawable(this);	
-	EntityManager::GetInstance()->RemoveUpdatable(this);
 }
 
 void RigidBodyModel::ChangeShader(GenericShader * s)

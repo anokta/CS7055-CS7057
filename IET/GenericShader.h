@@ -46,6 +46,9 @@ public:
 	void BindTexture(GLuint textureID);
 	void UnbindTexture();
 
+	void BindCubeTexture(GLuint textureID);
+	void UnbindCubeTexture();
+
 	void UseProgram();
 
 protected:
@@ -61,6 +64,8 @@ protected:
 	GLuint vUvID, fTextureID;
 	GLuint viewID, projectionID, modelID;
 	GLuint eyeID;
+	
+	GLuint fCubeTextureID;
 
 	GLuint ambientColorID, ambientIntensityID;	
 	GLuint diffuseColorID, diffuseIntensityID, diffuseDirectionID;

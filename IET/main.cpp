@@ -7,6 +7,7 @@
 #include "AudioManager.h"
 
 #include "Camera.h"
+#include "Skybox.h"
 
 #include "RigidBodyModel.h"
 #include "Box.h"
@@ -41,6 +42,7 @@ vector<RigidBodyModel*> rigidBodies;
 int currentBodyIndex;
 
 Camera * camera; 
+Skybox * skybox;
 bool freeMode;
 
 vec3 currentColor, nextColor;
@@ -213,7 +215,7 @@ void keyPressed(unsigned char key, int x, int y)
 		break;
 
 	case 8:
-		currentShaderIndex = (currentShaderIndex + shaders.size() - 3) % (shaders.size() - 1);
+		currentShaderIndex = (currentShaderIndex - 4) % (shaders.size() - 2) + 2;
 
 		for(unsigned int i=0; i<rigidBodies.size(); ++i)
 		{
@@ -227,7 +229,7 @@ void keyPressed(unsigned char key, int x, int y)
 
 		break;
 	case 13:
-		currentShaderIndex = (currentShaderIndex + 2) % (shaders.size() - 1);
+		currentShaderIndex = currentShaderIndex % (shaders.size() - 2) + 2;
 
 		for(unsigned int i=0; i<rigidBodies.size(); ++i)
 		{
@@ -407,6 +409,9 @@ void init()
 	// Set up the shaders
 	GenericShader * lineShader = new GenericShader("Default.vert", "Default.frag");
 	shaders.push_back(lineShader);
+	
+	GenericShader * skyboxShader = new GenericShader("Cubemap.vert", "Cubemap.frag", "Skybox");
+	shaders.push_back(skyboxShader);
 
 	GenericShader * constantShader = new GenericShader("Default.vert", "Constant.frag", "Fixed Color");
 	shaders.push_back(constantShader);
@@ -432,6 +437,8 @@ void init()
 	shaders.push_back(orenNayarShader);
 	GenericShader * orenNayarTexturedShader = new GenericShader("Textured.vert", "OrenNayarTextured.frag");
 	shaders.push_back(orenNayarTexturedShader);
+
+
 
 	for(unsigned int i=0; i<shaders.size(); ++i)
 	{
@@ -462,10 +469,12 @@ void init()
 		shaders[i]->SetRoughness(roughness);
 	}
 
-	currentShaderIndex = 1;
+	currentShaderIndex = 2;
 
 	// Create the camera
 	camera = new Camera(shaders, vec3(0,0,10), vec3(0,0,0), vec3(0,1,0));
+	skybox = new Skybox(shaders[1]);	
+	
 	freeMode = true;
 	pause = false;
 
