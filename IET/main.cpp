@@ -313,8 +313,8 @@ void update(int frame)
 		audioManager->Update();
 
 		// Update lighting
-		if (currentColor != nextColor)
-			currentColor = mix(currentColor, nextColor, 16 * DELTA_TIME);
+		//if (currentColor != nextColor)
+		//	currentColor = mix(currentColor, nextColor, 16 * DELTA_TIME);
 
 		//Update camera motion
 		if(!freeMode)
