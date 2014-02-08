@@ -15,18 +15,21 @@
 #include "Ellipsoid.h"
 #include "Cat.h"
 
-#include "HelperFunctions.h"
-
 #include "MeshLoader.h"
+
+#include "HelperFunctions.h"
 
 using namespace std;
 using namespace glm;
 
+// Update interval
 const int FrameRate = 40;
 const float DELTA_TIME = 1.0f/FrameRate;
 
+// Audio
 AudioManager * audioManager;
 
+// Shading properties
 vector<GenericShader*> shaders;
 int currentShaderIndex;
 
@@ -38,14 +41,15 @@ float specularIntensity;
 
 float roughness, shininess;
 
-vector<RigidBodyModel*> rigidBodies;
-int currentBodyIndex;
-
+// Camera
 Camera * camera; 
 Skybox * skybox;
 bool freeMode;
 
-vec3 currentColor, nextColor;
+// Entities
+vector<RigidBodyModel*> rigidBodies;
+int currentBodyIndex;
+
 
 float gravity = -2.0f;
 
@@ -136,39 +140,11 @@ void mouseDragged(int x, int y)
 	mouseY = y;
 }
 
-void specialKeyPressed(int key, int x, int y)
-{
-	switch(key)
-	{
-	case GLUT_KEY_LEFT:
-		directionalLightDirection = normalize(toMat3(quat(vec3(0.0f, -0.1f, 0.0f))) * directionalLightDirection);
-		for(unsigned int i=0; i<shaders.size(); ++i)
-			shaders[i]->SetDirectionalLight(directionalLightDirection, vec3(1,1,1), directionalLightIntensity);
-		break;
-	case GLUT_KEY_RIGHT:
-		directionalLightDirection = normalize(toMat3(quat(vec3(0.0f, 0.1f, 0.0f))) * directionalLightDirection);
-		for(unsigned int i=0; i<shaders.size(); ++i)
-			shaders[i]->SetDirectionalLight(directionalLightDirection, vec3(1,1,1), directionalLightIntensity);
-		break;
-	case GLUT_KEY_UP:
-		directionalLightDirection = normalize(toMat3(quat(vec3(-0.1f, 0.0f, 0.0f))) * directionalLightDirection);
-		for(unsigned int i=0; i<shaders.size(); ++i)
-			shaders[i]->SetDirectionalLight(directionalLightDirection, vec3(1,1,1), directionalLightIntensity);
-		break;
-	case GLUT_KEY_DOWN:
-		directionalLightDirection = normalize(toMat3(quat(vec3(0.1f, 0.0f, 0.0f))) * directionalLightDirection);
-		for(unsigned int i=0; i<shaders.size(); ++i)
-			shaders[i]->SetDirectionalLight(directionalLightDirection, vec3(1,1,1), directionalLightIntensity);
-		break;
-	}
-}
-
 void keyPressed(unsigned char key, int x, int y)
 {
 	if(key > 48 && key < 58)
 	{
 		currentBodyIndex = std::min((int)(rigidBodies.size()-1), (int)(key - 49));
-		//audioManager->ChangeSong(key-49);
 		return;
 	}
 
@@ -292,6 +268,33 @@ void keyPressed(unsigned char key, int x, int y)
 	}
 }
 
+void specialKeyPressed(int key, int x, int y)
+{
+	switch(key)
+	{
+	case GLUT_KEY_LEFT:
+		directionalLightDirection = normalize(toMat3(quat(vec3(0.0f, -0.1f, 0.0f))) * directionalLightDirection);
+		for(unsigned int i=0; i<shaders.size(); ++i)
+			shaders[i]->SetDirectionalLight(directionalLightDirection, vec3(1,1,1), directionalLightIntensity);
+		break;
+	case GLUT_KEY_RIGHT:
+		directionalLightDirection = normalize(toMat3(quat(vec3(0.0f, 0.1f, 0.0f))) * directionalLightDirection);
+		for(unsigned int i=0; i<shaders.size(); ++i)
+			shaders[i]->SetDirectionalLight(directionalLightDirection, vec3(1,1,1), directionalLightIntensity);
+		break;
+	case GLUT_KEY_UP:
+		directionalLightDirection = normalize(toMat3(quat(vec3(-0.1f, 0.0f, 0.0f))) * directionalLightDirection);
+		for(unsigned int i=0; i<shaders.size(); ++i)
+			shaders[i]->SetDirectionalLight(directionalLightDirection, vec3(1,1,1), directionalLightIntensity);
+		break;
+	case GLUT_KEY_DOWN:
+		directionalLightDirection = normalize(toMat3(quat(vec3(0.1f, 0.0f, 0.0f))) * directionalLightDirection);
+		for(unsigned int i=0; i<shaders.size(); ++i)
+			shaders[i]->SetDirectionalLight(directionalLightDirection, vec3(1,1,1), directionalLightIntensity);
+		break;
+	}
+}
+
 #pragma endregion INPUT_HANDLERS
 
 void display(){
@@ -311,12 +314,8 @@ void update(int frame)
 {
 	if(!pause)
 	{
-		// Update audio particleSystem
-		audioManager->Update();
-
-		// Update lighting
-		//if (currentColor != nextColor)
-		//	currentColor = mix(currentColor, nextColor, 16 * DELTA_TIME);
+		// Update audio manager
+		//audioManager->Update();
 
 		//Update camera motion
 		if(!freeMode)
@@ -326,7 +325,6 @@ void update(int frame)
 		} 
 
 		// Update entitities
-
 		if(rigidBodies.size() < 20)
 		{
 			if(rand() % 10 < 5)
@@ -389,11 +387,10 @@ void update(int frame)
 		}
 
 		for(unsigned int i=0; i<rigidBodies.size(); ++i)
-			rigidBodies[i]->ChangeColor(colliding[i] ? vec4(1,0,0,1) : vec4(0,1,0,1));//rigidBodies[i]->SetGizmos(colliding[i]);
+			rigidBodies[i]->ChangeGizmoColor(colliding[i] ? vec4(1,0,0,1) : vec4(0,1,0,1));
 		delete [] colliding;
 
 		EntityManager::GetInstance()->UpdateEntities(DELTA_TIME);
-
 	}
 
 	// Re-trigger update callback
@@ -453,8 +450,8 @@ void init()
 		shaders[i]->SetModelMatrix(mat4(1.0f));
 
 		// Lighting
-		ambientLightIntensity = 0.2f;
-		directionalLightIntensity = 0.8f;
+		ambientLightIntensity = 0.3f;
+		directionalLightIntensity = 0.7f;
 		specularIntensity = 0.5f;
 
 		shaders[i]->SetAmbientLight(vec3(1,1,1), ambientLightIntensity);
@@ -476,13 +473,14 @@ void init()
 	skybox = new Skybox(shaders[1]);	
 	
 	freeMode = true;
-	pause = false;
 
 	rigidBodies.push_back(new RigidBodyModel(new Ball(vec3(-5,0,0)), shaders[currentShaderIndex+1], shaders[0]));
 	rigidBodies.push_back(new RigidBodyModel(new Cat(vec3(-2,0,0), quat(), vec3(0.5f, 1.0f, 2.0f)), shaders[currentShaderIndex+1], shaders[0]));
 	rigidBodies.push_back(new RigidBodyModel(new Ellipsoid(vec3(2,0,0), quat(), vec3(0.7f, 0.4f, 0.5f)), shaders[currentShaderIndex], shaders[0]));
 	rigidBodies.push_back(new RigidBodyModel(new Box(vec3(5,0,0), quat(), vec3(1.0f, 0.4f, 1.5f)), shaders[currentShaderIndex+1], shaders[0]));
 	currentBodyIndex = 0;
+
+	pause = false;
 
 	// OpenGL initial setup
 	glClearColor(0.01f, 0.01f, 0.02f, 0.0f);
@@ -491,11 +489,8 @@ void init()
 	glEnable(GL_DEPTH_FUNC);
 	glDepthFunc(GL_LEQUAL);
 
-	//glEnable(GL_BLEND);
-	//glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
 	// Start music
-	audioManager->StartMusic();
+	//audioManager->StartMusic();
 } 
 
 void releaseResources()
@@ -524,7 +519,6 @@ int main(int argc, char** argv){
 
 	glutIdleFunc(idle);
 	glutTimerFunc(1000/FrameRate, update, 0);
-
 
 	// Input handling functions
 	glutMouseFunc(mousePressed);

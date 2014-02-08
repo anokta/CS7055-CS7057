@@ -20,7 +20,7 @@ public:
 	
 	void ChangeShader(GenericShader * s);
 
-	inline void ChangeColor(glm::vec4 & color) { boundingBox->ChangeColor(color); }
+	inline void ChangeGizmoColor(glm::vec4 & color) { boundingBox->ChangeColor(color); }
 
 	void Draw();
 	void Update(float deltaTime);
