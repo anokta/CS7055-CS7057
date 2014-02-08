@@ -353,8 +353,9 @@ void update(int frame)
 
 		}
 
-		bool * colliding = new bool[rigidBodies.size()];
-		for(unsigned int i=0; i<rigidBodies.size(); ++i) colliding[i] = false;
+		
+		for(unsigned int i=0; i<rigidBodies.size(); ++i)
+			rigidBodies[i]->GetBody()->SetCollided(false);
 
 		for(unsigned int i=0; i<rigidBodies.size(); ++i)
 		{
@@ -380,15 +381,15 @@ void update(int frame)
 			{
 				if(rigidBodies[i]->GetBody()->CheckCollision(rigidBodies[j]->GetBody()))
 				{
-					colliding[i] = true;
-					colliding[j] = true;
+					rigidBodies[i]->GetBody()->SetCollided(true);
+					rigidBodies[j]->GetBody()->SetCollided(true);
+
+					cout << i << " and " << j << " is collided." << endl;
 				}
 			}
-		}
 
-		for(unsigned int i=0; i<rigidBodies.size(); ++i)
-			rigidBodies[i]->ChangeGizmoColor(colliding[i] ? vec4(1,0,0,1) : vec4(0,1,0,1));
-		delete [] colliding;
+			rigidBodies[i]->ChangeGizmoColor(rigidBodies[i]->GetBody()->IsCollided() ? vec4(1,0,0,1) : vec4(0,1,0,1));
+		}
 
 		EntityManager::GetInstance()->UpdateEntities(DELTA_TIME);
 	}

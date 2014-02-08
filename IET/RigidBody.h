@@ -26,6 +26,10 @@ public:
 
 	inline glm::vec3 GetForce() const { return force; }
 	inline glm::vec3 GetTorque() const { return torque; }
+
+	inline bool IsCollided() { return collided; }
+	
+	glm::mat4 GetTransformationMatrix();
 	
 	// Setters
 	inline void SetPosition(const glm::vec3 &p) { position = p; }
@@ -40,9 +44,9 @@ public:
 
 	inline void AddForce(const glm::vec3 &f) { force += f; }
 	inline void ApplyGravity(float g) { force += glm::vec3(0, mass, 0) * g; }
-	
-	glm::mat4 GetTransformationMatrix();
 
+	inline void SetCollided(bool c) { collided = c; }
+	
 	bool CheckCollision(RigidBody * body);
 
 	void Update(float deltaTime);
@@ -62,6 +66,11 @@ protected:
 
 	float mass;
 	glm::mat3 inverseI;
+
+	bool collided;
+
+	bool checkCollisionBroad(RigidBody * body);
+	bool checkCollisionNarrow(RigidBody * body);
 };
 
 #endif

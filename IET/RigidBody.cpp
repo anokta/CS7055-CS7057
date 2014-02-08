@@ -20,6 +20,8 @@ RigidBody::RigidBody(vec3 &p, quat &o, vec3 &s, float m)
 	torque = vec3();
 
 	mass = m;
+
+	collided = false;
 }
 
 
@@ -32,22 +34,31 @@ mat4 RigidBody::GetTransformationMatrix()
 	return T * R * S;
 }
 
-
 bool RigidBody::CheckCollision(RigidBody * body)
 {
+	if(checkCollisionBroad(body))
+	{
+		return checkCollisionNarrow(body);
+	}
+
+	return false;
+}
+
+bool RigidBody::checkCollisionBroad(RigidBody * body)
+{
 	mat3 aOrientation = toMat3(orientation);
-	vec3 aX = aOrientation * vec3(1,0,0);
-	vec3 aY = aOrientation * vec3(0,1,0);
-	vec3 aZ = aOrientation * vec3(0,0,1);
+	vec3 aX = normalize(aOrientation * vec3(1,0,0));
+	vec3 aY = normalize(aOrientation * vec3(0,1,0));
+	vec3 aZ = normalize(aOrientation * vec3(0,0,1));
 
 	float aW = scale.x / 2.0f;
 	float aH = scale.y / 2.0f;
 	float aD = scale.z / 2.0f;
 
 	mat3 bOrientation = toMat3(body->GetOrientation());
-	vec3 bX = bOrientation * vec3(1,0,0);
-	vec3 bY = bOrientation * vec3(0,1,0);
-	vec3 bZ = bOrientation * vec3(0,0,1);
+	vec3 bX = normalize(bOrientation * vec3(1,0,0));
+	vec3 bY = normalize(bOrientation * vec3(0,1,0));
+	vec3 bZ = normalize(bOrientation * vec3(0,0,1));
 
 	vec3 bScale = body->GetScale();
 	float bW = bScale.x / 2.0f;
@@ -103,6 +114,11 @@ bool RigidBody::CheckCollision(RigidBody * body)
 	bool AzBz = (dot(T, cross(aZ, bZ)) > (abs(aW * dot(aY, bZ)) + abs(aH * dot(aX, bZ)) + abs(bW * dot(aZ, bY)) + abs(bH * dot(aZ, bX))));
 	if(AzBz) return false;
 
+	return true;
+}
+
+bool RigidBody::checkCollisionNarrow(RigidBody * body)
+{
 	return true;
 }
 
