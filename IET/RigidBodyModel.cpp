@@ -24,6 +24,10 @@ RigidBodyModel::RigidBodyModel(RigidBody *b, GenericShader * s, GenericShader * 
 
 	case RigidBody::BODY_TYPE::ELLIPSOID:
 		modelMesh = MeshLoader::GenerateSphereMesh(40);
+		break;	
+	
+	case RigidBody::BODY_TYPE::PLANE:
+		modelMesh = MeshLoader::GeneratePlaneMesh();
 		break;
 
 	case RigidBody::BODY_TYPE::CAT:
@@ -33,8 +37,8 @@ RigidBodyModel::RigidBodyModel(RigidBody *b, GenericShader * s, GenericShader * 
 
 	modelMesh->SetShader(modelShader);
 
-	boundingBox = MeshLoader::GenerateBoundingBox();
-	boundingBox->SetShader(lineShader);
+	gizmos["BoundingBox"] = MeshLoader::GenerateBoundingBox();
+	gizmos["BoundingBox"]->SetShader(lineShader);
 
 	EntityManager::GetInstance()->AddDrawable(this);
 	EntityManager::GetInstance()->AddUpdatable(this);
@@ -46,8 +50,12 @@ RigidBodyModel::~RigidBodyModel()
 	EntityManager::GetInstance()->RemoveUpdatable(this);
 
 	delete body;
+
 	delete modelMesh;
-	delete boundingBox;
+	
+	for(auto gizmo : gizmos)
+		delete gizmo.second;
+	gizmos.clear();
 }
 
 void RigidBodyModel::ChangeShader(GenericShader * s)
@@ -72,7 +80,8 @@ void RigidBodyModel::Draw()
 		M = lineShader->GetModelMatrix();
 
 		lineShader->SetModelMatrix(M * body->GetTransformationMatrix());
-		boundingBox->Render(lineShader);
+		for(auto gizmo : gizmos)
+			gizmo.second->Render(lineShader);
 		lineShader->SetModelMatrix(M);
 	}
 }

@@ -177,6 +177,9 @@
     <ClInclude Include="RigidBodyModel.h">
       <Filter>Header Files\Entities\RigidBody</Filter>
     </ClInclude>
+    <ClInclude Include="Plane.h">
+      <Filter>Header Files\Entities\RigidBody</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -247,6 +250,9 @@
     </ClCompile>
     <ClCompile Include="Skybox.cpp">
       <Filter>Source Files\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="Plane.cpp">
+      <Filter>Source Files\Entities\RigidBody</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

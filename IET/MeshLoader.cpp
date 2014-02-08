@@ -429,6 +429,40 @@ TexturedSimpleMesh * MeshLoader::GenerateTexturedCubeMesh(const string &textureP
 	return cube;
 }
 
+SimpleMesh * MeshLoader::GeneratePlaneMesh()
+{
+	vec3 vertices[] =
+	{
+		vec3(-0.5f, 0.0f, -0.5f),
+		vec3(-0.5f, 0.0f, 0.5f),
+		vec3(0.5f, 0.0f, -0.5f),
+		vec3(0.5f, 0.0f, -0.5f),
+		vec3(-0.5f, 0.0f, 0.5f),
+		vec3(0.5f, 0.0f, 0.5f),
+	};
+
+	std::vector<vec3> v(std::begin(vertices), std::end(vertices));
+
+	std::vector<vec4> c;
+	for(unsigned int i=0; i<v.size(); ++i)
+		c.push_back(vec4(1.0f, 1.0f, 1.0f, 1.0f));
+	
+	// Calculate Normals
+	std::vector<vec3> n;
+	for(unsigned int i=0; i<v.size(); i+=3)
+	{
+		vec3 v1 = v[i+1] - v[i];
+		vec3 v2 = v[i+2] - v[i];
+
+		vec3 norm = normalize(cross(v1, v2));
+		n.push_back(norm);
+		n.push_back(norm);
+		n.push_back(norm);
+	}
+
+	return new SimpleMesh(v, c, n);
+}
+
 Line * MeshLoader::GenerateBoundingBox()
 {
 	vec3 vertices[] = 
@@ -448,15 +482,14 @@ Line * MeshLoader::GenerateBoundingBox()
 		vec3(0.5f, -0.5f, 0.5f),
 		vec3(0.5f, 0.5f, 0.5f),
 		vec3(0.5f, 0.5f, -0.5f),
-		vec3(0.5f, -0.5f, -0.5f),
-
+		vec3(0.5f, -0.5f, -0.5f)
 	};
 
 	std::vector<vec3> v(std::begin(vertices), std::end(vertices));
 
 	std::vector<vec4> c;
 	for(unsigned int i=0; i<v.size(); ++i)
-		c.push_back(vec4(1.0f, 0.0f, 0.0f, 1.0f));
+		c.push_back(vec4(0.0f, 0.0f, 0.0f, 1.0f));
 
 	return new Line(v, c);
 }
@@ -509,7 +542,7 @@ SkyboxMesh * MeshLoader::GenerateCubemapMesh(
 		vec3(-5.0f, -5.0f,  5.0f),
 		vec3(5.0f, -5.0f,  10.0)
 	};
-	
+
 	std::vector<vec3> v(std::begin(vertices), std::end(vertices));
 
 	SkyboxMesh * cubemap = new SkyboxMesh(v);

@@ -19,6 +19,8 @@ public:
 	static SimpleMesh * GenerateSphereMesh(int numSegments);
 	static TexturedSimpleMesh * GenerateTexturedCubeMesh(const std::string &texturePath);
 
+	static SimpleMesh * GeneratePlaneMesh();
+
 	static Line * GenerateBoundingBox();
 
 	static SkyboxMesh * GenerateCubemapMesh(const std::string& PosXFilename,

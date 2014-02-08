@@ -13,6 +13,7 @@
 #include "Box.h"
 #include "Ball.h"
 #include "Ellipsoid.h"
+#include "Plane.h"
 #include "Cat.h"
 
 #include "MeshLoader.h"
@@ -195,7 +196,7 @@ void keyPressed(unsigned char key, int x, int y)
 
 		for(unsigned int i=0; i<rigidBodies.size(); ++i)
 		{
-			if(rigidBodies[i]->GetBody()->GetType() == RigidBody::ELLIPSOID)
+			if(rigidBodies[i]->GetBody()->GetType() == RigidBody::ELLIPSOID || rigidBodies[i]->GetBody()->GetType() == RigidBody::PLANE)
 				rigidBodies[i]->ChangeShader(shaders[currentShaderIndex]);
 			else if(rigidBodies[i]->GetBody()->GetType() == RigidBody::BOX || rigidBodies[i]->GetBody()->GetType() == RigidBody::CAT || rigidBodies[i]->GetBody()->GetType() == RigidBody::BALL)
 				rigidBodies[i]->ChangeShader(shaders[currentShaderIndex+1]);
@@ -209,7 +210,7 @@ void keyPressed(unsigned char key, int x, int y)
 
 		for(unsigned int i=0; i<rigidBodies.size(); ++i)
 		{
-			if(rigidBodies[i]->GetBody()->GetType() == RigidBody::ELLIPSOID)
+			if(rigidBodies[i]->GetBody()->GetType() == RigidBody::ELLIPSOID || rigidBodies[i]->GetBody()->GetType() == RigidBody::PLANE)
 				rigidBodies[i]->ChangeShader(shaders[currentShaderIndex]);
 			else if(rigidBodies[i]->GetBody()->GetType() == RigidBody::BOX || rigidBodies[i]->GetBody()->GetType() == RigidBody::CAT || rigidBodies[i]->GetBody()->GetType() == RigidBody::BALL)
 				rigidBodies[i]->ChangeShader(shaders[currentShaderIndex+1]);
@@ -320,7 +321,7 @@ void update(int frame)
 		//Update camera motion
 		if(!freeMode)
 		{
-			camera->SetEyeVector(mix(camera->GetEyeVector(), vec3(0, 0, 10), DELTA_TIME));
+			camera->SetEyeVector(mix(camera->GetEyeVector(), vec3(0, 0, 12), DELTA_TIME));
 			camera->SetTargetVector(mix(camera->GetTargetVector(), vec3(0, 0, 0), DELTA_TIME * 2));
 		} 
 
@@ -364,12 +365,6 @@ void update(int frame)
 
 			vec3 p = rigidBodies[i]->GetBody()->GetPosition();
 
-			//if((gravity < 0  && p.y < -25) || (gravity > 0  && p.y > 25)) 
-			//{
-			//	delete rigidBodies[i];
-			//	rigidBodies.erase(rigidBodies.begin() + i);
-			//}
-
 			if(p.y < -10) 
 			{
 				rigidBodies[i]->GetBody()->SetLinearMomentum(
@@ -377,6 +372,7 @@ void update(int frame)
 				rigidBodies[i]->GetBody()->SetForce(vec3(0, 10, 0));
 			}
 
+			// Detect collisions
 			for(unsigned int j=i+1; j<rigidBodies.size(); ++j)
 			{
 				if(rigidBodies[i]->GetBody()->CheckCollision(rigidBodies[j]->GetBody()))
@@ -384,14 +380,20 @@ void update(int frame)
 					rigidBodies[i]->GetBody()->SetCollided(true);
 					rigidBodies[j]->GetBody()->SetCollided(true);
 
-					cout << i << " and " << j << " is collided." << endl;
+					cout << i << "\tand\t" << j << "\tis collided." << endl;
 				}
 			}
-
-			rigidBodies[i]->ChangeGizmoColor(rigidBodies[i]->GetBody()->IsCollided() ? vec4(1,0,0,1) : vec4(0,1,0,1));
+			
+			rigidBodies[i]->UpdateGizmoColor();	
 		}
 
+		cout << endl;
+
 		EntityManager::GetInstance()->UpdateEntities(DELTA_TIME);
+	}
+	else
+	{
+		camera->Update(DELTA_TIME);
 	}
 
 	// Re-trigger update callback
@@ -467,18 +469,19 @@ void init()
 		shaders[i]->SetRoughness(roughness);
 	}
 
-	currentShaderIndex = 2;
+	currentShaderIndex = 8;
 
 	// Create the camera
-	camera = new Camera(shaders, vec3(0,0,10), vec3(0,0,0), vec3(0,1,0));
+	camera = new Camera(shaders, vec3(0,0,12), vec3(0,0,0), vec3(0,1,0));
 	skybox = new Skybox(shaders[1]);	
 	
 	freeMode = true;
 
-	rigidBodies.push_back(new RigidBodyModel(new Ball(vec3(-5,0,0)), shaders[currentShaderIndex+1], shaders[0]));
-	rigidBodies.push_back(new RigidBodyModel(new Cat(vec3(-2,0,0), quat(), vec3(0.5f, 1.0f, 2.0f)), shaders[currentShaderIndex+1], shaders[0]));
-	rigidBodies.push_back(new RigidBodyModel(new Ellipsoid(vec3(2,0,0), quat(), vec3(0.7f, 0.4f, 0.5f)), shaders[currentShaderIndex], shaders[0]));
-	rigidBodies.push_back(new RigidBodyModel(new Box(vec3(5,0,0), quat(), vec3(1.0f, 0.4f, 1.5f)), shaders[currentShaderIndex+1], shaders[0]));
+	rigidBodies.push_back(new RigidBodyModel(new Ball(vec3(-7,0,0)), shaders[currentShaderIndex+1], shaders[0]));
+	rigidBodies.push_back(new RigidBodyModel(new Cat(vec3(-3.5f,0,0), quat(), vec3(0.5f, 1.0f, 2.0f)), shaders[currentShaderIndex+1], shaders[0]));
+	rigidBodies.push_back(new RigidBodyModel(new Ellipsoid(vec3(0,0,0), quat(), vec3(0.7f, 0.4f, 0.5f)), shaders[currentShaderIndex], shaders[0]));
+	rigidBodies.push_back(new RigidBodyModel(new Plane(vec3(3.5f,0,0), quat(), vec2(1.0f, 2.0f)), shaders[currentShaderIndex], shaders[0]));
+	rigidBodies.push_back(new RigidBodyModel(new Box(vec3(7,0,0), quat(), vec3(1.0f, 0.4f, 1.5f)), shaders[currentShaderIndex+1], shaders[0]));
 	currentBodyIndex = 0;
 
 	pause = false;

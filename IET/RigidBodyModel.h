@@ -1,6 +1,8 @@
 #ifndef RIGID_BODY_MODEL
 #define RIGID_BODY_MODEL
 
+#include <map>
+
 #include "Drawable.h"
 #include "Updatable.h"
 
@@ -19,8 +21,9 @@ public:
 	inline RigidBody * GetBody() { return body; }
 	
 	void ChangeShader(GenericShader * s);
-
-	inline void ChangeGizmoColor(glm::vec4 & color) { boundingBox->ChangeColor(color); }
+	
+	inline void ChangeGizmoColor(glm::vec4 & color) { gizmos["BoundingBox"]->ChangeColor(color); }
+	inline void UpdateGizmoColor() { gizmos["BoundingBox"]->ChangeColor(body->IsCollided() ? glm::vec4(1,0,0,1) : glm::vec4(0,1,0,1)); }
 
 	void Draw();
 	void Update(float deltaTime);
@@ -34,7 +37,7 @@ private:
 	GenericShader * lineShader;
 
 	MeshBase * modelMesh;
-	Line * boundingBox;
+	std::map<std::string, Line *> gizmos;
 };
 
 #endif

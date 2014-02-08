@@ -108,6 +108,7 @@
     <ClInclude Include="Cat.h" />
     <ClInclude Include="Line.h" />
     <ClInclude Include="IndexedMesh.h" />
+    <ClInclude Include="Plane.h" />
     <ClInclude Include="SimpleMesh.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Drawable.h" />
@@ -136,6 +137,7 @@
     <ClCompile Include="Ellipsoid.cpp" />
     <ClCompile Include="Line.cpp" />
     <ClCompile Include="IndexedMesh.cpp" />
+    <ClCompile Include="Plane.cpp" />
     <ClCompile Include="SimpleMesh.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="EntitiyManager.cpp" />
