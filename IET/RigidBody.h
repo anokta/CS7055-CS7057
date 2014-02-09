@@ -28,7 +28,7 @@ public:
 	inline glm::vec3 GetTorque() const { return torque; }
 
 	inline std::vector<glm::vec3> GetPoints() { return points; }
-	inline bool IsCollided() { return collided; }
+	//inline bool IsCollided() { return collided; }
 	
 	glm::mat4 GetTransformationMatrix();
 	
@@ -47,7 +47,7 @@ public:
 	inline void ApplyGravity(const float g) { force += glm::vec3(0, mass, 0) * g; }
 
 	inline void SetPoints(const std::vector<glm::vec3> & vertices) { points = vertices; }
-	inline void SetCollided(const bool c) { collided = c; }
+	//inline void SetCollided(const bool c) { collided = c; }
 	
 	bool CheckCollisionBroad(RigidBody * body);
 	bool CheckCollisionNarrow(RigidBody * body);
@@ -72,7 +72,7 @@ protected:
 
 	std::vector<glm::vec3> points;
 
-	bool collided;
+	//bool collided;
 
 	bool checkSimplex(std::vector<glm::vec3> &simplex, glm::vec3 &direction);
 	bool checkTriangle(std::vector<glm::vec3> &simplex, glm::vec3 &direction);

@@ -19,11 +19,12 @@ public:
 	~RigidBodyModel();
 
 	inline RigidBody * GetBody() { return body; }
+	inline glm::vec4 GetGizmoColor() { return gizmoColor; }
 	
 	void ChangeShader(GenericShader * s);
 	
-	inline void ChangeGizmoColor(glm::vec4 & color) { gizmos["BoundingBox"]->ChangeColor(color); }
-	inline void UpdateGizmoColor() { gizmos["BoundingBox"]->ChangeColor(body->IsCollided() ? glm::vec4(1,0,0,1) : glm::vec4(0,1,0,1)); }
+	inline void SetGizmoColor(glm::vec4 & color) { gizmoColor = color; }
+	inline void UpdateGizmoColor() { gizmos["BoundingBox"]->ChangeColor(gizmoColor); } //body->IsCollided() ? glm::vec4(1,0,0,1) : glm::vec4(0,1,0,1)); }
 
 	bool DetectCollision(RigidBodyModel * rigidBodyModel);
 
@@ -40,6 +41,7 @@ private:
 
 	MeshBase * modelMesh;
 	std::map<std::string, Line *> gizmos;
+	glm::vec4 gizmoColor;
 };
 
 #endif

@@ -111,6 +111,11 @@ bool RigidBodyModel::DetectCollision(RigidBodyModel * rigidBodyModel)
 
 	if(body->CheckCollisionBroad(rigidBodyModel->GetBody()))
 	{	
+		if(gizmoColor.r == 0)
+			gizmoColor = vec4(1,1,0,1);
+		if(rigidBodyModel->GetGizmoColor().r == 0)
+			rigidBodyModel->SetGizmoColor(vec4(1,1,0,1));
+
 		//std::cout << "Broad Collided. . . ";
 		if(body->CheckCollisionNarrow(rigidBodyModel->GetBody()))
 		{

@@ -362,7 +362,7 @@ void update(int frame)
 
 		
 		for(unsigned int i=0; i<rigidBodies.size(); ++i)
-			rigidBodies[i]->GetBody()->SetCollided(false);
+			rigidBodies[i]->SetGizmoColor(vec4(0,1,0,1));
 
 		for(unsigned int i=0; i<rigidBodies.size(); ++i)
 		{
@@ -383,8 +383,10 @@ void update(int frame)
 			{
 				if(rigidBodies[i]->DetectCollision(rigidBodies[j]))//rigidBodies[i]->GetBody()->CheckCollision(rigidBodies[j]->GetBody()))
 				{
-					rigidBodies[i]->GetBody()->SetCollided(true);
-					rigidBodies[j]->GetBody()->SetCollided(true);
+					rigidBodies[i]->SetGizmoColor(vec4(1,0,0,1));
+					rigidBodies[j]->SetGizmoColor(vec4(1,0,0,1));
+					//rigidBodies[i]->GetBody()->SetCollided(true);
+					//rigidBodies[j]->GetBody()->SetCollided(true);
 
 					//cout << i << "\tand\t" << j << "\tis collided." << endl;
 				}
@@ -459,8 +461,8 @@ void init()
 		shaders[i]->SetModelMatrix(mat4(1.0f));
 
 		// Lighting
-		ambientLightIntensity = 0.3f;
-		directionalLightIntensity = 0.7f;
+		ambientLightIntensity = 0.4f;
+		directionalLightIntensity = 0.6f;
 		specularIntensity = 0.5f;
 
 		shaders[i]->SetAmbientLight(vec3(1,1,1), ambientLightIntensity);
@@ -479,7 +481,7 @@ void init()
 
 	// Create the camera
 	camera = new Camera(shaders, vec3(0,0,12), vec3(0,0,0), vec3(0,1,0));
-	skybox = new Skybox(shaders[1]);	
+	//skybox = new Skybox(shaders[1]);	
 	
 	freeMode = true;
 

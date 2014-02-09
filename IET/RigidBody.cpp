@@ -22,8 +22,6 @@ RigidBody::RigidBody(vec3 &p, quat &o, vec3 &s, float m)
 	torque = vec3();
 
 	mass = m;
-
-	collided = false;
 }
 
 
@@ -136,17 +134,19 @@ bool RigidBody::CheckCollisionNarrow(RigidBody * body)
 
 		if(dot(mDiff, direction) < 0)
 		{
-			std::cout << "No Intersection" << std::endl;
+			//std::cout << "No Intersection" << std::endl;
 			return false;
 		}
 		simplex.push_back(mDiff);
 
 		if(checkSimplex(simplex, direction))
 		{
-			std::cout << "Intersection" << std::endl;
+			//std::cout << "Intersection" << std::endl;
 			return true;
 		}
 	}
+
+	std::cout << "Limit exceeded." << std::endl;
 
 	return false;
 }
