@@ -299,7 +299,7 @@ bool RigidBody::checkTriangle(vector<glm::vec3> &simplex, glm::vec3 &direction)
 	return false;
 }
 
-vector<vec3> RigidBody::findContactPoints(vector<vec3> &simplex)
+vector<vec3> RigidBody::findContactPoints(vector<vec3> &simplex, vec3 &target)
 {
 	vec3 D = simplex[0];
 	vec3 C = simplex[1];
@@ -307,10 +307,10 @@ vector<vec3> RigidBody::findContactPoints(vector<vec3> &simplex)
 	vec3 A = simplex[3];
 
 	float distances[4];
-	distances[0] = dot(-A, cross(C-A, B-A)); //float dACB = dot(-A, cross(C-A, B-A));
-	distances[1] = dot(-A, cross(B-A, D-A)); //float dABD = dot(-A, cross(B-A, D-A));
-	distances[2] = dot(-A, cross(D-A, C-A)); //float dADC = dot(-A, cross(D-A, C-A));
-	distances[3] = dot(-B, cross(C-B, D-B)); //float dBCD = dot(-A, cross(C-B, D-B));
+	distances[0] = dot(target-A, normalize(cross(C-A, B-A))); //float dACB = dot(-A, cross(C-A, B-A));
+	distances[1] = dot(target-A, normalize(cross(B-A, D-A))); //float dABD = dot(-A, cross(B-A, D-A));
+	distances[2] = dot(target-A, normalize(cross(D-A, C-A))); //float dADC = dot(-A, cross(D-A, C-A));
+	distances[3] = dot(target-B, normalize(cross(C-B, D-B))); //float dBCD = dot(-A, cross(C-B, D-B));
 
 	int minIndex = 0;
 	for(int i=0; i<4; ++i)
@@ -340,7 +340,7 @@ vector<vec3> RigidBody::findContactPoints(vector<vec3> &simplex)
 		break;
 	}
 	
-	findSimplexWithMinDistanceInTriangle(simplex);
+	findSimplexWithMinDistanceInTriangle(simplex, target);
 
 	return simplex;
 }
@@ -385,7 +385,18 @@ vec3 RigidBody::GetMinDistancePointVeronoi(vec3 &target)
 	vector<vec3> simplex(points);
 	for(int i=0; i<simplex.size(); ++i)
 		simplex[i] = vec3(GetTransformationMatrix() * vec4(simplex[i], 1.0f));
-	findSimplexWithMinDistanceInTriangle(simplex, target);
+
+	switch(simplex.size())
+	{
+	case 3: 
+		findSimplexWithMinDistanceInTriangle(simplex, target);
+		break;
+	case 4:
+		findContactPoints(simplex, target);
+		break;
+	default:
+		return vec3();
+	}
 
 	vec3 n;
 	switch(simplex.size())

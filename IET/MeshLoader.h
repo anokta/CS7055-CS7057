@@ -25,6 +25,7 @@ public:
 	static Line * GenerateBoundingSphere();
 	static Line * GenerateLine(glm::vec4 &color);
 	static Line * GenerateTriangle();
+	static Line * GenerateTetrahedron();
 
 	static SkyboxMesh * GenerateCubemapMesh(const std::string& PosXFilename,
 		const std::string& NegXFilename,

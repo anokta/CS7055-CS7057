@@ -22,6 +22,7 @@ public:
 	inline glm::vec4 GetGizmoColor() { return gizmoColor; }
 	
 	void ChangeShader(GenericShader * s);
+	inline bool IsTextured() { return textured; }
 	
 	inline void SetGizmoColor(glm::vec4 & color) { gizmoColor = color; }
 	inline void UpdateGizmoColor() { gizmos["BoundingBox"]->ChangeColor(gizmoColor); } //body->IsCollided() ? glm::vec4(1,0,0,1) : glm::vec4(0,1,0,1)); }
@@ -42,6 +43,7 @@ private:
 	MeshBase * modelMesh;
 	std::map<std::string, Line *> gizmos;
 	glm::vec4 gizmoColor;
+	bool textured;
 };
 
 #endif

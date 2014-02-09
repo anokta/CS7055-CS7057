@@ -124,8 +124,10 @@
     <ClInclude Include="SkyboxMesh.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="Tetrahedron.h" />
     <ClInclude Include="TexturedSimpleMesh.h" />
     <ClInclude Include="TexturedIndexedMesh.h" />
+    <ClInclude Include="Triangle.h" />
     <ClInclude Include="Updatable.h" />
   </ItemGroup>
   <ItemGroup>
@@ -151,8 +153,10 @@
     <ClCompile Include="Skybox.cpp" />
     <ClCompile Include="SkyboxMesh.cpp" />
     <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="Tetrahedron.cpp" />
     <ClCompile Include="TexturedSimpleMesh.cpp" />
     <ClCompile Include="TexturedIndexedMesh.cpp" />
+    <ClCompile Include="Triangle.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Cubemap.frag" />

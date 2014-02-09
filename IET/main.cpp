@@ -14,6 +14,8 @@
 #include "Ball.h"
 #include "Ellipsoid.h"
 #include "Plane.h"
+#include "Tetrahedron.h"
+#include "Triangle.h"
 #include "Cat.h"
 
 #include "MeshLoader.h"
@@ -46,12 +48,14 @@ float roughness, shininess;
 Camera * camera; 
 Skybox * skybox;
 bool freeMode;
+vec2 currentTarget;
 
 // Entities
 vector<RigidBodyModel*> rigidBodies;
 int currentBodyIndex;
 
 Line * voronoiLine;
+Line * voronoiLineTetrahedron;
 
 
 float gravity = -2.0f;
@@ -68,7 +72,7 @@ void rotateBody(float x, float y, float z)
 void translateBody(float x, float y, float z)
 {
 	//rigidBodies[currentBodyIndex]->GetBody()->SetPosition(rigidBodies[currentBodyIndex]->GetBody()->GetPosition() + vec3(x, y, z));
-	rigidBodies[currentBodyIndex]->GetBody()->SetLinearMomentum(10.0f * vec3(x, y, z));
+	rigidBodies[currentBodyIndex]->GetBody()->SetLinearMomentum(10.0f * vec3(x, y, z) * rigidBodies[currentBodyIndex]->GetBody()->GetMass());
 }
 
 // Mouse & Keyboard Handler Functions
@@ -197,12 +201,12 @@ void keyPressed(unsigned char key, int x, int y)
 	case 8:
 		currentShaderIndex = (currentShaderIndex + shaders.size() - 6) % (shaders.size() - 2) + 2;
 
-		for(unsigned int i=0; i<rigidBodies.size(); ++i)
+		for(unsigned int i=0; i<rigidBodies.size(); ++i) 
 		{
-			if(rigidBodies[i]->GetBody()->GetType() == RigidBody::ELLIPSOID || rigidBodies[i]->GetBody()->GetType() == RigidBody::PLANE)
-				rigidBodies[i]->ChangeShader(shaders[currentShaderIndex]);
-			else if(rigidBodies[i]->GetBody()->GetType() == RigidBody::BOX || rigidBodies[i]->GetBody()->GetType() == RigidBody::CAT || rigidBodies[i]->GetBody()->GetType() == RigidBody::BALL)
+			if(rigidBodies[i]->IsTextured())
 				rigidBodies[i]->ChangeShader(shaders[currentShaderIndex+1]);
+			else 
+				rigidBodies[i]->ChangeShader(shaders[currentShaderIndex]);
 		}
 
 		cout << "Current shader pair: " << shaders[currentShaderIndex]->GetName() << endl << endl;
@@ -213,10 +217,10 @@ void keyPressed(unsigned char key, int x, int y)
 
 		for(unsigned int i=0; i<rigidBodies.size(); ++i)
 		{
-			if(rigidBodies[i]->GetBody()->GetType() == RigidBody::ELLIPSOID || rigidBodies[i]->GetBody()->GetType() == RigidBody::PLANE)
-				rigidBodies[i]->ChangeShader(shaders[currentShaderIndex]);
-			else if(rigidBodies[i]->GetBody()->GetType() == RigidBody::BOX || rigidBodies[i]->GetBody()->GetType() == RigidBody::CAT || rigidBodies[i]->GetBody()->GetType() == RigidBody::BALL)
+			if(rigidBodies[i]->IsTextured())
 				rigidBodies[i]->ChangeShader(shaders[currentShaderIndex+1]);
+			else 
+				rigidBodies[i]->ChangeShader(shaders[currentShaderIndex]);
 		}
 
 		cout << "Current shader pair: " << shaders[currentShaderIndex]->GetName() << endl << endl;
@@ -265,6 +269,9 @@ void keyPressed(unsigned char key, int x, int y)
 	case 'e':
 		translateBody(0.0f, 0.0f, -0.1f);
 		break;
+	case 'r':
+		translateBody(0.0f, 0.0f, 0.0f);
+		break;
 
 	case 'p':
 		pause = !pause;
@@ -272,6 +279,22 @@ void keyPressed(unsigned char key, int x, int y)
 
 	case 'b':
 		//rigidBodies[currentBodyIndex]->getFurthestPointInDirection(-directionalLightDirection);
+		break;
+
+	case ' ':
+		if(!freeMode)
+		{
+			if(currentTarget == vec2())
+			{
+				currentTarget = vec2(40, 0); 
+				currentBodyIndex = 4;
+			}
+			else
+			{
+				currentTarget = vec2();
+				currentBodyIndex = 0;
+			}
+		}
 		break;
 	}
 }
@@ -309,8 +332,9 @@ void display(){
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	EntityManager::GetInstance()->DrawEntities();
-
+	
 	voronoiLine->Render(shaders[0]);
+	voronoiLineTetrahedron->Render(shaders[0]);
 
 	glutSwapBuffers();
 }
@@ -331,8 +355,8 @@ void update(int frame)
 		//Update camera motion
 		if(!freeMode)
 		{
-			camera->SetEyeVector(mix(camera->GetEyeVector(), vec3(0, 0, 12), DELTA_TIME));
-			camera->SetTargetVector(mix(camera->GetTargetVector(), vec3(0, 0, 0), DELTA_TIME * 2));
+			camera->SetEyeVector(mix(camera->GetEyeVector(), vec3(currentTarget, 12), DELTA_TIME));
+			camera->SetTargetVector(mix(camera->GetTargetVector(), vec3(currentTarget, 0), DELTA_TIME * 2));
 		} 
 
 		// Update entitities
@@ -399,11 +423,13 @@ void update(int frame)
 			rigidBodies[i]->UpdateGizmoColor();	
 		}
 
-		vec3 target = rigidBodies[0]->GetBody()->GetPosition();
-		voronoiLine->SetFromTo(target, rigidBodies[3]->GetBody()->GetMinDistancePointVeronoi(target));
-
-		//cout << endl;
-
+		if(currentTarget != vec2())
+		{
+			vec3 target = rigidBodies[currentBodyIndex]->GetBody()->GetPosition();
+			voronoiLine->SetFromTo(target, rigidBodies[6]->GetBody()->GetMinDistancePointVeronoi(target));
+			voronoiLineTetrahedron->SetFromTo(target, rigidBodies[5]->GetBody()->GetMinDistancePointVeronoi(target));
+		}
+		
 		EntityManager::GetInstance()->UpdateEntities(DELTA_TIME);
 	}
 	else
@@ -491,16 +517,25 @@ void init()
 	//skybox = new Skybox(shaders[1]);	
 	
 	freeMode = true;
+	
+
+	currentBodyIndex = 0;
 
 	//rigidBodies.push_back(new RigidBodyModel(new Ball(vec3(-7,0,0)), shaders[currentShaderIndex+1], shaders[0]));
 	rigidBodies.push_back(new RigidBodyModel(new Box(vec3(7,0,0), quat(), vec3(1.0f, 0.4f, 1.5f)), shaders[currentShaderIndex+1], shaders[0]));
 	rigidBodies.push_back(new RigidBodyModel(new Ellipsoid(vec3(0,0,0), quat(), vec3(0.7f, 1.4f, 0.5f)), shaders[currentShaderIndex], shaders[0]));
 	rigidBodies.push_back(new RigidBodyModel(new Cat(vec3(-3.5f,0,0), quat(), vec3(0.5f, 1.0f, 2.0f)), shaders[currentShaderIndex+1], shaders[0]));
 	rigidBodies.push_back(new RigidBodyModel(new Plane(vec3(3.5f,0,0), quat(), vec2(1.0f, 2.0f)), shaders[currentShaderIndex], shaders[0]));
-	currentBodyIndex = 0;
+	
+	// Voronoi
+	rigidBodies.push_back(new RigidBodyModel(new Ellipsoid(vec3(40,2,0), quat(), vec3(0.1f, 0.1f, 0.1f)), shaders[currentShaderIndex], shaders[0]));
+	rigidBodies.push_back(new RigidBodyModel(new Tetrahedron(vec3(42.0f,0,0)), shaders[0], shaders[0]));
+	rigidBodies.push_back(new RigidBodyModel(new Triangle(vec3(38.0f,0,0)), shaders[0], shaders[0]));
 
-	voronoiLine = MeshLoader::GenerateLine(vec4(1,1,0.2f,1));
+	voronoiLine = MeshLoader::GenerateLine(vec4(1,0.6f,0.1f,1));
 	voronoiLine->SetShader(shaders[0]);
+	voronoiLineTetrahedron = MeshLoader::GenerateLine(vec4(1,0.6f,0.1f,1));
+	voronoiLineTetrahedron->SetShader(shaders[0]);
 
 	pause = false;
 
@@ -527,6 +562,7 @@ void releaseResources()
 	EntityManager::Destroy();
 
 	delete voronoiLine;
+	delete voronoiLineTetrahedron;
 }
 
 int main(int argc, char** argv){

@@ -20,23 +20,38 @@ RigidBodyModel::RigidBodyModel(RigidBody *b, GenericShader * s, GenericShader * 
 	case RigidBody::BODY_TYPE::BOX:
 		modelMesh = MeshLoader::GenerateTexturedCubeMesh("..\\IET\\res\\box.jpg");
 		//MeshLoader::LoadMesh("..\\IET\\res\\block.dae", "..\\IET\\res\\block.tga");
+		textured = true;
 		break;
 
 	case RigidBody::BODY_TYPE::BALL:
-		modelMesh = MeshLoader::LoadMesh("..\\IET\\res\\basketball.obj", "..\\IET\\res\\basketball.jpg");
+		modelMesh = MeshLoader::LoadMesh("..\\IET\\res\\basketball.obj", "..\\IET\\res\\basketball.jpg");		
+		textured = true;
 		break;
 
 	case RigidBody::BODY_TYPE::ELLIPSOID:
 		modelMesh = MeshLoader::GenerateSphereMesh(25);
+		textured = false;
 		//MeshLoader::LoadMesh("..\\IET\\res\\Mountain Bike.obj");//MeshLoader::GenerateSphereMesh(25);
 		break;	
-	
+
 	case RigidBody::BODY_TYPE::PLANE:
-		modelMesh = MeshLoader::GenerateTriangle();//MeshLoader::GeneratePlaneMesh();
+		modelMesh = MeshLoader::GeneratePlaneMesh();
+		textured = false;
+		break;
+
+	case RigidBody::BODY_TYPE::TETRAHEDRON:
+		modelMesh = MeshLoader::GenerateTetrahedron();//MeshLoader::GeneratePlaneMesh();
+		textured = false;
+		break;
+
+	case RigidBody::BODY_TYPE::TRIANGLE:
+		modelMesh = MeshLoader::GenerateTriangle();
+		textured = false;
 		break;
 
 	case RigidBody::BODY_TYPE::CAT:
 		modelMesh = MeshLoader::LoadMesh("..\\IET\\res\\cat.obj", "..\\IET\\res\\cat.tga");
+		textured = true;
 		break;
 	}
 
@@ -63,7 +78,7 @@ RigidBodyModel::~RigidBodyModel()
 	delete body;
 
 	delete modelMesh;
-	
+
 	for(auto gizmo : gizmos)
 		delete gizmo.second;
 	gizmos.clear();

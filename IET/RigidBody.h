@@ -13,13 +13,15 @@ public:
 	RigidBody(glm::vec3 &p = glm::vec3(), glm::quat &o = glm::quat(), glm::vec3 &s = glm::vec3(1,1,1), float m = 1.0f);
 
 	// Type
-	enum BODY_TYPE { BOX, BALL, ELLIPSOID, PLANE, CAT };
+	enum BODY_TYPE { BOX, BALL, ELLIPSOID, PLANE, TETRAHEDRON, TRIANGLE, CAT };
 	inline BODY_TYPE GetType() { return type; }
 
 	// Getters
 	inline glm::vec3 GetPosition() const { return position; }
 	inline glm::quat GetOrientation() const { return orientation; }
 	inline glm::vec3 GetScale() const { return scale; }
+
+	inline float GetMass() const { return mass; }
 
 	inline glm::vec3 GetLinearMomentum() const { return linearMomentum; }
 	inline glm::vec3 GetAngularMomentum() const { return angularMomentum; }
@@ -78,7 +80,7 @@ protected:
 	glm::vec3 getFurthestPointInDirection(glm::vec3 &direction);
 
 	// contact model
-	std::vector<glm::vec3> findContactPoints(std::vector<glm::vec3> &simplex);
+	std::vector<glm::vec3> findContactPoints(std::vector<glm::vec3> &simplex, glm::vec3 &target = glm::vec3());
 	void findSimplexWithMinDistanceInTriangle(std::vector<glm::vec3> &simplex, glm::vec3 &target = glm::vec3());
 };
 

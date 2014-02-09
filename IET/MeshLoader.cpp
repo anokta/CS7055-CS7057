@@ -555,7 +555,7 @@ Line * MeshLoader::GenerateLine(vec4 &color)
 {
 	vector<vec3> v;
 	v.push_back(vec3(0,0,0));
-	v.push_back(vec3(1,0,0));
+	v.push_back(vec3(0,0,0));
 
 	vector<vec4> c;
 	c.push_back(color);
@@ -569,12 +569,31 @@ Line * MeshLoader::GenerateTriangle()
 	vector<vec3> v;
 	v.push_back(vec3(-0.5f,-0.21f,0));
 	v.push_back(vec3(0.5f,-0.21f,0));
-	v.push_back(vec3(-0.5f,0.42f,0));
+	v.push_back(vec3(0.0f,0.42f,0));
 
 	vector<vec4> c;
 	c.push_back(vec4(1,0,1,1));
 	c.push_back(vec4(1,0,1,1));
 	c.push_back(vec4(1,0,1,1));
+
+	return new Line(v, c);
+}
+
+Line * MeshLoader::GenerateTetrahedron()
+{
+	vector<vec3> v;
+	v.push_back(vec3(-0.5f,-0.125f,-0.21f));
+	v.push_back(vec3(0.5f,-0.125f,-0.21f));
+	v.push_back(vec3(0.0f,-0.125f, 0.42f));
+	v.push_back(vec3(-0.5f,-0.125f,-0.21f));
+	v.push_back(vec3(0.0f, 0.375f, 0.0f));
+	v.push_back(vec3(0.5f,-0.125f,-0.21f));
+	v.push_back(vec3(0.0f, 0.375f, 0.0f));
+	v.push_back(vec3(0.0f,-0.125f, 0.42f));
+
+	vector<vec4> c;
+	for(int i=0; i<v.size(); ++i)
+		c.push_back(vec4(1,0,1,1));
 
 	return new Line(v, c);
 }
