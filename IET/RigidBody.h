@@ -49,13 +49,8 @@ public:
 	inline void SetPoints(const std::vector<glm::vec3> & vertices) { points = vertices; }
 	inline void SetCollided(const bool c) { collided = c; }
 	
-	bool CheckCollision(RigidBody * body);
-	
-
-	bool checkCollisionBroad(RigidBody * body);
-	bool checkCollisionNarrow(RigidBody * body);
-	
-	glm::vec3 getFurthestPointInDirection(glm::vec3 &direction);
+	bool CheckCollisionBroad(RigidBody * body);
+	bool CheckCollisionNarrow(RigidBody * body);
 
 	void Update(float deltaTime);
 
@@ -80,7 +75,8 @@ protected:
 	bool collided;
 
 	bool checkSimplex(std::vector<glm::vec3> &simplex, glm::vec3 &direction);
-	bool checkTriangle(std::vector<glm::vec3> &simplex, std::vector<GLuint> &indices, glm::vec3 &direction);
+	bool checkTriangle(std::vector<glm::vec3> &simplex, glm::vec3 &direction);
+	glm::vec3 getFurthestPointInDirection(glm::vec3 &direction);
 };
 
 #endif

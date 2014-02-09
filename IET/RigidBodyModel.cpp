@@ -18,7 +18,8 @@ RigidBodyModel::RigidBodyModel(RigidBody *b, GenericShader * s, GenericShader * 
 	switch(body->GetType())
 	{
 	case RigidBody::BODY_TYPE::BOX:
-		modelMesh = MeshLoader::GenerateTexturedCubeMesh("..\\IET\\res\\box.jpg");//MeshLoader::LoadMesh("..\\IET\\res\\block.dae", "..\\IET\\res\\block.tga");
+		modelMesh = MeshLoader::GenerateTexturedCubeMesh("..\\IET\\res\\box.jpg");
+		//MeshLoader::LoadMesh("..\\IET\\res\\block.dae", "..\\IET\\res\\block.tga");
 		break;
 
 	case RigidBody::BODY_TYPE::BALL:
@@ -27,6 +28,7 @@ RigidBodyModel::RigidBodyModel(RigidBody *b, GenericShader * s, GenericShader * 
 
 	case RigidBody::BODY_TYPE::ELLIPSOID:
 		modelMesh = MeshLoader::GenerateSphereMesh(25);
+		//MeshLoader::LoadMesh("..\\IET\\res\\Mountain Bike.obj");//MeshLoader::GenerateSphereMesh(25);
 		break;	
 	
 	case RigidBody::BODY_TYPE::PLANE:
@@ -92,8 +94,6 @@ void RigidBodyModel::Draw()
 		M = lineShader->GetModelMatrix();
 
 		lineShader->SetModelMatrix(M * body->GetTransformationMatrix());
-		//for(auto gizmo : gizmos)
-		//	gizmo.second->Render(lineShader);
 		gizmos["BoundingBox"]->Render(lineShader);
 		lineShader->SetModelMatrix(M);
 	}
@@ -106,15 +106,13 @@ void RigidBodyModel::Update(float deltaTime)
 
 bool RigidBodyModel::DetectCollision(RigidBodyModel * rigidBodyModel)
 {
-	if(body->GetLinearMomentum() != vec3())
-	{
 	////gizmos["FurthestPoint"]->Translate(furthestA);
 	//gizmos["BetweenLine"]->SetFromTo(furthestA, furthestB);
-	}
-	if(body->checkCollisionBroad(rigidBodyModel->GetBody()))
+
+	if(body->CheckCollisionBroad(rigidBodyModel->GetBody()))
 	{	
 		//std::cout << "Broad Collided. . . ";
-		if(body->checkCollisionNarrow(rigidBodyModel->GetBody()))
+		if(body->CheckCollisionNarrow(rigidBodyModel->GetBody()))
 		{
 			//std::cout << "NARROW Collided. . . ";
 			return true;

@@ -356,7 +356,7 @@ void update(int frame)
 				)
 					);
 			}
-			rigidBodies.back()->GetBody()->SetLinearMomentum(vec3(float(rand())/RAND_MAX * 20.0f - 10.0f, float(rand())/RAND_MAX * 10.0f - 5.0f,float(rand())/RAND_MAX * 10.0f - 5.0f));
+			//rigidBodies.back()->GetBody()->SetLinearMomentum(vec3(float(rand())/RAND_MAX * 20.0f - 10.0f, float(rand())/RAND_MAX * 10.0f - 5.0f,float(rand())/RAND_MAX * 10.0f - 5.0f));
 
 		}
 
@@ -393,7 +393,7 @@ void update(int frame)
 			rigidBodies[i]->UpdateGizmoColor();	
 		}
 
-		cout << endl;
+		//cout << endl;
 
 		EntityManager::GetInstance()->UpdateEntities(DELTA_TIME);
 	}
@@ -485,7 +485,7 @@ void init()
 
 	//rigidBodies.push_back(new RigidBodyModel(new Ball(vec3(-7,0,0)), shaders[currentShaderIndex+1], shaders[0]));
 	rigidBodies.push_back(new RigidBodyModel(new Box(vec3(7,0,0), quat(), vec3(1.0f, 0.4f, 1.5f)), shaders[currentShaderIndex+1], shaders[0]));
-	rigidBodies.push_back(new RigidBodyModel(new Ellipsoid(vec3(0,0,0), quat(), vec3(0.7f, 0.4f, 0.5f)), shaders[currentShaderIndex], shaders[0]));
+	rigidBodies.push_back(new RigidBodyModel(new Ellipsoid(vec3(0,0,0), quat(), vec3(0.7f, 1.4f, 0.5f)), shaders[currentShaderIndex], shaders[0]));
 	rigidBodies.push_back(new RigidBodyModel(new Cat(vec3(-3.5f,0,0), quat(), vec3(0.5f, 1.0f, 2.0f)), shaders[currentShaderIndex+1], shaders[0]));
 	rigidBodies.push_back(new RigidBodyModel(new Plane(vec3(3.5f,0,0), quat(), vec2(1.0f, 2.0f)), shaders[currentShaderIndex], shaders[0]));
 	currentBodyIndex = 0;

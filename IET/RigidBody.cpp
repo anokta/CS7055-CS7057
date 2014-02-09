@@ -36,31 +36,21 @@ mat4 RigidBody::GetTransformationMatrix()
 	return T * R * S;
 }
 
-bool RigidBody::CheckCollision(RigidBody * body)
-{
-	if(checkCollisionBroad(body))
-	{
-		return checkCollisionNarrow(body);
-	}
-
-	return false;
-}
-
-bool RigidBody::checkCollisionBroad(RigidBody * body)
+bool RigidBody::CheckCollisionBroad(RigidBody * body)
 {
 	mat3 aOrientation = toMat3(orientation);
-	vec3 aX = normalize(aOrientation * vec3(1,0,0));
-	vec3 aY = normalize(aOrientation * vec3(0,1,0));
-	vec3 aZ = normalize(aOrientation * vec3(0,0,1));
+	vec3 aX = aOrientation * vec3(1,0,0);
+	vec3 aY = aOrientation * vec3(0,1,0);
+	vec3 aZ = aOrientation * vec3(0,0,1);
 
 	float aW = scale.x / 2.0f;
 	float aH = scale.y / 2.0f;
 	float aD = scale.z / 2.0f;
 
 	mat3 bOrientation = toMat3(body->GetOrientation());
-	vec3 bX = normalize(bOrientation * vec3(1,0,0));
-	vec3 bY = normalize(bOrientation * vec3(0,1,0));
-	vec3 bZ = normalize(bOrientation * vec3(0,0,1));
+	vec3 bX = bOrientation * vec3(1,0,0);
+	vec3 bY = bOrientation * vec3(0,1,0);
+	vec3 bZ = bOrientation * vec3(0,0,1);
 
 	vec3 bScale = body->GetScale();
 	float bW = bScale.x / 2.0f;
@@ -119,10 +109,10 @@ bool RigidBody::checkCollisionBroad(RigidBody * body)
 	return true;
 }
 
-bool RigidBody::checkCollisionNarrow(RigidBody * body)
+bool RigidBody::CheckCollisionNarrow(RigidBody * body)
 {
 	// Support function
-	vec3 direction = normalize(body->GetPosition() - position); // normalize(body->GetLinearMomentum());
+	vec3 direction = body->GetPosition() - position; // normalize(body->GetLinearMomentum());
 
 	vec3 furthestA = getFurthestPointInDirection(direction);
 	vec3 furthestB = body->getFurthestPointInDirection(-direction);
@@ -137,7 +127,8 @@ bool RigidBody::checkCollisionNarrow(RigidBody * body)
 	// Initial direction
 	direction = -mDiff;
 
-	while(true)
+	int count = 100;
+	while(count-- > 0)
 	{
 		furthestA = getFurthestPointInDirection(direction);
 		furthestB = body->getFurthestPointInDirection(-direction);
@@ -157,13 +148,12 @@ bool RigidBody::checkCollisionNarrow(RigidBody * body)
 		}
 	}
 
-	return true;
+	return false;
 }
 
 bool RigidBody::checkSimplex(std::vector<vec3> &simplex, vec3 &direction)
 {
 	vec3 A, B, C, D;
-	std::vector<GLuint> indices;
 
 	switch(simplex.size())
 	{
@@ -183,12 +173,8 @@ bool RigidBody::checkSimplex(std::vector<vec3> &simplex, vec3 &direction)
 		return false;
 
 	case 3: // triangle
-		indices.clear();
-		indices.push_back(0);
-		indices.push_back(1);
-		indices.push_back(2);
 
-		return checkTriangle(simplex, indices, direction);
+		return checkTriangle(simplex, direction);
 
 	case 4:	// tetrahedron
 		D = simplex[0];
@@ -201,42 +187,35 @@ bool RigidBody::checkSimplex(std::vector<vec3> &simplex, vec3 &direction)
 		vec3 ACD = cross(C-A, D-A);
 
 		if(dot(ABC, -A) > 0)
-		{
-			indices.clear();
-			indices.push_back(1);
-			indices.push_back(2);
-			indices.push_back(3);
+		{			
+			simplex.erase(simplex.begin());
 
-			return checkTriangle(simplex, indices, direction);
+			return checkTriangle(simplex, direction);
 		}
 		else if(dot(ADB, -A) > 0)
 		{
-			indices.clear();
-			indices.push_back(0);
-			indices.push_back(2);
-			indices.push_back(3);
+			simplex.erase(simplex.begin() + 1);
+			simplex[0] = B;
+			simplex[1] = D;
 
-			return checkTriangle(simplex, indices, direction);
+			return checkTriangle(simplex, direction);
 		}
 		else if(dot(ACD, -A) > 0)
 		{
-			indices.clear();
-			indices.push_back(0);
-			indices.push_back(1);
-			indices.push_back(3);
+			simplex.erase(simplex.begin() + 2);
 
-			return checkTriangle(simplex, indices, direction);
+			return checkTriangle(simplex, direction);
 		}
 
-		return  dot(cross(D-B, C-B), -A) <= 0;
+		return true;
 	}
 }
 
-bool RigidBody::checkTriangle(std::vector<glm::vec3> &simplex, std::vector<GLuint> &indices, glm::vec3 &direction)
+bool RigidBody::checkTriangle(std::vector<glm::vec3> &simplex, glm::vec3 &direction)
 {
-	vec3 C = simplex[indices[0]];
-	vec3 B = simplex[indices[1]];
-	vec3 A = simplex[indices[2]];
+	vec3 C = simplex[0];
+	vec3 B = simplex[1];
+	vec3 A = simplex[2];
 
 	// face
 	vec3 ABC = cross(B-A, C-A);
@@ -246,20 +225,20 @@ bool RigidBody::checkTriangle(std::vector<glm::vec3> &simplex, std::vector<GLuin
 		if(dot(C-A, -A) > 0) // outside AC edge
 		{
 			direction = cross(cross(C-A, -A), C-A);
-			std::remove(simplex.begin(), simplex.end(), B);
+			simplex.erase(simplex.begin() + 1);
 		}
 		else
 		{
 			if(dot(B-A, -A) > 0) // outside AB edge
 			{
 				direction = cross(cross(B-A, -A), B-A);
-				std::remove(simplex.begin(), simplex.end(), C);
+				simplex.erase(simplex.begin());
 			}
 			else // outside A
 			{
 				direction = -A;
-				std::remove(simplex.begin(), simplex.end(), B);
-				std::remove(simplex.begin(), simplex.end(), C);
+				simplex.erase(simplex.begin());
+				simplex.erase(simplex.begin());
 			}
 		}
 	}
@@ -270,13 +249,13 @@ bool RigidBody::checkTriangle(std::vector<glm::vec3> &simplex, std::vector<GLuin
 			if(dot(B-A, -A) > 0) // outside AB plane
 			{
 				direction = cross(cross(B-A, -A), B-A);
-				std::remove(simplex.begin(), simplex.end(), C);
+				simplex.erase(simplex.begin());
 			}
 			else // outside A
 			{
 				direction = -A;
-				std::remove(simplex.begin(), simplex.end(), B);
-				std::remove(simplex.begin(), simplex.end(), C);
+				simplex.erase(simplex.begin());
+				simplex.erase(simplex.begin());
 			}
 		}
 		else // orthogonal to face
@@ -287,8 +266,8 @@ bool RigidBody::checkTriangle(std::vector<glm::vec3> &simplex, std::vector<GLuin
 			}
 			else // inside face
 			{
-				simplex[indices[0]] = B;
-				simplex[indices[1]] = C;
+				simplex[0] = B;
+				simplex[1] = C;
 
 				direction = -ABC;
 			}
@@ -300,10 +279,10 @@ bool RigidBody::checkTriangle(std::vector<glm::vec3> &simplex, std::vector<GLuin
 
 vec3 RigidBody::getFurthestPointInDirection(vec3 &direction)
 {
-	vec3 furthestPoint;
+	int furthestPoint = 0;
 	float max = FLT_MIN;
 
-	vec3 d = vec3(toMat4(inverse(orientation)) * vec4(direction, 0.0f));
+	vec3 d = normalize(vec3(toMat4(inverse(orientation)) * vec4(direction, 0.0f))); // toMat3(inverse(orientation)) * direction;
 	for(unsigned int i=0; i<points.size(); ++i)
 	{
 		vec3 vertex = scale * points[i];
@@ -311,16 +290,12 @@ vec3 RigidBody::getFurthestPointInDirection(vec3 &direction)
 
 		if(projection > max)
 		{
-			furthestPoint = vertex;
+			furthestPoint = i;
 			max = projection;
 		}
 	}
 
-	furthestPoint = vec3(GetTransformationMatrix() * vec4(furthestPoint, 1.0f));
-
-	//std::cout << furthestPoint.x << " " << furthestPoint.y << " " << furthestPoint.z << std::endl;
-
-	return furthestPoint;
+	return vec3(GetTransformationMatrix() * vec4(points[furthestPoint], 1.0f));
 }
 
 void RigidBody::Update(float deltaTime)
