@@ -479,7 +479,7 @@ void init()
 
 	// Create the camera
 	camera = new Camera(shaders, vec3(0,0,12), vec3(0,0,0), vec3(0,1,0));
-	//skybox = new Skybox(shaders[1]);	
+	skybox = new Skybox(shaders[1]);	
 	
 	freeMode = true;
 

@@ -171,14 +171,14 @@
     <ClInclude Include="SkyboxMesh.h">
       <Filter>Header Files\Graphics\Meshes</Filter>
     </ClInclude>
-    <ClInclude Include="Skybox.h">
-      <Filter>Header Files\Entities</Filter>
-    </ClInclude>
     <ClInclude Include="RigidBodyModel.h">
       <Filter>Header Files\Entities\RigidBody</Filter>
     </ClInclude>
     <ClInclude Include="Plane.h">
       <Filter>Header Files\Entities\RigidBody</Filter>
+    </ClInclude>
+    <ClInclude Include="Skybox.h">
+      <Filter>Header Files\Graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -248,11 +248,11 @@
     <ClCompile Include="SkyboxMesh.cpp">
       <Filter>Source Files\Graphics\Meshes</Filter>
     </ClCompile>
-    <ClCompile Include="Skybox.cpp">
-      <Filter>Source Files\Entities</Filter>
-    </ClCompile>
     <ClCompile Include="Plane.cpp">
       <Filter>Source Files\Entities\RigidBody</Filter>
+    </ClCompile>
+    <ClCompile Include="Skybox.cpp">
+      <Filter>Source Files\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

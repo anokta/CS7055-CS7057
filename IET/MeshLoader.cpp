@@ -570,47 +570,47 @@ SkyboxMesh * MeshLoader::GenerateCubemapMesh(
 	const string& PosZFilename, const string& NegZFilename)
 {
 	vec3 vertices[] = {
-		vec3(-5.0f,  5.0f, -5.0f),
-		vec3(-5.0f, -5.0f, -5.0f),
-		vec3(5.0f, -5.0f, -5.0f),
-		vec3(5.0f, -5.0f, -5.0f),
-		vec3(5.0f,  5.0f, -5.0f),
-		vec3(-5.0f,  5.0f, -5.0f),
+		vec3(-1.0f,  1.0f, -1.0f),
+		vec3(-1.0f, -1.0f, -1.0f),
+		vec3(1.0f, -1.0f, -1.0f),
+		vec3(1.0f, -1.0f, -1.0f),
+		vec3(1.0f,  1.0f, -1.0f),
+		vec3(-1.0f,  1.0f, -1.0f),
 
-		vec3(-5.0f, -5.0f,  5.0f),
-		vec3(-5.0f, -5.0f, -5.0f),
-		vec3(-5.0f,  5.0f, -5.0f),
-		vec3(-5.0f,  5.0f, -5.0f),
-		vec3(-5.0f,  5.0f,  5.0f),
-		vec3(-5.0f, -5.0f,  5.0f),
+		vec3(-1.0f, -1.0f,  1.0f),
+		vec3(-1.0f, -1.0f, -1.0f),
+		vec3(-1.0f,  1.0f, -1.0f),
+		vec3(-1.0f,  1.0f, -1.0f),
+		vec3(-1.0f,  1.0f,  1.0f),
+		vec3(-1.0f, -1.0f,  1.0f),
 
-		vec3(5.0f, -5.0f, -5.0f),
-		vec3(5.0f, -5.0f,  5.0f),
-		vec3(5.0f,  5.0f,  5.0f),
-		vec3(5.0f,  5.0f,  5.0f),
-		vec3(5.0f,  5.0f, -5.0f),
-		vec3(5.0f, -5.0f, -5.0f),
+		vec3(1.0f, -1.0f, -1.0f),
+		vec3(1.0f, -1.0f,  1.0f),
+		vec3(1.0f,  1.0f,  1.0f),
+		vec3(1.0f,  1.0f,  1.0f),
+		vec3(1.0f,  1.0f, -1.0f),
+		vec3(1.0f, -1.0f, -1.0f),
 
-		vec3(-5.0f, -5.0f,  5.0f),
-		vec3(-5.0f,  5.0f,  5.0f),
-		vec3(5.0f,  5.0f,  5.0f),
-		vec3(5.0f,  5.0f,  5.0f),
-		vec3(5.0f, -5.0f,  5.0f),
-		vec3(-5.0f, -5.0f,  5.0f),
+		vec3(-1.0f, -1.0f,  1.0f),
+		vec3(-1.0f,  1.0f,  1.0f),
+		vec3(1.0f,  1.0f,  1.0f),
+		vec3(1.0f,  1.0f,  1.0f),
+		vec3(1.0f, -1.0f,  1.0f),
+		vec3(-1.0f, -1.0f,  1.0f),
 
-		vec3(-5.0f,  5.0f, -5.0f),
-		vec3(5.0f,  5.0f, -5.0f),
-		vec3(5.0f,  5.0f,  5.0f),
-		vec3(5.0f,  5.0f,  5.0f),
-		vec3(-5.0f,  5.0f,  5.0f),
-		vec3(-5.0f,  5.0f, -5.0f),
+		vec3(-1.0f,  1.0f, -1.0f),
+		vec3(1.0f,  1.0f, -1.0f),
+		vec3(1.0f,  1.0f,  1.0f),
+		vec3(1.0f,  1.0f,  1.0f),
+		vec3(-1.0f,  1.0f,  1.0f),
+		vec3(-1.0f,  1.0f, -1.0f),
 
-		vec3(-5.0f, -5.0f, -5.0f),
-		vec3(-5.0f, -5.0f,  5.0f),
-		vec3(5.0f, -5.0f, -5.0f),
-		vec3(5.0f, -5.0f, -5.0f),
-		vec3(-5.0f, -5.0f,  5.0f),
-		vec3(5.0f, -5.0f,  10.0)
+		vec3(-1.0f, -1.0f, -1.0f),
+		vec3(-1.0f, -1.0f,  1.0f),
+		vec3(1.0f, -1.0f, -1.0f),
+		vec3(1.0f, -1.0f, -1.0f),
+		vec3(-1.0f, -1.0f,  1.0f),
+		vec3(1.0f, -1.0f,  1.0f)
 	};
 
 	std::vector<vec3> v(std::begin(vertices), std::end(vertices));
@@ -667,7 +667,7 @@ GLuint MeshLoader::loadCubemapTexture(
 	const string& PosYFilename, const string& NegYFilename,
 	const string& PosZFilename, const string& NegZFilename)
 {
-	string BaseDir = "..\\IET\\res\\";
+	string BaseDir = "..\\IET\\res\\skybox\\";
 
 	string m_fileNames[6];
 	m_fileNames[0] = BaseDir + PosXFilename;
