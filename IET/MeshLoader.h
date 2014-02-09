@@ -22,6 +22,8 @@ public:
 	static SimpleMesh * GeneratePlaneMesh();
 
 	static Line * GenerateBoundingBox();
+	static Line * GenerateBoundingSphere();
+	static Line * GenerateLine(glm::vec4 &color);
 
 	static SkyboxMesh * GenerateCubemapMesh(const std::string& PosXFilename,
 		const std::string& NegXFilename,

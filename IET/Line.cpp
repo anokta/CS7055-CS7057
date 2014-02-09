@@ -49,6 +49,21 @@ void Line::ChangeColor(vec4 &color)
 
 }
 
+void Line::SetFromTo(vec3 &from, vec3 &to)
+{
+	vertices[0] = from;
+	vertices[1] = to;
+
+	glBindVertexArray( vaoID );
+	glBindBuffer( GL_ARRAY_BUFFER, vboID );
+	
+	glBufferSubData( GL_ARRAY_BUFFER, 0, vSize, (const GLvoid*)(&vertices[0]) );
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+}
+
+
 void Line::SetShader(GenericShader * shader)
 {
 	// Bind buffer

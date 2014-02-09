@@ -14,6 +14,8 @@ public:
 		glDeleteVertexArrays(1, &vaoID);
 	}
 
+	inline std::vector<glm::vec3> GetVertices() { return vertices; }
+
 	virtual void GenerateBuffer() = 0;
 	
 	virtual void SetShader(GenericShader * shader) = 0;

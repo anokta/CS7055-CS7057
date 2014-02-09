@@ -5,6 +5,8 @@
 #include "glm\gtx\transform.hpp"
 #include "glm\gtx\quaternion.hpp"
 
+#include <algorithm>
+
 using namespace glm;
 
 RigidBody::RigidBody(vec3 &p, quat &o, vec3 &s, float m)
@@ -119,7 +121,269 @@ bool RigidBody::checkCollisionBroad(RigidBody * body)
 
 bool RigidBody::checkCollisionNarrow(RigidBody * body)
 {
+	// Support function
+	vec3 direction = normalize(body->GetPosition() - position); // normalize(body->GetLinearMomentum());
+
+	vec3 furthestA = getFurthestPointInDirection(direction);
+	vec3 furthestB = body->getFurthestPointInDirection(-direction);
+
+	// Minkowski difference
+	vec3 mDiff = furthestA - furthestB;
+
+	// Simplex points
+	std::vector<vec3> simplex;
+	simplex.push_back(mDiff);
+
+	// Initial direction
+	direction = -mDiff;
+
+	while(true)
+	{
+		furthestA = getFurthestPointInDirection(direction);
+		furthestB = body->getFurthestPointInDirection(-direction);
+		mDiff = furthestA - furthestB;
+
+		if(dot(mDiff, direction) < 0)
+		{
+			std::cout << "No Intersection" << std::endl;
+			return false;
+		}
+		simplex.push_back(mDiff);
+
+		if(checkSimplex(simplex, direction))
+		{
+			std::cout << "Intersection" << std::endl;
+			return true;
+		}
+	}
+
 	return true;
+}
+
+bool RigidBody::checkSimplex(std::vector<vec3> &simplex, vec3 &direction)
+{
+	vec3 A, B, C, D;
+	std::vector<GLuint> indices;
+
+	switch(simplex.size())
+	{
+	case 2: // line
+		B = simplex[0];
+		A = simplex[1];
+
+		if(dot(B-A, -A) > 0)
+		{
+			direction = cross(cross(B-A, -A), B-A);
+		}
+		else
+		{
+			direction = -A;
+		}
+
+		return false;
+
+	case 3: // triangle
+		indices.clear();
+		indices.push_back(0);
+		indices.push_back(1);
+		indices.push_back(2);
+
+		return checkTriangle(simplex, indices, direction);
+
+		//C = simplex[0];
+		//B = simplex[1];
+		//A = simplex[2];
+
+		//// face
+		//vec3 ABC = cross(B-A, C-A);
+
+		//if(dot(cross(ABC, C-A), -A) > 0) // AC plane 
+		//{
+		//	if(dot(C-A, -A) > 0) // outside AC edge
+		//	{
+		//		direction = cross(cross(C-A, -A), C-A);
+		//		simplex.erase(simplex.begin() + 1);
+		//	}
+		//	else
+		//	{
+		//		if(dot(B-A, -A) > 0) // outside AB edge
+		//		{
+		//			direction = cross(cross(B-A, -A), B-A);
+		//			simplex.erase(simplex.begin());
+		//		}
+		//		else // outside A
+		//		{
+		//			direction = -A;
+		//			simplex.erase(simplex.begin());
+		//			simplex.erase(simplex.begin());
+		//		}
+		//	}
+		//}
+		//else // inside AC 
+		//{
+		//	if(dot(cross(B-A, ABC), -A) > 0) // AB plane 
+		//	{
+		//		if(dot(B-A, -A) > 0) // outside AB plane
+		//		{
+		//			direction = cross(cross(B-A, -A), B-A);
+		//			simplex.erase(simplex.begin());
+		//		}
+		//		else // outside A
+		//		{
+		//			direction = -A;
+		//			simplex.erase(simplex.begin());
+		//			simplex.erase(simplex.begin());
+		//		}
+		//	}
+		//	else // orthogonal to face
+		//	{
+		//		if(dot(ABC, -A) > 0) // outside face
+		//		{
+		//			direction = ABC;
+		//		}
+		//		else // inside face
+		//		{
+		//			simplex[0] = B;
+		//			simplex[1] = C;
+
+		//			direction = -ABC;
+		//		}
+		//	}
+		//}
+
+		//return false;
+
+	case 4:	// tetrahedron
+		D = simplex[0];
+		C = simplex[1];
+		B = simplex[2];
+		A = simplex[3];
+
+		vec3 ABC = cross(B-A, C-A);
+		vec3 ABD = cross(B-A, D-A);
+		vec3 ACD = cross(C-A, D-A);
+
+		if(dot(ABC, -A) > 0)
+		{
+			indices.clear();
+			indices.push_back(1);
+			indices.push_back(2);
+			indices.push_back(3);
+
+			return checkTriangle(simplex, indices, direction);
+		}
+		else if(dot(ABD, -A) > 0)
+		{
+			indices.clear();
+			indices.push_back(0);
+			indices.push_back(2);
+			indices.push_back(3);
+
+			return checkTriangle(simplex, indices, direction);
+		}
+		else if(dot(ACD, -A) > 0)
+		{
+			indices.clear();
+			indices.push_back(0);
+			indices.push_back(1);
+			indices.push_back(3);
+
+			return checkTriangle(simplex, indices, direction);
+		}
+
+		return  dot(cross(C-B, D-B), -A) <= 0;
+	}
+}
+
+bool RigidBody::checkTriangle(std::vector<glm::vec3> &simplex, std::vector<GLuint> &indices, glm::vec3 &direction)
+{
+	vec3 C = simplex[indices[0]];
+	vec3 B = simplex[indices[1]];
+	vec3 A = simplex[indices[2]];
+
+	// face
+	vec3 ABC = cross(B-A, C-A);
+
+	if(dot(cross(ABC, C-A), -A) > 0) // AC plane 
+	{
+		if(dot(C-A, -A) > 0) // outside AC edge
+		{
+			direction = cross(cross(C-A, -A), C-A);
+			std::remove(simplex.begin(), simplex.end(), B);
+		}
+		else
+		{
+			if(dot(B-A, -A) > 0) // outside AB edge
+			{
+				direction = cross(cross(B-A, -A), B-A);
+				std::remove(simplex.begin(), simplex.end(), C);
+			}
+			else // outside A
+			{
+				direction = -A;
+				std::remove(simplex.begin(), simplex.end(), B);
+				std::remove(simplex.begin(), simplex.end(), C);
+			}
+		}
+	}
+	else // inside AC 
+	{
+		if(dot(cross(B-A, ABC), -A) > 0) // AB plane 
+		{
+			if(dot(B-A, -A) > 0) // outside AB plane
+			{
+				direction = cross(cross(B-A, -A), B-A);
+				std::remove(simplex.begin(), simplex.end(), C);
+			}
+			else // outside A
+			{
+				direction = -A;
+				std::remove(simplex.begin(), simplex.end(), B);
+				std::remove(simplex.begin(), simplex.end(), C);
+			}
+		}
+		else // orthogonal to face
+		{
+			if(dot(ABC, -A) > 0) // outside face
+			{
+				direction = ABC;
+			}
+			else // inside face
+			{
+				simplex[std::find(simplex.begin(), simplex.end(), C) - simplex.begin()] = B;
+				simplex[std::find(simplex.begin(), simplex.end(), B) - simplex.begin()] = C;
+
+				direction = -ABC;
+			}
+		}
+	}
+
+	return false;
+}
+
+vec3 RigidBody::getFurthestPointInDirection(vec3 &direction)
+{
+	vec3 furthestPoint;
+	float max = FLT_MIN;
+
+	vec3 d = toMat3(inverse(orientation)) * direction;
+	for(unsigned int i=0; i<points.size(); ++i)
+	{
+		vec3 vertex = scale * points[i];
+		float projection = dot(vertex, d);
+
+		if(projection > max)
+		{
+			furthestPoint = vertex;
+			max = projection;
+		}
+	}
+
+	furthestPoint = vec3(GetTransformationMatrix() * vec4(furthestPoint, 1.0f));
+
+	//std::cout << furthestPoint.x << " " << furthestPoint.y << " " << furthestPoint.z << std::endl;
+
+	return furthestPoint;
 }
 
 void RigidBody::Update(float deltaTime)

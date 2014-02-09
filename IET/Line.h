@@ -11,6 +11,8 @@ public:
 	void GenerateBuffer();
 
 	void ChangeColor(glm::vec4 &color);
+	//void ChangeVertexColor(glm::vec4 &color);
+	void SetFromTo(glm::vec3 &f, glm::vec3 &t);
 
 	void SetShader(GenericShader * shader);
 	void Render(GenericShader * shader);

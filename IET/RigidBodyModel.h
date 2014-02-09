@@ -25,6 +25,8 @@ public:
 	inline void ChangeGizmoColor(glm::vec4 & color) { gizmos["BoundingBox"]->ChangeColor(color); }
 	inline void UpdateGizmoColor() { gizmos["BoundingBox"]->ChangeColor(body->IsCollided() ? glm::vec4(1,0,0,1) : glm::vec4(0,1,0,1)); }
 
+	bool DetectCollision(RigidBodyModel * rigidBodyModel);
+
 	void Draw();
 	void Update(float deltaTime);
 

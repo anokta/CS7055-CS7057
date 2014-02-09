@@ -494,6 +494,76 @@ Line * MeshLoader::GenerateBoundingBox()
 	return new Line(v, c);
 }
 
+Line * MeshLoader::GenerateBoundingSphere()
+{
+	int numSegments = 40;
+
+	std::vector< vec3 > v;
+
+	std::vector<vec3> points;
+	for (int j= 0; j < numSegments; ++j)
+	{
+		float theta = (pi<float>()*j)/(numSegments);
+
+		for( int i=0; i<numSegments; ++i)
+		{
+			float phi = (2*pi<float>()*i)/(numSegments);
+			points.push_back(vec3(sin(theta)*cos(phi), sin(theta)*sin(phi), cos(theta)) / 20.0f);
+		}
+	}
+
+	for (int j= 0; j < numSegments; j ++)
+	{ 
+
+		for( int i=0; i<numSegments; i++ )
+		{
+			int iNext = i+1;
+			if (i == numSegments - 1)
+				iNext = 0;
+
+			int index = (j*numSegments*6)+(i*6);
+
+			v.push_back(points[j*numSegments+i]);
+			v.push_back(points[j*numSegments+iNext]);
+
+			if (j != numSegments -1)
+				v.push_back(points[((j+1)*numSegments)+i]);
+			else
+				v.push_back(vec3( 0, 0, -0.05f));
+
+			v.push_back(v[index+2]);
+			v.push_back(v[index+1]);
+
+			if (j != numSegments - 1)
+				v.push_back(points[((j+1)*numSegments)+iNext]);
+			else
+				v.push_back(vec3( 0,0,-0.05f));
+		}
+	}
+
+	//for(int i=0; i< v.size(); ++i)
+	//	v[i] += offset;
+
+	std::vector<vec4> c;
+	for(unsigned int i=0; i<v.size(); ++i)
+		c.push_back(vec4(0,0,1,1));
+
+	return new Line(v, c);
+}
+
+Line * MeshLoader::GenerateLine(vec4 &color)
+{
+	vector<vec3> v;
+	v.push_back(vec3(0,0,0));
+	v.push_back(vec3(1,0,0));
+
+	vector<vec4> c;
+	c.push_back(color);
+	c.push_back(color);
+
+	return new Line(v, c);
+}
+
 SkyboxMesh * MeshLoader::GenerateCubemapMesh(
 	const string& PosXFilename, const string& NegXFilename,
 	const string& PosYFilename, const string& NegYFilename,

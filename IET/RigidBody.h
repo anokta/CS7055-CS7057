@@ -27,6 +27,7 @@ public:
 	inline glm::vec3 GetForce() const { return force; }
 	inline glm::vec3 GetTorque() const { return torque; }
 
+	inline std::vector<glm::vec3> GetPoints() { return points; }
 	inline bool IsCollided() { return collided; }
 	
 	glm::mat4 GetTransformationMatrix();
@@ -43,11 +44,18 @@ public:
 	inline void SetTorque(const glm::vec3 &t) { torque = t; }
 
 	inline void AddForce(const glm::vec3 &f) { force += f; }
-	inline void ApplyGravity(float g) { force += glm::vec3(0, mass, 0) * g; }
+	inline void ApplyGravity(const float g) { force += glm::vec3(0, mass, 0) * g; }
 
-	inline void SetCollided(bool c) { collided = c; }
+	inline void SetPoints(const std::vector<glm::vec3> & vertices) { points = vertices; }
+	inline void SetCollided(const bool c) { collided = c; }
 	
 	bool CheckCollision(RigidBody * body);
+	
+
+	bool checkCollisionBroad(RigidBody * body);
+	bool checkCollisionNarrow(RigidBody * body);
+	
+	glm::vec3 getFurthestPointInDirection(glm::vec3 &direction);
 
 	void Update(float deltaTime);
 
@@ -67,10 +75,12 @@ protected:
 	float mass;
 	glm::mat3 inverseI;
 
+	std::vector<glm::vec3> points;
+
 	bool collided;
 
-	bool checkCollisionBroad(RigidBody * body);
-	bool checkCollisionNarrow(RigidBody * body);
+	bool checkSimplex(std::vector<glm::vec3> &simplex, glm::vec3 &direction);
+	bool checkTriangle(std::vector<glm::vec3> &simplex, std::vector<GLuint> &indices, glm::vec3 &direction);
 };
 
 #endif

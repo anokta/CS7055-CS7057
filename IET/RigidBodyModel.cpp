@@ -2,6 +2,9 @@
 
 #include "EntityManager.h"
 
+#include "glm\gtx\quaternion.hpp"
+#include "glm\gtx\transform.hpp"
+
 using namespace glm;
 
 bool RigidBodyModel::gizmo = false;
@@ -15,7 +18,7 @@ RigidBodyModel::RigidBodyModel(RigidBody *b, GenericShader * s, GenericShader * 
 	switch(body->GetType())
 	{
 	case RigidBody::BODY_TYPE::BOX:
-		modelMesh = MeshLoader::LoadMesh("..\\IET\\res\\block.dae", "..\\IET\\res\\block.tga");
+		modelMesh = MeshLoader::GenerateTexturedCubeMesh("..\\IET\\res\\box.jpg");//MeshLoader::LoadMesh("..\\IET\\res\\block.dae", "..\\IET\\res\\block.tga");
 		break;
 
 	case RigidBody::BODY_TYPE::BALL:
@@ -23,7 +26,7 @@ RigidBodyModel::RigidBodyModel(RigidBody *b, GenericShader * s, GenericShader * 
 		break;
 
 	case RigidBody::BODY_TYPE::ELLIPSOID:
-		modelMesh = MeshLoader::GenerateSphereMesh(40);
+		modelMesh = MeshLoader::GenerateSphereMesh(25);
 		break;	
 	
 	case RigidBody::BODY_TYPE::PLANE:
@@ -36,9 +39,15 @@ RigidBodyModel::RigidBodyModel(RigidBody *b, GenericShader * s, GenericShader * 
 	}
 
 	modelMesh->SetShader(modelShader);
+	body->SetPoints(modelMesh->GetVertices());
 
 	gizmos["BoundingBox"] = MeshLoader::GenerateBoundingBox();
 	gizmos["BoundingBox"]->SetShader(lineShader);
+
+	//gizmos["FurthestPoint"] = MeshLoader::GenerateBoundingSphere();
+	//gizmos["FurthestPoint"]->SetShader(lineShader);
+	//gizmos["BetweenLine"] = MeshLoader::GenerateLine(vec4(1,0,1,1));
+	//gizmos["BetweenLine"]->SetShader(lineShader);
 
 	EntityManager::GetInstance()->AddDrawable(this);
 	EntityManager::GetInstance()->AddUpdatable(this);
@@ -77,11 +86,15 @@ void RigidBodyModel::Draw()
 	// Render gizmos
 	if(gizmo)
 	{
+		//gizmos["BetweenLine"]->Render(lineShader);
+		//gizmos["FurthestPoint"]->Render(lineShader);
+
 		M = lineShader->GetModelMatrix();
 
 		lineShader->SetModelMatrix(M * body->GetTransformationMatrix());
-		for(auto gizmo : gizmos)
-			gizmo.second->Render(lineShader);
+		//for(auto gizmo : gizmos)
+		//	gizmo.second->Render(lineShader);
+		gizmos["BoundingBox"]->Render(lineShader);
 		lineShader->SetModelMatrix(M);
 	}
 }
@@ -89,4 +102,24 @@ void RigidBodyModel::Draw()
 void RigidBodyModel::Update(float deltaTime)
 {
 	body->Update(deltaTime);
+}
+
+bool RigidBodyModel::DetectCollision(RigidBodyModel * rigidBodyModel)
+{
+	if(body->GetLinearMomentum() != vec3())
+	{
+	////gizmos["FurthestPoint"]->Translate(furthestA);
+	//gizmos["BetweenLine"]->SetFromTo(furthestA, furthestB);
+	}
+	if(body->checkCollisionBroad(rigidBodyModel->GetBody()))
+	{	
+		//std::cout << "Broad Collided. . . ";
+		if(body->checkCollisionNarrow(rigidBodyModel->GetBody()))
+		{
+			//std::cout << "NARROW Collided. . . ";
+			return true;
+		}
+	}
+
+	return false;
 }
