@@ -190,69 +190,6 @@ bool RigidBody::checkSimplex(std::vector<vec3> &simplex, vec3 &direction)
 
 		return checkTriangle(simplex, indices, direction);
 
-		//C = simplex[0];
-		//B = simplex[1];
-		//A = simplex[2];
-
-		//// face
-		//vec3 ABC = cross(B-A, C-A);
-
-		//if(dot(cross(ABC, C-A), -A) > 0) // AC plane 
-		//{
-		//	if(dot(C-A, -A) > 0) // outside AC edge
-		//	{
-		//		direction = cross(cross(C-A, -A), C-A);
-		//		simplex.erase(simplex.begin() + 1);
-		//	}
-		//	else
-		//	{
-		//		if(dot(B-A, -A) > 0) // outside AB edge
-		//		{
-		//			direction = cross(cross(B-A, -A), B-A);
-		//			simplex.erase(simplex.begin());
-		//		}
-		//		else // outside A
-		//		{
-		//			direction = -A;
-		//			simplex.erase(simplex.begin());
-		//			simplex.erase(simplex.begin());
-		//		}
-		//	}
-		//}
-		//else // inside AC 
-		//{
-		//	if(dot(cross(B-A, ABC), -A) > 0) // AB plane 
-		//	{
-		//		if(dot(B-A, -A) > 0) // outside AB plane
-		//		{
-		//			direction = cross(cross(B-A, -A), B-A);
-		//			simplex.erase(simplex.begin());
-		//		}
-		//		else // outside A
-		//		{
-		//			direction = -A;
-		//			simplex.erase(simplex.begin());
-		//			simplex.erase(simplex.begin());
-		//		}
-		//	}
-		//	else // orthogonal to face
-		//	{
-		//		if(dot(ABC, -A) > 0) // outside face
-		//		{
-		//			direction = ABC;
-		//		}
-		//		else // inside face
-		//		{
-		//			simplex[0] = B;
-		//			simplex[1] = C;
-
-		//			direction = -ABC;
-		//		}
-		//	}
-		//}
-
-		//return false;
-
 	case 4:	// tetrahedron
 		D = simplex[0];
 		C = simplex[1];
@@ -260,7 +197,7 @@ bool RigidBody::checkSimplex(std::vector<vec3> &simplex, vec3 &direction)
 		A = simplex[3];
 
 		vec3 ABC = cross(B-A, C-A);
-		vec3 ABD = cross(B-A, D-A);
+		vec3 ADB = cross(D-A, B-A);
 		vec3 ACD = cross(C-A, D-A);
 
 		if(dot(ABC, -A) > 0)
@@ -272,7 +209,7 @@ bool RigidBody::checkSimplex(std::vector<vec3> &simplex, vec3 &direction)
 
 			return checkTriangle(simplex, indices, direction);
 		}
-		else if(dot(ABD, -A) > 0)
+		else if(dot(ADB, -A) > 0)
 		{
 			indices.clear();
 			indices.push_back(0);
@@ -291,7 +228,7 @@ bool RigidBody::checkSimplex(std::vector<vec3> &simplex, vec3 &direction)
 			return checkTriangle(simplex, indices, direction);
 		}
 
-		return  dot(cross(C-B, D-B), -A) <= 0;
+		return  dot(cross(D-B, C-B), -A) <= 0;
 	}
 }
 
@@ -350,8 +287,8 @@ bool RigidBody::checkTriangle(std::vector<glm::vec3> &simplex, std::vector<GLuin
 			}
 			else // inside face
 			{
-				simplex[std::find(simplex.begin(), simplex.end(), C) - simplex.begin()] = B;
-				simplex[std::find(simplex.begin(), simplex.end(), B) - simplex.begin()] = C;
+				simplex[indices[0]] = B;
+				simplex[indices[1]] = C;
 
 				direction = -ABC;
 			}
@@ -366,7 +303,7 @@ vec3 RigidBody::getFurthestPointInDirection(vec3 &direction)
 	vec3 furthestPoint;
 	float max = FLT_MIN;
 
-	vec3 d = toMat3(inverse(orientation)) * direction;
+	vec3 d = vec3(toMat4(inverse(orientation)) * vec4(direction, 0.0f));
 	for(unsigned int i=0; i<points.size(); ++i)
 	{
 		vec3 vertex = scale * points[i];

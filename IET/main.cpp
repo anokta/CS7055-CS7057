@@ -332,7 +332,7 @@ void update(int frame)
 		} 
 
 		// Update entitities
-		if(rigidBodies.size() < 10)
+		if(rigidBodies.size() < 0)
 		{
 			if(rand() % 10 < 5)
 			{
