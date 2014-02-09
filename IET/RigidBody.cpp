@@ -8,6 +8,7 @@
 #include <algorithm>
 
 using namespace glm;
+using namespace std;
 
 RigidBody::RigidBody(vec3 &p, quat &o, vec3 &s, float m)
 {
@@ -32,6 +33,26 @@ mat4 RigidBody::GetTransformationMatrix()
 	mat4 S = glm::scale(scale);
 
 	return T * R * S;
+}
+
+void RigidBody::SetPoints(const vector<vec3> & vertices)
+{
+	points.clear();
+	for(int i=0; i<vertices.size(); ++i)
+	{
+		bool flag = false;
+		for(int j=0; j<points.size(); ++j)
+		{
+			if(vertices[i] == points[j])
+			{
+				flag = true;
+				break;
+			}
+		}
+
+		if(!flag)
+			points.push_back(vertices[i]); 
+	}
 }
 
 bool RigidBody::CheckCollisionBroad(RigidBody * body)
@@ -119,7 +140,7 @@ bool RigidBody::CheckCollisionNarrow(RigidBody * body)
 	vec3 mDiff = furthestA - furthestB;
 
 	// Simplex points
-	std::vector<vec3> simplex;
+	vector<vec3> simplex;
 	simplex.push_back(mDiff);
 
 	// Initial direction
@@ -134,24 +155,25 @@ bool RigidBody::CheckCollisionNarrow(RigidBody * body)
 
 		if(dot(mDiff, direction) < 0)
 		{
-			//std::cout << "No Intersection" << std::endl;
+			//cout << "No Intersection" << endl;
 			return false;
 		}
 		simplex.push_back(mDiff);
 
 		if(checkSimplex(simplex, direction))
 		{
-			//std::cout << "Intersection" << std::endl;
+
+			//cout << "Intersection" << endl;
 			return true;
 		}
 	}
 
-	std::cout << "Limit exceeded." << std::endl;
+	cout << "Limit exceeded." << endl;
 
 	return false;
 }
 
-bool RigidBody::checkSimplex(std::vector<vec3> &simplex, vec3 &direction)
+bool RigidBody::checkSimplex(vector<vec3> &simplex, vec3 &direction)
 {
 	vec3 A, B, C, D;
 
@@ -211,7 +233,7 @@ bool RigidBody::checkSimplex(std::vector<vec3> &simplex, vec3 &direction)
 	}
 }
 
-bool RigidBody::checkTriangle(std::vector<glm::vec3> &simplex, glm::vec3 &direction)
+bool RigidBody::checkTriangle(vector<glm::vec3> &simplex, glm::vec3 &direction)
 {
 	vec3 C = simplex[0];
 	vec3 B = simplex[1];
@@ -275,6 +297,38 @@ bool RigidBody::checkTriangle(std::vector<glm::vec3> &simplex, glm::vec3 &direct
 	}
 
 	return false;
+}
+
+vector<vec3> RigidBody::findContactPoints(vector<vec3> &simplex)
+{
+	vec3 D = simplex[0];
+	vec3 C = simplex[1];
+	vec3 B = simplex[2];
+	vec3 A = simplex[3];
+
+	float distances[4];
+	distances[0] = dot(-A, cross(C-A, B-A)); //float dACB = dot(-A, cross(C-A, B-A));
+	distances[1] = dot(-A, cross(B-A, D-A)); //float dABD = dot(-A, cross(B-A, D-A));
+	distances[2] = dot(-A, cross(D-A, C-A)); //float dADC = dot(-A, cross(D-A, C-A));
+	distances[3] = dot(-B, cross(C-B, D-B)); //float dBCD = dot(-A, cross(C-B, D-B));
+
+	int minIndex = 0;
+	for(int i=0; i<4; ++i)
+		if(distances[i] < distances[minIndex]) 
+			minIndex = i;
+
+	//switch(minIndex)
+	//{
+	//case 0: // ACB
+
+	//case 1: // ABD
+
+	//case 2: // ADC
+
+	//case 3: // BCD
+	//}
+
+	return vector<vec3>();
 }
 
 vec3 RigidBody::getFurthestPointInDirection(vec3 &direction)

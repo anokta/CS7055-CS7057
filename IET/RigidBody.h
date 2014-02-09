@@ -28,8 +28,7 @@ public:
 	inline glm::vec3 GetTorque() const { return torque; }
 
 	inline std::vector<glm::vec3> GetPoints() { return points; }
-	//inline bool IsCollided() { return collided; }
-	
+
 	glm::mat4 GetTransformationMatrix();
 	
 	// Setters
@@ -46,8 +45,7 @@ public:
 	inline void AddForce(const glm::vec3 &f) { force += f; }
 	inline void ApplyGravity(const float g) { force += glm::vec3(0, mass, 0) * g; }
 
-	inline void SetPoints(const std::vector<glm::vec3> & vertices) { points = vertices; }
-	//inline void SetCollided(const bool c) { collided = c; }
+	void SetPoints(const std::vector<glm::vec3> & vertices);
 	
 	bool CheckCollisionBroad(RigidBody * body);
 	bool CheckCollisionNarrow(RigidBody * body);
@@ -72,11 +70,13 @@ protected:
 
 	std::vector<glm::vec3> points;
 
-	//bool collided;
-
+	// collision
 	bool checkSimplex(std::vector<glm::vec3> &simplex, glm::vec3 &direction);
 	bool checkTriangle(std::vector<glm::vec3> &simplex, glm::vec3 &direction);
 	glm::vec3 getFurthestPointInDirection(glm::vec3 &direction);
+
+	// contact model
+	std::vector<glm::vec3> findContactPoints(std::vector<glm::vec3> &simplex);
 };
 
 #endif
