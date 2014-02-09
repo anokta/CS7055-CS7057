@@ -50,6 +50,8 @@ public:
 	bool CheckCollisionBroad(RigidBody * body);
 	bool CheckCollisionNarrow(RigidBody * body);
 
+	glm::vec3 GetMinDistancePointVeronoi(glm::vec3 &target);
+
 	void Update(float deltaTime);
 
 protected:
@@ -77,6 +79,7 @@ protected:
 
 	// contact model
 	std::vector<glm::vec3> findContactPoints(std::vector<glm::vec3> &simplex);
+	void findSimplexWithMinDistanceInTriangle(std::vector<glm::vec3> &simplex, glm::vec3 &target = glm::vec3());
 };
 
 #endif

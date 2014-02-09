@@ -51,6 +51,8 @@ bool freeMode;
 vector<RigidBodyModel*> rigidBodies;
 int currentBodyIndex;
 
+Line * voronoiLine;
+
 
 float gravity = -2.0f;
 
@@ -308,6 +310,8 @@ void display(){
 
 	EntityManager::GetInstance()->DrawEntities();
 
+	voronoiLine->Render(shaders[0]);
+
 	glutSwapBuffers();
 }
 
@@ -394,6 +398,9 @@ void update(int frame)
 			
 			rigidBodies[i]->UpdateGizmoColor();	
 		}
+
+		vec3 target = rigidBodies[0]->GetBody()->GetPosition();
+		voronoiLine->SetFromTo(target, rigidBodies[3]->GetBody()->GetMinDistancePointVeronoi(target));
 
 		//cout << endl;
 
@@ -492,6 +499,9 @@ void init()
 	rigidBodies.push_back(new RigidBodyModel(new Plane(vec3(3.5f,0,0), quat(), vec2(1.0f, 2.0f)), shaders[currentShaderIndex], shaders[0]));
 	currentBodyIndex = 0;
 
+	voronoiLine = MeshLoader::GenerateLine(vec4(1,1,0.2f,1));
+	voronoiLine->SetShader(shaders[0]);
+
 	pause = false;
 
 	// OpenGL initial setup
@@ -515,6 +525,8 @@ void releaseResources()
 	audioManager = NULL;
 
 	EntityManager::Destroy();
+
+	delete voronoiLine;
 }
 
 int main(int argc, char** argv){

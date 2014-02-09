@@ -32,7 +32,7 @@ RigidBodyModel::RigidBodyModel(RigidBody *b, GenericShader * s, GenericShader * 
 		break;	
 	
 	case RigidBody::BODY_TYPE::PLANE:
-		modelMesh = MeshLoader::GeneratePlaneMesh();
+		modelMesh = MeshLoader::GenerateTriangle();//MeshLoader::GeneratePlaneMesh();
 		break;
 
 	case RigidBody::BODY_TYPE::CAT:

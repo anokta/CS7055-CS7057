@@ -564,6 +564,21 @@ Line * MeshLoader::GenerateLine(vec4 &color)
 	return new Line(v, c);
 }
 
+Line * MeshLoader::GenerateTriangle()
+{
+	vector<vec3> v;
+	v.push_back(vec3(-0.5f,-0.21f,0));
+	v.push_back(vec3(0.5f,-0.21f,0));
+	v.push_back(vec3(-0.5f,0.42f,0));
+
+	vector<vec4> c;
+	c.push_back(vec4(1,0,1,1));
+	c.push_back(vec4(1,0,1,1));
+	c.push_back(vec4(1,0,1,1));
+
+	return new Line(v, c);
+}
+
 SkyboxMesh * MeshLoader::GenerateCubemapMesh(
 	const string& PosXFilename, const string& NegXFilename,
 	const string& PosYFilename, const string& NegYFilename,

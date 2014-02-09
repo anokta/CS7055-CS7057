@@ -317,18 +317,88 @@ vector<vec3> RigidBody::findContactPoints(vector<vec3> &simplex)
 		if(distances[i] < distances[minIndex]) 
 			minIndex = i;
 
-	//switch(minIndex)
-	//{
-	//case 0: // ACB
+	switch(minIndex)
+	{
+	case 0: // ACB
+		simplex.erase(simplex.begin());
+		simplex[0] = B;
+		simplex[1] = C;
+		break;
+	
+	case 1: // ABD
+		simplex.erase(simplex.begin() + 1);
+		break;
 
-	//case 1: // ABD
+	case 2: // ADC
+		simplex.erase(simplex.begin() + 2);
+		simplex[0] = C;
+		simplex[1] = D;
+		break;
 
-	//case 2: // ADC
+	case 3: // BCD
+		simplex.erase(simplex.begin() + 3);
+		break;
+	}
+	
+	findSimplexWithMinDistanceInTriangle(simplex);
 
-	//case 3: // BCD
-	//}
+	return simplex;
+}
 
-	return vector<vec3>();
+void RigidBody::findSimplexWithMinDistanceInTriangle(vector<vec3> &simplex, vec3 &target)
+{
+	vec3 C = simplex[0];
+	vec3 B = simplex[1];
+	vec3 A = simplex[2];
+
+	if(dot(target-A, B-A) <= 0 && dot(target-A, C-A) <= 0)
+	{
+		simplex.erase(simplex.begin());
+		simplex.erase(simplex.begin());
+	}
+	else if(dot(target-B, C-B) <= 0 && dot(target-B, A-B) <= 0)
+	{
+		simplex.erase(simplex.begin() + 2);
+		simplex.erase(simplex.begin());
+	}
+	else if(dot(target-C, B-C) <= 0 && dot(target-C, A-C) <= 0)
+	{	
+		simplex.erase(simplex.begin() + 2);
+		simplex.erase(simplex.begin() + 1);
+	}
+	else if(dot(cross(cross(C-A, B-A), B-A), target-A) > 0)
+	{
+		simplex.erase(simplex.begin());
+	}
+	else if(dot(cross(cross(C-A, B-A), A-C), target-A) > 0)
+	{
+		simplex.erase(simplex.begin() + 1);
+	}
+	else if(dot(cross(cross(C-A, B-A), C-B), target-B) > 0)
+	{
+		simplex.erase(simplex.begin() + 2);
+	}
+}
+
+vec3 RigidBody::GetMinDistancePointVeronoi(vec3 &target)
+{
+	vector<vec3> simplex(points);
+	for(int i=0; i<simplex.size(); ++i)
+		simplex[i] = vec3(GetTransformationMatrix() * vec4(simplex[i], 1.0f));
+	findSimplexWithMinDistanceInTriangle(simplex, target);
+
+	vec3 n;
+	switch(simplex.size())
+	{
+	case 1:
+		return simplex[0];
+	case 2:
+		n = normalize(simplex[1] - simplex[0]);
+		return simplex[0] + (dot(target - simplex[0], n) * n);
+	case 3:
+		n = normalize(cross(simplex[1]-simplex[0], simplex[2]-simplex[0]));
+		return target - (dot(target - simplex[0], n) * n);
+	}
 }
 
 vec3 RigidBody::getFurthestPointInDirection(vec3 &direction)
