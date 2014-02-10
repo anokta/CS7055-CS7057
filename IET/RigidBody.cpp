@@ -162,7 +162,7 @@ bool RigidBody::CheckCollisionNarrow(RigidBody * body)
 
 		if(checkSimplex(simplex, direction))
 		{
-
+			findContactPoints(simplex);
 			//cout << "Intersection" << endl;
 			return true;
 		}
@@ -342,7 +342,25 @@ vector<vec3> RigidBody::findContactPoints(vector<vec3> &simplex, vec3 &target)
 	
 	findSimplexWithMinDistanceInTriangle(simplex, target);
 
+	vec3 cp;
+	vec3 n;
+	switch(simplex.size())
+	{
+	case 1:
+		cp = simplex[0];
+		break;
+	case 2:
+		n = normalize(simplex[1] - simplex[0]);
+		cp =  simplex[0] + (dot(target - simplex[0], n) * n);
+		break;
+	case 3:
+		n = normalize(cross(simplex[0]-simplex[2], simplex[1]-simplex[2]));
+		cp = target - (dot(target - simplex[0], n) * n);
+		break;
+	}
+
 	return simplex;
+
 }
 
 void RigidBody::findSimplexWithMinDistanceInTriangle(vector<vec3> &simplex, vec3 &target)
@@ -350,6 +368,8 @@ void RigidBody::findSimplexWithMinDistanceInTriangle(vector<vec3> &simplex, vec3
 	vec3 C = simplex[0];
 	vec3 B = simplex[1];
 	vec3 A = simplex[2];
+
+	vec3 ABC = cross(C-A, B-A);
 
 	if(dot(target-A, B-A) <= 0 && dot(target-A, C-A) <= 0)
 	{
@@ -366,15 +386,15 @@ void RigidBody::findSimplexWithMinDistanceInTriangle(vector<vec3> &simplex, vec3
 		simplex.erase(simplex.begin() + 2);
 		simplex.erase(simplex.begin() + 1);
 	}
-	else if(dot(cross(cross(C-A, B-A), B-A), target-A) > 0)
+	else if(dot(cross(ABC, B-A), target-A) >= 0 && dot(target-A, B-A) >= 0 && dot(target-B, A-B) >= 0)
 	{
 		simplex.erase(simplex.begin());
 	}
-	else if(dot(cross(cross(C-A, B-A), A-C), target-A) > 0)
+	else if(dot(cross(ABC, A-C), target-A) >= 0 && dot(target-C, A-C) >= 0 && dot(target-A, C-A) >= 0)
 	{
 		simplex.erase(simplex.begin() + 1);
 	}
-	else if(dot(cross(cross(C-A, B-A), C-B), target-B) > 0)
+	else if(dot(cross(ABC, C-B), target-B) >= 0 && dot(target-B, C-B) >= 0 && dot(target-C, B-C) >= 0)
 	{
 		simplex.erase(simplex.begin() + 2);
 	}
@@ -407,7 +427,7 @@ vec3 RigidBody::GetMinDistancePointVeronoi(vec3 &target)
 		n = normalize(simplex[1] - simplex[0]);
 		return simplex[0] + (dot(target - simplex[0], n) * n);
 	case 3:
-		n = normalize(cross(simplex[1]-simplex[0], simplex[2]-simplex[0]));
+		n = normalize(cross(simplex[0]-simplex[2], simplex[1]-simplex[2]));
 		return target - (dot(target - simplex[0], n) * n);
 	}
 }
