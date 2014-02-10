@@ -60,7 +60,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)$(SolutionName)\glew-1.10.0\lib\Release\Win32;$(SolutionDir)$(SolutionName)\freeglut\lib;$(SolutionDir)$(SolutionName)\Assimp\lib\x86;$(SolutionDir)$(SolutionName)\SOIL\lib;$(SolutionDir)$(SolutionName)\fmod\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)$(SolutionName)\glew-1.10.0\lib\Win32;$(SolutionDir)$(SolutionName)\freeglut\lib;$(SolutionDir)$(SolutionName)\Assimp\lib\x86;$(SolutionDir)$(SolutionName)\SOIL\lib;$(SolutionDir)$(SolutionName)\fmod\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>freeglut.lib;glew32.lib;assimp.lib;SOIL.lib;fmodexL_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -81,7 +81,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(SolutionDir)$(SolutionName)\glew-1.10.0\lib\Release\Win32;$(SolutionDir)$(SolutionName)\freeglut\lib;$(SolutionDir)$(SolutionName)\Assimp\lib\x86;$(SolutionDir)$(SolutionName)\SOIL\lib;$(SolutionDir)$(SolutionName)\fmod\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)$(SolutionName)\glew-1.10.0\lib\Win32;$(SolutionDir)$(SolutionName)\freeglut\lib;$(SolutionDir)$(SolutionName)\Assimp\lib\x86;$(SolutionDir)$(SolutionName)\SOIL\lib;$(SolutionDir)$(SolutionName)\fmod\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>freeglut.lib;glew32.lib;assimp.lib;SOIL.lib;fmodex_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
