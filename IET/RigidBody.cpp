@@ -128,7 +128,7 @@ bool RigidBody::CheckCollisionBroad(RigidBody * body)
 	return true;
 }
 
-bool RigidBody::CheckCollisionNarrow(RigidBody * body)
+vec3 RigidBody::CheckCollisionNarrow(RigidBody * body)
 {
 	// Support function
 	vec3 direction = body->GetPosition() - position; // normalize(body->GetLinearMomentum());
@@ -138,6 +138,8 @@ bool RigidBody::CheckCollisionNarrow(RigidBody * body)
 
 	// Minkowski difference
 	vec3 mDiff = furthestA - furthestB;
+
+	//simplexA[mDiff] = furthestA;
 
 	// Simplex points
 	vector<vec3> simplex;
@@ -156,21 +158,20 @@ bool RigidBody::CheckCollisionNarrow(RigidBody * body)
 		if(dot(mDiff, direction) < 0)
 		{
 			//cout << "No Intersection" << endl;
-			return false;
+			return vec3(vec3::null);
 		}
 		simplex.push_back(mDiff);
 
 		if(checkSimplex(simplex, direction))
 		{
-			findContactPoints(simplex);
 			//cout << "Intersection" << endl;
-			return true;
+			return findContactPoint(simplex);
 		}
 	}
 
 	cout << "Limit exceeded." << endl;
 
-	return false;
+	return vec3(vec3::null);
 }
 
 bool RigidBody::checkSimplex(vector<vec3> &simplex, vec3 &direction)
@@ -299,7 +300,7 @@ bool RigidBody::checkTriangle(vector<glm::vec3> &simplex, glm::vec3 &direction)
 	return false;
 }
 
-vector<vec3> RigidBody::findContactPoints(vector<vec3> &simplex, vec3 &target)
+vector<vec3> RigidBody::findClosestSimplex(vector<vec3> &simplex, vec3 &target)
 {
 	vec3 D = simplex[0];
 	vec3 C = simplex[1];
@@ -342,25 +343,7 @@ vector<vec3> RigidBody::findContactPoints(vector<vec3> &simplex, vec3 &target)
 	
 	findSimplexWithMinDistanceInTriangle(simplex, target);
 
-	vec3 cp;
-	vec3 n;
-	switch(simplex.size())
-	{
-	case 1:
-		cp = simplex[0];
-		break;
-	case 2:
-		n = normalize(simplex[1] - simplex[0]);
-		cp =  simplex[0] + (dot(target - simplex[0], n) * n);
-		break;
-	case 3:
-		n = normalize(cross(simplex[0]-simplex[2], simplex[1]-simplex[2]));
-		cp = target - (dot(target - simplex[0], n) * n);
-		break;
-	}
-
 	return simplex;
-
 }
 
 void RigidBody::findSimplexWithMinDistanceInTriangle(vector<vec3> &simplex, vec3 &target)
@@ -400,6 +383,30 @@ void RigidBody::findSimplexWithMinDistanceInTriangle(vector<vec3> &simplex, vec3
 	}
 }
 
+vec3 RigidBody::findContactPoint(vector<vec3> &simplex)
+{
+	findClosestSimplex(simplex);
+
+	vec3 cp;
+	vec3 n;
+	switch(simplex.size())
+	{
+	case 1:
+		cp = simplex[0];
+		break;
+	case 2:
+		n = normalize(simplex[1] - simplex[0]);
+		cp =  simplex[0] + (dot(-simplex[0], n) * n);
+		break;
+	case 3:
+		n = normalize(cross(simplex[0]-simplex[2], simplex[1]-simplex[2]));
+		cp = (dot(simplex[0], n) * n);
+		break;
+	}
+
+	return -cp;
+}
+
 vec3 RigidBody::GetMinDistancePointVeronoi(vec3 &target)
 {
 	vector<vec3> simplex(points);
@@ -412,7 +419,7 @@ vec3 RigidBody::GetMinDistancePointVeronoi(vec3 &target)
 		findSimplexWithMinDistanceInTriangle(simplex, target);
 		break;
 	case 4:
-		findContactPoints(simplex, target);
+		findClosestSimplex(simplex, target);
 		break;
 	default:
 		return vec3();

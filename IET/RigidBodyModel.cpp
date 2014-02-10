@@ -63,8 +63,8 @@ RigidBodyModel::RigidBodyModel(RigidBody *b, GenericShader * s, GenericShader * 
 
 	//gizmos["FurthestPoint"] = MeshLoader::GenerateBoundingSphere();
 	//gizmos["FurthestPoint"]->SetShader(lineShader);
-	//gizmos["BetweenLine"] = MeshLoader::GenerateLine(vec4(1,0,1,1));
-	//gizmos["BetweenLine"]->SetShader(lineShader);
+	gizmos["BetweenLine"] = MeshLoader::GenerateLine(vec4(1,0,1,1));
+	gizmos["BetweenLine"]->SetShader(lineShader);
 
 	EntityManager::GetInstance()->AddDrawable(this);
 	EntityManager::GetInstance()->AddUpdatable(this);
@@ -103,7 +103,7 @@ void RigidBodyModel::Draw()
 	// Render gizmos
 	if(gizmo)
 	{
-		//gizmos["BetweenLine"]->Render(lineShader);
+		gizmos["BetweenLine"]->Render(lineShader);
 		//gizmos["FurthestPoint"]->Render(lineShader);
 
 		M = lineShader->GetModelMatrix();
@@ -122,8 +122,6 @@ void RigidBodyModel::Update(float deltaTime)
 bool RigidBodyModel::DetectCollision(RigidBodyModel * rigidBodyModel)
 {
 	////gizmos["FurthestPoint"]->Translate(furthestA);
-	//gizmos["BetweenLine"]->SetFromTo(furthestA, furthestB);
-
 	if(body->CheckCollisionBroad(rigidBodyModel->GetBody()))
 	{	
 		if(gizmoColor.r == 0)
@@ -132,8 +130,16 @@ bool RigidBodyModel::DetectCollision(RigidBodyModel * rigidBodyModel)
 			rigidBodyModel->SetGizmoColor(vec4(1,1,0,1));
 
 		//std::cout << "Broad Collided. . . ";
-		if(body->CheckCollisionNarrow(rigidBodyModel->GetBody()))
+		vec3 contact = body->CheckCollisionNarrow(rigidBodyModel->GetBody());
+		if(contact != vec3(vec3::null))
 		{
+			contact = normalize(contact);
+			//if(dot(rigidBodyModel->GetBody()->getFurthestPointInDirection(-contact) - body->getFurthestPointInDirection(contact), contact) < 0)
+			//	contact = -contact;
+			gizmos["BetweenLine"]->SetFromTo(body->GetPosition(), body->GetPosition()+5.0f*normalize(contact));
+		
+			//gizmos["BetweenLine"]->SetFromTo(body->GetPosition(), body->GetPosition()-normalize(contact));
+			//std::cout << "CP: " << contact.x << "\t" << contact.y << "\t" << contact.z << std::endl;
 			//std::cout << "NARROW Collided. . . ";
 			return true;
 		}

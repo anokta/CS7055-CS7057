@@ -7,6 +7,8 @@
 
 #include "SimpleMesh.h"
 
+#include <map>
+
 class RigidBody
 {
 public:
@@ -50,9 +52,10 @@ public:
 	void SetPoints(const std::vector<glm::vec3> & vertices);
 	
 	bool CheckCollisionBroad(RigidBody * body);
-	bool CheckCollisionNarrow(RigidBody * body);
+	glm::vec3 CheckCollisionNarrow(RigidBody * body);
 
 	glm::vec3 GetMinDistancePointVeronoi(glm::vec3 &target);
+	glm::vec3 getFurthestPointInDirection(glm::vec3 &direction);
 
 	void Update(float deltaTime);
 
@@ -77,10 +80,12 @@ protected:
 	// collision
 	bool checkSimplex(std::vector<glm::vec3> &simplex, glm::vec3 &direction);
 	bool checkTriangle(std::vector<glm::vec3> &simplex, glm::vec3 &direction);
-	glm::vec3 getFurthestPointInDirection(glm::vec3 &direction);
 
 	// contact model
-	std::vector<glm::vec3> findContactPoints(std::vector<glm::vec3> &simplex, glm::vec3 &target = glm::vec3());
+	//std::map<glm::vec3, glm::vec3> simplexA;
+
+	glm::vec3 findContactPoint(std::vector<glm::vec3> &simplex);
+	std::vector<glm::vec3> findClosestSimplex(std::vector<glm::vec3> &simplex, glm::vec3 &target = glm::vec3());
 	void findSimplexWithMinDistanceInTriangle(std::vector<glm::vec3> &simplex, glm::vec3 &target = glm::vec3());
 };
 

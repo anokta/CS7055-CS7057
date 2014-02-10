@@ -395,7 +395,7 @@ void update(int frame)
 		for(unsigned int i=0; i<rigidBodies.size(); ++i)
 		{
 			//rigidBodies[i]->GetBody()->ApplyGravity(gravity);
-			rigidBodies[i]->GetBody()->SetTorque(vec3(float(rand())/RAND_MAX * 2.0f - 1.0f, float(rand())/RAND_MAX * 2.0f - 1.0f, float(rand())/RAND_MAX * 2.0f - 1.0f));
+		//	rigidBodies[i]->GetBody()->SetTorque(vec3(float(rand())/RAND_MAX * 2.0f - 1.0f, float(rand())/RAND_MAX * 2.0f - 1.0f, float(rand())/RAND_MAX * 2.0f - 1.0f));
 
 			vec3 p = rigidBodies[i]->GetBody()->GetPosition();
 
