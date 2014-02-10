@@ -20,7 +20,7 @@ RigidBodyModel::RigidBodyModel(RigidBody *b, GenericShader * s, GenericShader * 
 	case RigidBody::BODY_TYPE::BOX:
 		modelMesh = MeshLoader::GenerateTexturedCubeMesh("..\\IET\\res\\box.jpg");
 		//MeshLoader::LoadMesh("..\\IET\\res\\block.dae", "..\\IET\\res\\block.tga");
-		textured = true;
+		textured = false;
 		break;
 
 	case RigidBody::BODY_TYPE::BALL:
@@ -133,10 +133,10 @@ bool RigidBodyModel::DetectCollision(RigidBodyModel * rigidBodyModel)
 		vec3 contact = body->CheckCollisionNarrow(rigidBodyModel->GetBody());
 		if(contact != vec3(vec3::null))
 		{
-			contact = normalize(contact);
+			//contact = normalize(contact);
 			//if(dot(rigidBodyModel->GetBody()->getFurthestPointInDirection(-contact) - body->getFurthestPointInDirection(contact), contact) < 0)
 			//	contact = -contact;
-			gizmos["BetweenLine"]->SetFromTo(body->GetPosition(), body->GetPosition()+5.0f*normalize(contact));
+			gizmos["BetweenLine"]->SetFromTo(body->getFurthestPointInDirection(normalize(contact)), body->getFurthestPointInDirection(normalize(-contact)));
 		
 			//gizmos["BetweenLine"]->SetFromTo(body->GetPosition(), body->GetPosition()-normalize(contact));
 			//std::cout << "CP: " << contact.x << "\t" << contact.y << "\t" << contact.z << std::endl;

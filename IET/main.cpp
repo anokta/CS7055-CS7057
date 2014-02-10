@@ -360,7 +360,7 @@ void update(int frame)
 		} 
 
 		// Update entitities
-		if(rigidBodies.size() < 0)
+		if(rigidBodies.size() < 10)
 		{
 			if(rand() % 10 < 5)
 			{
@@ -395,7 +395,7 @@ void update(int frame)
 		for(unsigned int i=0; i<rigidBodies.size(); ++i)
 		{
 			//rigidBodies[i]->GetBody()->ApplyGravity(gravity);
-		//	rigidBodies[i]->GetBody()->SetTorque(vec3(float(rand())/RAND_MAX * 2.0f - 1.0f, float(rand())/RAND_MAX * 2.0f - 1.0f, float(rand())/RAND_MAX * 2.0f - 1.0f));
+			rigidBodies[i]->GetBody()->SetTorque(vec3(float(rand())/RAND_MAX * 2.0f - 1.0f, float(rand())/RAND_MAX * 2.0f - 1.0f, float(rand())/RAND_MAX * 2.0f - 1.0f));
 
 			vec3 p = rigidBodies[i]->GetBody()->GetPosition();
 
@@ -425,9 +425,9 @@ void update(int frame)
 
 		if(currentTarget != vec2())
 		{
-			vec3 target = rigidBodies[currentBodyIndex]->GetBody()->GetPosition();
-			voronoiLine->SetFromTo(target, rigidBodies[6]->GetBody()->GetMinDistancePointVeronoi(target));
-			voronoiLineTetrahedron->SetFromTo(target, rigidBodies[5]->GetBody()->GetMinDistancePointVeronoi(target));
+			vec3 target = rigidBodies[4]->GetBody()->GetPosition();
+			voronoiLine->SetFromTo(target, rigidBodies[5]->GetBody()->GetMinDistancePointVeronoi(target));
+			voronoiLineTetrahedron->SetFromTo(target, rigidBodies[6]->GetBody()->GetMinDistancePointVeronoi(target));
 		}
 		
 		EntityManager::GetInstance()->UpdateEntities(DELTA_TIME);
@@ -523,14 +523,14 @@ void init()
 
 	//rigidBodies.push_back(new RigidBodyModel(new Ball(vec3(-7,0,0)), shaders[currentShaderIndex+1], shaders[0]));
 	rigidBodies.push_back(new RigidBodyModel(new Box(vec3(7,0,0), quat(), vec3(1.0f, 0.4f, 1.5f)), shaders[currentShaderIndex+1], shaders[0]));
-	rigidBodies.push_back(new RigidBodyModel(new Ellipsoid(vec3(0,0,0), quat(), vec3(0.7f, 1.4f, 0.5f)), shaders[currentShaderIndex], shaders[0]));
-	rigidBodies.push_back(new RigidBodyModel(new Cat(vec3(-3.5f,0,0), quat(), vec3(0.5f, 1.0f, 2.0f)), shaders[currentShaderIndex+1], shaders[0]));
-	rigidBodies.push_back(new RigidBodyModel(new Plane(vec3(3.5f,0,0), quat(), vec2(1.0f, 2.0f)), shaders[currentShaderIndex], shaders[0]));
+	rigidBodies.push_back(new RigidBodyModel(new Ellipsoid(vec3(-1,0,0), quat(), vec3(1.4f, 1.0f, 0.5f)), shaders[currentShaderIndex], shaders[0]));
+	rigidBodies.push_back(new RigidBodyModel(new Cat(vec3(-7.0f,1,0), quat(), vec3(0.5f, 1.0f, 2.0f)), shaders[currentShaderIndex+1], shaders[0]));
+	rigidBodies.push_back(new RigidBodyModel(new Plane(vec3(3.5,-1,0), quat(), vec2(1.0f, 2.0f)), shaders[currentShaderIndex], shaders[0]));
 	
 	// Voronoi
 	rigidBodies.push_back(new RigidBodyModel(new Ellipsoid(vec3(40,2,0), quat(), vec3(0.1f, 0.1f, 0.1f)), shaders[currentShaderIndex], shaders[0]));
-	rigidBodies.push_back(new RigidBodyModel(new Tetrahedron(vec3(42.0f,0,0)), shaders[0], shaders[0]));
-	rigidBodies.push_back(new RigidBodyModel(new Triangle(vec3(38.0f,0,0)), shaders[0], shaders[0]));
+	rigidBodies.push_back(new RigidBodyModel(new Triangle(vec3(36.0f,0,0), quat(), vec2(5,5)), shaders[0], shaders[0]));
+	rigidBodies.push_back(new RigidBodyModel(new Tetrahedron(vec3(44.0f,0,0), quat(), vec3(5,5,5)), shaders[0], shaders[0]));
 
 	voronoiLine = MeshLoader::GenerateLine(vec4(1,0.6f,0.1f,1));
 	voronoiLine->SetShader(shaders[0]);
