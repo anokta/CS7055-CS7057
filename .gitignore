@@ -46,6 +46,8 @@ build/
 *.log
 *.scc
 
+!/IET/res/*.obj
+
 # Visual C++ cache files
 ipch/
 *.aps
