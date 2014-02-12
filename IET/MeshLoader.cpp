@@ -143,6 +143,98 @@ TexturedIndexedMesh * MeshLoader::LoadMesh(const std::string &path, const string
 	return NULL;
 }
 
+BumpedTexturedMesh * MeshLoader::LoadBumpedMesh(const std::string &path, const string &texturePath, const string &normalPath)
+{
+	// Load the file
+	Assimp::Importer importer;
+	const aiScene* scene = importer.ReadFile(
+		path, 
+		aiProcess_Triangulate
+		| aiProcess_JoinIdenticalVertices
+		| aiProcess_OptimizeGraph
+		| aiProcess_OptimizeMeshes
+		| aiProcess_RemoveRedundantMaterials
+		| aiProcess_GenSmoothNormals
+		| aiProcess_CalcTangentSpace
+		);
+
+	if (scene->HasMeshes())
+	{
+		// Get the model mesh
+		aiMesh &mesh = *scene->mMeshes[0];
+
+		if (!mesh.HasPositions() || !mesh.HasFaces()) 
+			return NULL;
+
+		// Initialize the model
+		vector<glm::vec3> vertices;
+		vector<GLuint> indices;
+		vector<glm::vec3> normals;
+		vector<glm::vec2> uvs;
+		vector<glm::vec4> tangents;
+
+		// Get mesh properties 
+		for (unsigned int i=0; i<mesh.mNumVertices; ++i) 
+		{
+			// Get vertices
+			vertices.push_back(glm::vec3(mesh.mVertices[i].x, mesh.mVertices[i].y, mesh.mVertices[i].z));
+			//vertices[vertices.size()-1] /= 38;
+
+			// Get normals
+			normals.push_back(glm::vec3(mesh.mNormals[i].x, mesh.mNormals[i].y, mesh.mNormals[i].z));
+
+			// Get UVs
+			uvs.push_back(glm::vec2(mesh.mTextureCoords[0][i].x, mesh.mTextureCoords[0][i].y));
+
+			if (mesh.HasTangentsAndBitangents()) 
+			{
+				const aiVector3D tangent = mesh.mTangents[i];
+				const aiVector3D bitangent = mesh.mBitangents[i];
+
+				// put the three vectors into my vec3 struct format for doing maths
+				vec3 t (tangent.x, tangent.y, tangent.z);
+				vec3 b (bitangent.x, bitangent.y, bitangent.z);
+				// orthogonalise and normalise the tangent so we can use it in something
+				// approximating a T,N,B inverse matrix
+				vec3 t_i = t - normals[i] * dot (normals[i], t);
+				//5std::cout << i << ": " << t_i.x << " " << t_i.y << " " << t_i.z << std::endl;
+				if(!isnan(t_i.x)) t_i = normalize(t_i);
+
+				// get determinant of T,B,N 3x3 matrix by dot*cross method
+				float det = (dot (cross (normals[i], t), b));
+				if (det < 0.0f) {
+					det = -1.0f;
+				} else {
+					det = 1.0f;
+				}
+
+				tangents.push_back(vec4(t_i, det));
+			}
+		}		
+
+		// Normalize vertices
+		normalizeVertices(vertices);
+
+		// Get indices
+		for (unsigned int i=0; i<mesh.mNumFaces; ++i) 
+		{
+			aiFace face = mesh.mFaces[i];
+
+			indices.push_back(face.mIndices[0]);
+			indices.push_back(face.mIndices[1]);
+			indices.push_back(face.mIndices[2]);
+		}
+
+		BumpedTexturedMesh * modelMesh =  new BumpedTexturedMesh(vertices, indices, normals, uvs, tangents);
+		modelMesh->SetTexture(loadTexture(texturePath));
+		modelMesh->SetNormalTexture(loadTexture(normalPath));
+
+		return modelMesh;
+	}
+
+	return NULL;
+}
+
 SimpleMesh * MeshLoader::GenerateCubeMesh()
 {
 	vec3 vertices[] = {
@@ -559,7 +651,7 @@ Line * MeshLoader::GenerateLine(vec4 &color)
 
 	vector<vec4> c;
 	c.push_back(color);
-	c.push_back(color);
+	c.push_back(1.0f-color);
 
 	return new Line(v, c);
 }

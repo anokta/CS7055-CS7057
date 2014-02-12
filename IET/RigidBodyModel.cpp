@@ -24,7 +24,7 @@ RigidBodyModel::RigidBodyModel(RigidBody *b, GenericShader * s, GenericShader * 
 		break;
 
 	case RigidBody::BODY_TYPE::BALL:
-		modelMesh = MeshLoader::LoadMesh("..\\IET\\res\\basketball.obj", "..\\IET\\res\\basketball.jpg");		
+		modelMesh = MeshLoader::LoadBumpedMesh("..\\IET\\res\\Earth.dae", "..\\IET\\res\\Earth_D.tga", "..\\IET\\res\\Earth_N.tga");		
 		textured = true;
 		break;
 
@@ -50,7 +50,7 @@ RigidBodyModel::RigidBodyModel(RigidBody *b, GenericShader * s, GenericShader * 
 		break;
 
 	case RigidBody::BODY_TYPE::CAT:
-		modelMesh = MeshLoader::LoadMesh("..\\IET\\res\\cat.obj", "..\\IET\\res\\cat.tga");
+		modelMesh = MeshLoader::LoadBumpedMesh("..\\IET\\res\\Apple_Of_Eden.dae", "..\\IET\\res\\AppleOfEden_D.tga", "..\\IET\\res\\AppleOfEden_N.tga");
 		textured = true;
 		break;
 	}
@@ -133,10 +133,11 @@ bool RigidBodyModel::DetectCollision(RigidBodyModel * rigidBodyModel)
 		vec3 contact = body->CheckCollisionNarrow(rigidBodyModel->GetBody());
 		if(contact != vec3(vec3::null))
 		{
-			//contact = normalize(contact);
+			contact = normalize(contact);
 			//if(dot(rigidBodyModel->GetBody()->getFurthestPointInDirection(-contact) - body->getFurthestPointInDirection(contact), contact) < 0)
 			//	contact = -contact;
-			gizmos["BetweenLine"]->SetFromTo(body->getFurthestPointInDirection(normalize(contact)), body->getFurthestPointInDirection(normalize(-contact)));
+			//gizmos["BetweenLine"]->SetFromTo(body->getFurthestPointInDirection(normalize(contact)), body->getFurthestPointInDirection(normalize(-contact)));
+			gizmos["BetweenLine"]->SetFromTo(vec3(), contact);
 		
 			//gizmos["BetweenLine"]->SetFromTo(body->GetPosition(), body->GetPosition()-normalize(contact));
 			//std::cout << "CP: " << contact.x << "\t" << contact.y << "\t" << contact.z << std::endl;

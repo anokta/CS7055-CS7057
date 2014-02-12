@@ -186,6 +186,9 @@
     <ClInclude Include="Triangle.h">
       <Filter>Header Files\Entities\RigidBody</Filter>
     </ClInclude>
+    <ClInclude Include="BumpedTexturedMesh.h">
+      <Filter>Header Files\Graphics\Meshes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -266,6 +269,9 @@
     <ClCompile Include="Triangle.cpp">
       <Filter>Source Files\Entities\RigidBody</Filter>
     </ClCompile>
+    <ClCompile Include="BumpedTexturedMesh.cpp">
+      <Filter>Source Files\Graphics\Meshes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Default.frag">
@@ -288,6 +294,12 @@
     </None>
     <None Include="Cubemap.frag">
       <Filter>Resource Files\Shaders\Skybox</Filter>
+    </None>
+    <None Include="Bumped.vert">
+      <Filter>Resource Files\Shaders\Textured</Filter>
+    </None>
+    <None Include="Bumped.frag">
+      <Filter>Resource Files\Shaders\Textured</Filter>
     </None>
   </ItemGroup>
 </Project>

@@ -102,6 +102,7 @@
     <ClInclude Include="AudioManager.h" />
     <ClInclude Include="AudioEventManager.h" />
     <ClInclude Include="AudioEvent.h" />
+    <ClInclude Include="BumpedTexturedMesh.h" />
     <ClInclude Include="Ellipsoid.h" />
     <ClInclude Include="Box.h" />
     <ClInclude Include="Ball.h" />
@@ -135,6 +136,7 @@
     <ClCompile Include="AudioManager.cpp" />
     <ClCompile Include="Ball.cpp" />
     <ClCompile Include="Box.cpp" />
+    <ClCompile Include="BumpedTexturedMesh.cpp" />
     <ClCompile Include="Cat.cpp" />
     <ClCompile Include="Ellipsoid.cpp" />
     <ClCompile Include="Line.cpp" />
@@ -159,6 +161,8 @@
     <ClCompile Include="Triangle.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Bumped.frag" />
+    <None Include="Bumped.vert" />
     <None Include="Cubemap.frag" />
     <None Include="Default.frag" />
     <None Include="DefaultTextured.frag" />

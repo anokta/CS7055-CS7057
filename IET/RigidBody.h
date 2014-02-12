@@ -46,8 +46,8 @@ public:
 	inline void SetForce(const glm::vec3 &f) { force = f; }
 	inline void SetTorque(const glm::vec3 &t) { torque = t; }
 
-	inline void AddForce(const glm::vec3 &f) { force += f; }
 	inline void ApplyGravity(const float g) { force += glm::vec3(0, mass, 0) * g; }
+	void ApplyForce(const glm::vec3 &point, const glm::vec3 &f);
 
 	void SetPoints(const std::vector<glm::vec3> & vertices);
 	
@@ -55,7 +55,6 @@ public:
 	glm::vec3 CheckCollisionNarrow(RigidBody * body);
 
 	glm::vec3 GetMinDistancePointVeronoi(glm::vec3 &target);
-	glm::vec3 getFurthestPointInDirection(glm::vec3 &direction);
 
 	void Update(float deltaTime);
 
@@ -85,8 +84,10 @@ protected:
 	//std::map<glm::vec3, glm::vec3> simplexA;
 
 	glm::vec3 findContactPoint(std::vector<glm::vec3> &simplex);
+	glm::vec3 findContactNormal(std::vector<glm::vec3> &simplex);
 	std::vector<glm::vec3> findClosestSimplex(std::vector<glm::vec3> &simplex, glm::vec3 &target = glm::vec3());
 	void findSimplexWithMinDistanceInTriangle(std::vector<glm::vec3> &simplex, glm::vec3 &target = glm::vec3());
+	glm::vec3 getFurthestPointInDirection(glm::vec3 &direction);
 };
 
 #endif

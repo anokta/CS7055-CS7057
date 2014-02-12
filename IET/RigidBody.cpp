@@ -55,6 +55,13 @@ void RigidBody::SetPoints(const vector<vec3> & vertices)
 	}
 }
 
+
+void RigidBody::ApplyForce(const glm::vec3 &point, const glm::vec3 &f)
+{
+	force += f;
+	torque += cross(point - position, f);
+}
+
 bool RigidBody::CheckCollisionBroad(RigidBody * body)
 {
 	mat3 aOrientation = toMat3(orientation);
@@ -165,7 +172,7 @@ vec3 RigidBody::CheckCollisionNarrow(RigidBody * body)
 		if(checkSimplex(simplex, direction))
 		{
 			//cout << "Intersection" << endl;
-			return findContactPoint(simplex);
+			return findContactNormal(simplex);//findContactPoint(simplex);
 		}
 	}
 
@@ -406,6 +413,17 @@ vec3 RigidBody::findContactPoint(vector<vec3> &simplex)
 
 	return -cp;
 }
+
+vec3 RigidBody::findContactNormal(vector<vec3> &simplex)
+{
+	//while(true)
+	//{
+
+	//}
+
+	return vec3();
+}
+
 
 vec3 RigidBody::GetMinDistancePointVeronoi(vec3 &target)
 {

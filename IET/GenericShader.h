@@ -24,6 +24,7 @@ public:
 	inline const GLuint GetVertexColorID() { return vColorID; }
 	inline const GLuint GetVertexNormalID() { return vNormalID; }
 	inline const GLuint GetVertexUVID() { return vUvID; }
+	inline const GLuint GetVertexTangentID() { return vTangentID; }
 	
 	inline const glm::mat4& GetViewMatrix() { return V; }
 	inline const glm::mat4& GetProjectionMatrix() { return P; }
@@ -43,7 +44,8 @@ public:
 	void SetSpecularComponent(glm::vec3 color, float intensity, float shininess);
 	void SetRoughness(float roughness);
 	
-	void BindTexture(GLuint textureID);
+	enum TextureType { DIFFUSE, NORMAL };
+	void BindTexture(GLuint textureID, TextureType type = TextureType::DIFFUSE);
 	void UnbindTexture();
 
 	void BindCubeTexture(GLuint textureID);
@@ -62,9 +64,11 @@ protected:
 	
 	GLuint vPositionID, vColorID, vNormalID;
 	GLuint vUvID, fTextureID;
+	GLuint vTangentID;
 	GLuint viewID, projectionID, modelID;
 	GLuint eyeID;
 	
+	GLuint fNormalTextureID;
 	GLuint fCubeTextureID;
 
 	GLuint ambientColorID, ambientIntensityID;	

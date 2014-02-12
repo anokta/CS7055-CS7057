@@ -13,7 +13,7 @@ public:
 
 	void Render(GenericShader * shader);
 
-private:
+protected:
 	GLuint iboID;
 	
 	std::vector<GLuint> indices;

@@ -55,6 +55,7 @@ GenericShader::GenericShader(string vShaderFilepath, string fShaderFilepath, str
 
 	vUvID = glGetAttribLocation(programID, "vUv");
 	fTextureID = glGetUniformLocation(programID, "fTexture");
+	fNormalTextureID = glGetUniformLocation(programID, "fNormalTexture");
 
 	fCubeTextureID = glGetUniformLocation(programID, "fCubeTexture");
 }
@@ -70,12 +71,20 @@ void GenericShader::UseProgram()
 }
 
 
-void GenericShader::BindTexture(GLuint textureID)
+void GenericShader::BindTexture(GLuint textureID, TextureType type)
 {
 	glEnable(GL_TEXTURE_2D);
 
-	glUniform1i(fTextureID, 0);
-	glActiveTexture(GL_TEXTURE0);
+	if(type == TextureType::DIFFUSE)
+	{
+		glUniform1i(fTextureID, 0);
+		glActiveTexture(GL_TEXTURE0);
+	}
+	else
+	{
+		glUniform1i(fNormalTextureID, 1);
+		glActiveTexture(GL_TEXTURE1);
+	}
 
 	glBindTexture(GL_TEXTURE_2D, textureID);
 }
