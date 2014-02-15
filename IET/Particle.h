@@ -21,7 +21,7 @@ public:
 	inline void AddForce(const glm::vec3 &f) { force += f; }
 
 	//bool IsColliding(ObstaclePlane * plane);
-	//void ResolveCollision(ObstaclePlane * plane);
+	//void RespondCollision(ObstaclePlane * plane);
 	
 	void Update(float deltaTime);
 

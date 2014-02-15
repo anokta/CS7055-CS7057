@@ -35,7 +35,7 @@ void Particle::Update(float deltaTime)
 //	return (dot(position - plane->GetPosition(), plane->GetNormal()) < EPSILON) && (dot(plane->GetNormal(), velocity) < 0);
 //}
 
-//void Particle::ResolveCollision(ObstaclePlane * plane)
+//void Particle::RespondCollision(ObstaclePlane * plane)
 //{
 //	// reverse velocity
 //	vec3 vn = dot(plane->GetNormal(), velocity) * plane->GetNormal();

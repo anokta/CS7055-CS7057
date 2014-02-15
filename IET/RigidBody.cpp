@@ -10,7 +10,7 @@
 using namespace glm;
 using namespace std;
 
-RigidBody::RigidBody(vec3 &p, quat &o, vec3 &s, float m)
+RigidBody::RigidBody(vec3 &p, quat &o, vec3 &s)
 {
 	position = p;
 	orientation = o;
@@ -21,8 +21,6 @@ RigidBody::RigidBody(vec3 &p, quat &o, vec3 &s, float m)
 
 	angularMomentum = vec3();
 	torque = vec3();
-
-	mass = m;
 }
 
 
@@ -35,13 +33,18 @@ mat4 RigidBody::GetTransformationMatrix()
 	return T * R * S;
 }
 
+mat3 RigidBody::GetInertiaInverse() const
+{
+	return toMat3(orientation) * inverseI * transpose(toMat3(orientation));
+}
+
 void RigidBody::SetPoints(const vector<vec3> & vertices)
 {
 	points.clear();
 	for(int i=0; i<vertices.size(); ++i)
 	{
 		bool flag = false;
-		for(int j=0; j<points.size(); ++j)
+		for(unsigned int j=0; j<points.size(); ++j)
 		{
 			if(vertices[i] == points[j])
 			{
@@ -171,14 +174,61 @@ vec3 RigidBody::CheckCollisionNarrow(RigidBody * body)
 
 		if(checkSimplex(simplex, direction))
 		{
+			vec3 normal;
+			//while(true)
+			//{
+			//	int index = findClosestFace(simplex);
+			//	cout << simplex.size() << endl;
+			//	vec3 normal = normalize(cross(simplex[index+2] - simplex[index], simplex[index+1] - simplex[index]));
+			//	
+			//	vec3 supportA = getFurthestPointInDirection(getFurthestPointInDirection(normal));
+			//	vec3 supportB = getFurthestPointInDirection(getFurthestPointInDirection(-normal));
+			//	vec3 newPoint = supportA - supportB;
+
+			//	if(dot(newPoint - simplex[index+1], normal) - dot(-simplex[index+1], normal) < 0.03f) 
+			//	{
+			//		normal = -normal * dot(-simplex[index+1], normal);
+			//		break;
+			//	}
+
+			//	simplex.insert(simplex.begin() + index + 1, newPoint);
+			//}
+
 			//cout << "Intersection" << endl;
-			return findContactNormal(simplex);//findContactPoint(simplex);
+			return normal; //findContactNormal(simplex);//findContactPoint(simplex);
 		}
 	}
 
 	cout << "Limit exceeded." << endl;
 
 	return vec3(vec3::null);
+}
+
+void RigidBody::RespondCollision(RigidBody *body, vec3 &cpA, vec3 &cpB, vec3 &n)
+{
+	vec3 rA = cpA - position;
+	vec3 rB = cpB - body->GetPosition();
+
+	vec3 J = CalculateCollisionImpulse(body, rA, rB, n, 1.0f) * n;
+	
+	linearMomentum = linearMomentum + J;
+	angularMomentum = angularMomentum + cross(rA, J);
+
+	body->SetLinearMomentum(body->GetLinearMomentum() - J);
+	body->SetAngularMomentum(body->GetAngularMomentum() - cross(rB, J));
+	
+}
+
+float RigidBody::calculateCollisionImpulse(RigidBody *body, vec3 &rA, vec3 &rB, vec3 &n, float e)
+{ 
+	vec3 pA = GetLinearVelocity() + cross(GetAngularVelocity(), rA);
+	vec3 pB = body->GetLinearVelocity() + cross(body->GetAngularVelocity(), rB);
+	vec3 relativeV = pA - pB;
+
+	float j = (-(1 + e) * dot(n, relativeV)) / 
+		(massInverse + body->GetMassInverse() + dot(n, GetInertiaInverse() * cross(rA, n)) + dot(n, body->GetInertiaInverse() * cross(rB, n)));
+
+	return j;
 }
 
 bool RigidBody::checkSimplex(vector<vec3> &simplex, vec3 &direction)
@@ -315,10 +365,10 @@ vector<vec3> RigidBody::findClosestSimplex(vector<vec3> &simplex, vec3 &target)
 	vec3 A = simplex[3];
 
 	float distances[4];
-	distances[0] = dot(target-A, normalize(cross(C-A, B-A))); //float dACB = dot(-A, cross(C-A, B-A));
-	distances[1] = dot(target-A, normalize(cross(B-A, D-A))); //float dABD = dot(-A, cross(B-A, D-A));
-	distances[2] = dot(target-A, normalize(cross(D-A, C-A))); //float dADC = dot(-A, cross(D-A, C-A));
-	distances[3] = dot(target-B, normalize(cross(C-B, D-B))); //float dBCD = dot(-A, cross(C-B, D-B));
+	distances[0] = dot(-A, normalize(cross(C-A, B-A))); //float dACB = dot(-A, cross(C-A, B-A));
+	distances[1] = dot(-A, normalize(cross(B-A, D-A))); //float dABD = dot(-A, cross(B-A, D-A));
+	distances[2] = dot(-A, normalize(cross(D-A, C-A))); //float dADC = dot(-A, cross(D-A, C-A));
+	distances[3] = dot(-B, normalize(cross(C-B, D-B))); //float dBCD = dot(-A, cross(C-B, D-B));
 
 	int minIndex = 0;
 	for(int i=0; i<4; ++i)
@@ -361,30 +411,30 @@ void RigidBody::findSimplexWithMinDistanceInTriangle(vector<vec3> &simplex, vec3
 
 	vec3 ABC = cross(C-A, B-A);
 
-	if(dot(target-A, B-A) <= 0 && dot(target-A, C-A) <= 0)
+	if(dot(-A, B-A) <= 0 && dot(-A, C-A) <= 0)
 	{
 		simplex.erase(simplex.begin());
 		simplex.erase(simplex.begin());
 	}
-	else if(dot(target-B, C-B) <= 0 && dot(target-B, A-B) <= 0)
+	else if(dot(-B, C-B) <= 0 && dot(-B, A-B) <= 0)
 	{
 		simplex.erase(simplex.begin() + 2);
 		simplex.erase(simplex.begin());
 	}
-	else if(dot(target-C, B-C) <= 0 && dot(target-C, A-C) <= 0)
+	else if(dot(-C, B-C) <= 0 && dot(-C, A-C) <= 0)
 	{	
 		simplex.erase(simplex.begin() + 2);
 		simplex.erase(simplex.begin() + 1);
 	}
-	else if(dot(cross(ABC, B-A), target-A) >= 0 && dot(target-A, B-A) >= 0 && dot(target-B, A-B) >= 0)
+	else if(dot(cross(ABC, B-A), -A) >= 0 && dot(-A, B-A) >= 0 && dot(-B, A-B) >= 0)
 	{
 		simplex.erase(simplex.begin());
 	}
-	else if(dot(cross(ABC, A-C), target-A) >= 0 && dot(target-C, A-C) >= 0 && dot(target-A, C-A) >= 0)
+	else if(dot(cross(ABC, A-C), -A) >= 0 && dot(-C, A-C) >= 0 && dot(-A, C-A) >= 0)
 	{
 		simplex.erase(simplex.begin() + 1);
 	}
-	else if(dot(cross(ABC, C-B), target-B) >= 0 && dot(target-B, C-B) >= 0 && dot(target-C, B-C) >= 0)
+	else if(dot(cross(ABC, C-B), -B) >= 0 && dot(-B, C-B) >= 0 && dot(-C, B-C) >= 0)
 	{
 		simplex.erase(simplex.begin() + 2);
 	}
@@ -416,6 +466,7 @@ vec3 RigidBody::findContactPoint(vector<vec3> &simplex)
 
 vec3 RigidBody::findContactNormal(vector<vec3> &simplex)
 {
+
 	//while(true)
 	//{
 
@@ -424,6 +475,26 @@ vec3 RigidBody::findContactNormal(vector<vec3> &simplex)
 	return vec3();
 }
 
+int RigidBody::findClosestFace(vector<vec3> &simplex)
+{
+	float minDistance = FLT_MAX;
+	unsigned int minIndex = 0;
+	for(unsigned int i=0; i<simplex.size()-2; ++i)
+	{
+		vec3 face = normalize(cross(simplex[i+2] - simplex[i], simplex[i+1] - simplex[i]));
+
+		float distance = dot(-simplex[i], face);
+		if(distance < minDistance)
+		{
+			minDistance = distance;
+			minIndex = i;
+		}
+	}
+
+
+
+	return minIndex;
+}
 
 vec3 RigidBody::GetMinDistancePointVeronoi(vec3 &target)
 {
@@ -482,7 +553,7 @@ void RigidBody::Update(float deltaTime)
 {	
 	// linear
 	linearMomentum += force * deltaTime;
-	position += (linearMomentum/mass)  * deltaTime;
+	position += (linearMomentum * massInverse)  * deltaTime;
 
 	force = vec3();
 

@@ -2,9 +2,12 @@
 
 using namespace glm;
 
-Tetrahedron::Tetrahedron(vec3 &p, quat &o, vec3 &s, float d) : RigidBody(p, o, s, d)
+Tetrahedron::Tetrahedron(vec3 &p, quat &o, vec3 &s, float d) : RigidBody(p, o, s)
 {
 	type = BODY_TYPE::TETRAHEDRON;
+	
+	float mass = d * scale.x * scale.y * scale.z;
+	massInverse = 1.0f / mass;
 
 	mat3 I = mat3(
 		vec3(3.0f*mass/5.0f*scale.y *scale.y + 3.0f*mass/20.0f*scale.x*scale.z , 0, 0),
@@ -13,5 +16,4 @@ Tetrahedron::Tetrahedron(vec3 &p, quat &o, vec3 &s, float d) : RigidBody(p, o, s
 		);
 	inverseI = I._inverse();
 
-	mass = d * scale.x * scale.y * scale.z;
 }
