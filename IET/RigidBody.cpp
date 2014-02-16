@@ -174,28 +174,49 @@ vec3 RigidBody::CheckCollisionNarrow(RigidBody * body)
 
 		if(checkSimplex(simplex, direction))
 		{
-			vec3 normal;
-			//while(true)
-			//{
-			//	int index = findClosestFace(simplex);
-			//	cout << simplex.size() << endl;
-			//	vec3 normal = normalize(cross(simplex[index+2] - simplex[index], simplex[index+1] - simplex[index]));
-			//	
-			//	vec3 supportA = getFurthestPointInDirection(getFurthestPointInDirection(normal));
-			//	vec3 supportB = getFurthestPointInDirection(getFurthestPointInDirection(-normal));
-			//	vec3 newPoint = supportA - supportB;
+			vector<Face> faces;
+			faces.push_back(Face(0, 1, 2, simplex[0], simplex[1], simplex[2]));
+			faces.push_back(Face(0, 1, 3, simplex[0], simplex[1], simplex[3]));
+			faces.push_back(Face(0, 2, 3, simplex[0], simplex[2], simplex[3]));
+			faces.push_back(Face(1, 2, 3, simplex[1], simplex[2], simplex[3]));
+			
+			while(true)
+			{
+				int index = findClosestFace(faces);
+				vec3 normal = -faces[index].normal;
 
-			//	if(dot(newPoint - simplex[index+1], normal) - dot(-simplex[index+1], normal) < 0.03f) 
-			//	{
-			//		normal = -normal * dot(-simplex[index+1], normal);
-			//		break;
-			//	}
+				vec3 supportA = getFurthestPointInDirection(normal);
+				vec3 supportB = body->getFurthestPointInDirection(-normal);
+				vec3 newPoint = supportA - supportB;
+				
+				//std::cout << "point: " << newPoint.x << " " << newPoint.y << " " << newPoint.z << endl;
+				//std::cout << "P dot\t: " << dot(newPoint - faces[index].v1, normal) << endl;
+				//std::cout << "Normal dot\t: " << dot(faces[index].v1, normal) << endl;
 
-			//	simplex.insert(simplex.begin() + index + 1, newPoint);
-			//}
 
-			//cout << "Intersection" << endl;
-			return normal; //findContactNormal(simplex);//findContactPoint(simplex);
+				if(dot(newPoint - faces[index].v1, normal) - dot(faces[index].v1, normal) < 0.01f) 
+				{				
+					// Calculate normal
+					vec3 result = -normal * dot(-faces[index].v1, -normal);
+
+					if(result != vec3())
+						return normalize(result);
+					else
+						return vec3(vec3::null);
+				}
+
+				simplex.push_back(newPoint);
+				int newIndex = simplex.size()-1;
+				int i1 = faces[index].i1;
+				int i2 = faces[index].i2;
+				int i3 = faces[index].i3;
+
+				faces.push_back(Face(newIndex, i1, i2, simplex[newIndex], simplex[i1], simplex[i2]));
+				faces.push_back(Face(newIndex, i1, i3, simplex[newIndex], simplex[i1], simplex[i3]));
+				faces.push_back(Face(newIndex, i2, i3, simplex[newIndex], simplex[i2], simplex[i3])); 
+
+				faces.erase(faces.begin() + index);
+			}
 		}
 	}
 
@@ -209,7 +230,7 @@ void RigidBody::RespondCollision(RigidBody *body, vec3 &cpA, vec3 &cpB, vec3 &n)
 	vec3 rA = cpA - position;
 	vec3 rB = cpB - body->GetPosition();
 
-	vec3 J = CalculateCollisionImpulse(body, rA, rB, n, 1.0f) * n;
+	vec3 J = calculateCollisionImpulse(body, rA, rB, n, 1.0f) * n;
 	
 	linearMomentum = linearMomentum + J;
 	angularMomentum = angularMomentum + cross(rA, J);
@@ -220,7 +241,7 @@ void RigidBody::RespondCollision(RigidBody *body, vec3 &cpA, vec3 &cpB, vec3 &n)
 }
 
 float RigidBody::calculateCollisionImpulse(RigidBody *body, vec3 &rA, vec3 &rB, vec3 &n, float e)
-{ 
+{
 	vec3 pA = GetLinearVelocity() + cross(GetAngularVelocity(), rA);
 	vec3 pB = body->GetLinearVelocity() + cross(body->GetAngularVelocity(), rB);
 	vec3 relativeV = pA - pB;
@@ -475,23 +496,20 @@ vec3 RigidBody::findContactNormal(vector<vec3> &simplex)
 	return vec3();
 }
 
-int RigidBody::findClosestFace(vector<vec3> &simplex)
+int RigidBody::findClosestFace(vector<Face> &faces)
 {
 	float minDistance = FLT_MAX;
 	unsigned int minIndex = 0;
-	for(unsigned int i=0; i<simplex.size()-2; ++i)
+	for(unsigned int i=0; i<faces.size(); ++i)
 	{
-		vec3 face = normalize(cross(simplex[i+2] - simplex[i], simplex[i+1] - simplex[i]));
+		float distance = dot(-faces[i].v1, faces[i].normal);
 
-		float distance = dot(-simplex[i], face);
 		if(distance < minDistance)
 		{
 			minDistance = distance;
 			minIndex = i;
 		}
 	}
-
-
 
 	return minIndex;
 }

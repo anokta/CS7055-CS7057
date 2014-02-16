@@ -130,22 +130,21 @@ bool RigidBodyModel::ResolveCollision(RigidBodyModel * rigidBodyModel)
 			rigidBodyModel->SetGizmoColor(vec4(1,1,0,1));
 
 		//std::cout << "Broad Collided. . . ";
-		vec3 contact = body->CheckCollisionNarrow(rigidBodyModel->GetBody());
-		if(contact != vec3(vec3::null))
+		vec3 contactNormal = body->CheckCollisionNarrow(rigidBodyModel->GetBody());
+		if(contactNormal != vec3(vec3::null))
 		{
-			contact = vec3(0, -1, 0);
-			vec3 cpA = body->GetPosition() + vec3(body->GetScale().x/2.0f, -body->GetScale().y/2.0f, 0);
-			vec3 cpB = rigidBodyModel->GetBody()->GetPosition() + vec3(-rigidBodyModel->GetBody()->GetScale().x/2.0f, 0.0f, 0);
+			//contact = vec3(0, -1, 0);
+			vec3 cpA = body->GetPosition();// + vec3(body->GetScale().x/2.0f, -body->GetScale().y/2.0f, 0);
+			vec3 cpB = rigidBodyModel->GetBody()->GetPosition();// + vec3(-rigidBodyModel->GetBody()->GetScale().x/2.0f, 0.0f, 0);
 
-			body->RespondCollision(rigidBodyModel->GetBody(), cpA, cpB, contact);
-			//contact = normalize(contact);
+			body->RespondCollision(rigidBodyModel->GetBody(), cpA, cpB, contactNormal);
 			//if(dot(rigidBodyModel->GetBody()->getFurthestPointInDirection(-contact) - body->getFurthestPointInDirection(contact), contact) < 0)
 			//	contact = -contact;
-			//gizmos["BetweenLine"]->SetFromTo(body->getFurthestPointInDirection(normalize(contact)), body->getFurthestPointInDirection(normalize(-contact)));
-			gizmos["BetweenLine"]->SetFromTo(cpB, cpB-contact);
+			gizmos["BetweenLine"]->SetFromTo(vec3(), 10.0f * contactNormal);
+			//gizmos["BetweenLine"]->SetFromTo(cpB, cpB-contact);
 		
 			//gizmos["BetweenLine"]->SetFromTo(body->GetPosition(), body->GetPosition()-normalize(contact));
-			//std::cout << "CP: " << contact.x << "\t" << contact.y << "\t" << contact.z << std::endl;
+			std::cout << "CP: " << contactNormal.x << "\t" << contactNormal.y << "\t" << contactNormal.z << std::endl;
 			//std::cout << "NARROW Collided. . . ";
 			return true;
 		}
