@@ -121,7 +121,6 @@ void RigidBodyModel::Update(float deltaTime)
 
 bool RigidBodyModel::ResolveCollision(RigidBodyModel * rigidBodyModel)
 {
-	////gizmos["FurthestPoint"]->Translate(furthestA);
 	if(body->CheckCollisionBroad(rigidBodyModel->GetBody()))
 	{	
 		if(gizmoColor.r == 0)
@@ -133,17 +132,13 @@ bool RigidBodyModel::ResolveCollision(RigidBodyModel * rigidBodyModel)
 		vec3 contactNormal = body->CheckCollisionNarrow(rigidBodyModel->GetBody());
 		if(contactNormal != vec3(vec3::null))
 		{
-			//contact = vec3(0, -1, 0);
 			vec3 cpA = body->GetPosition();// + vec3(body->GetScale().x/2.0f, -body->GetScale().y/2.0f, 0);
 			vec3 cpB = rigidBodyModel->GetBody()->GetPosition();// + vec3(-rigidBodyModel->GetBody()->GetScale().x/2.0f, 0.0f, 0);
 
 			body->RespondCollision(rigidBodyModel->GetBody(), cpA, cpB, contactNormal);
-			//if(dot(rigidBodyModel->GetBody()->getFurthestPointInDirection(-contact) - body->getFurthestPointInDirection(contact), contact) < 0)
-			//	contact = -contact;
-			gizmos["BetweenLine"]->SetFromTo(vec3(), 10.0f * contactNormal);
-			//gizmos["BetweenLine"]->SetFromTo(cpB, cpB-contact);
+
+			gizmos["BetweenLine"]->SetFromTo(vec3(), contactNormal);
 		
-			//gizmos["BetweenLine"]->SetFromTo(body->GetPosition(), body->GetPosition()-normalize(contact));
 			std::cout << "CP: " << contactNormal.x << "\t" << contactNormal.y << "\t" << contactNormal.z << std::endl;
 			//std::cout << "NARROW Collided. . . ";
 			return true;

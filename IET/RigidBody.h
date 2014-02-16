@@ -82,33 +82,35 @@ protected:
 	glm::mat3 inverseI;
 
 	std::vector<glm::vec3> points;
-
-	// collision
-	bool checkSimplex(std::vector<glm::vec3> &simplex, glm::vec3 &direction);
-	bool checkTriangle(std::vector<glm::vec3> &simplex, glm::vec3 &direction);
-
+	
 	struct Face
 	{
-		Face(int i11, int i22, int i33, glm::vec3 v11, glm::vec3 v22, glm::vec3 v33) : i1(i11), i2(i22), i3(i33), v1(v11), v2(v22), v3(v33) {
+		Face(int index1, int index2, int index3, std::vector<glm::vec3> &simplex) : i1(index1), i2(index2), i3(index3){
+			v1 = simplex[i1];
+			v2 = simplex[i2];
+			v3 = simplex[i3];
+
 			normal = glm::normalize(glm::cross(v3 - v1, v2 - v1));
-			if(glm::dot(v1, normal) > 0)
+			if(glm::dot(v1, normal) < 0)
 				normal = -normal;
 		}
 
 		glm::vec3 v1, v2, v3;
 		int i1, i2, i3;
+
 		glm::vec3 normal;
 	};
-
-	glm::vec3 findContactPoint(std::vector<glm::vec3> &simplex);
-	glm::vec3 findContactNormal(std::vector<glm::vec3> &simplex);
+	
 	std::vector<glm::vec3> findClosestSimplex(std::vector<glm::vec3> &simplex, glm::vec3 &target = glm::vec3());
-	//int findClosestFace(std::vector<glm::vec3> &simplex);
-	int findClosestFace(std::vector<Face> &faces);
 	void findSimplexWithMinDistanceInTriangle(std::vector<glm::vec3> &simplex, glm::vec3 &target = glm::vec3());
+
+	bool checkSimplex(std::vector<glm::vec3> &simplex, glm::vec3 &direction);
+	bool checkTriangle(std::vector<glm::vec3> &simplex, glm::vec3 &direction);
+
+	glm::vec3 findContactNormal(RigidBody * body, std::vector<glm::vec3> &simplex);
+	Face findClosestFace(std::vector<Face> &faces);
+
 	glm::vec3 getFurthestPointInDirection(glm::vec3 &direction);
-
-
 
 	float calculateCollisionImpulse(RigidBody *body, glm::vec3 &rA, glm::vec3 &rB, glm::vec3 &n, float e = 1.0f);
 };
