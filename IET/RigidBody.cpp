@@ -137,7 +137,7 @@ bool RigidBody::CheckCollisionBroad(RigidBody * body)
 	return true;
 }
 
-vec3 RigidBody::CheckCollisionNarrow(RigidBody * body)
+RigidBody::Contact * RigidBody::CheckCollisionNarrow(RigidBody * body)
 {
 	// Support function
 	vec3 direction = body->GetPosition() - position;
@@ -164,21 +164,27 @@ vec3 RigidBody::CheckCollisionNarrow(RigidBody * body)
 
 		if(dot(mDiff, direction) < 0)
 		{
-			return vec3(vec3::null);
+			return NULL;
 		}
 		simplex.push_back(mDiff);
 
 		if(checkSimplex(simplex, direction))
 		{
 			vec3 normal = findContactNormal(body, simplex);
+			if(normal != vec3(vec3::null))
+			{	
+				vector<vec3> contactPoints = findContactPoints(body, normal);
+				
+				return new Contact(normal, contactPoints[0], contactPoints[1]);
+			}
 
-			return normal;
+			return NULL;
 		}
 	}
 
 	cout << "Limit exceeded." << endl;
 
-	return vec3(vec3::null);
+	return NULL;
 }
 
 void RigidBody::RespondCollision(RigidBody *body, vec3 &cpA, vec3 &cpB, vec3 &n)
@@ -481,6 +487,17 @@ RigidBody::Face RigidBody::findClosestFace(vector<Face> &faces)
 	faces.erase(faces.begin() + minIndex);
 
 	return closest;
+}
+
+
+vector<vec3> RigidBody::findContactPoints(RigidBody * body, glm::vec3 &normal)
+{
+	vector<vec3> contactPoints;
+	
+	contactPoints.push_back(position);
+	contactPoints.push_back(body->GetPosition());
+
+	return contactPoints;
 }
 
 float RigidBody::calculateCollisionImpulse(RigidBody *body, vec3 &rA, vec3 &rB, vec3 &n, float e)

@@ -56,12 +56,21 @@ public:
 
 	void SetPoints(const std::vector<glm::vec3> & vertices);
 	
-	bool CheckCollisionBroad(RigidBody * body);
-	glm::vec3 CheckCollisionNarrow(RigidBody * body);
+	struct Contact
+	{
+		Contact(glm::vec3 n, glm::vec3 &a, glm::vec3 &b) : normal(n), cA(a), cB(b) {}
 
-	glm::vec3 GetMinDistancePointVeronoi(glm::vec3 &target);
+		glm::vec3 normal;
+		glm::vec3 cA;
+		glm::vec3 cB;
+	};
+
+	bool CheckCollisionBroad(RigidBody * body);
+	Contact * CheckCollisionNarrow(RigidBody * body);
 
 	void RespondCollision(RigidBody *body, glm::vec3 &cpA, glm::vec3 &cpB, glm::vec3 &n);
+
+	glm::vec3 GetMinDistancePointVeronoi(glm::vec3 &target);
 
 	void Update(float deltaTime);
 
@@ -109,6 +118,8 @@ protected:
 
 	glm::vec3 findContactNormal(RigidBody * body, std::vector<glm::vec3> &simplex);
 	Face findClosestFace(std::vector<Face> &faces);
+
+	std::vector<glm::vec3> findContactPoints(RigidBody * body, glm::vec3 &normal);
 
 	glm::vec3 getFurthestPointInDirection(glm::vec3 &direction);
 

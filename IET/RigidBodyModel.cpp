@@ -129,17 +129,16 @@ bool RigidBodyModel::ResolveCollision(RigidBodyModel * rigidBodyModel)
 			rigidBodyModel->SetGizmoColor(vec4(1,1,0,1));
 
 		//std::cout << "Broad Collided. . . ";
-		vec3 contactNormal = body->CheckCollisionNarrow(rigidBodyModel->GetBody());
-		if(contactNormal != vec3(vec3::null))
-		{
-			vec3 cpA = body->GetPosition();// + vec3(body->GetScale().x/2.0f, -body->GetScale().y/2.0f, 0);
-			vec3 cpB = rigidBodyModel->GetBody()->GetPosition();// + vec3(-rigidBodyModel->GetBody()->GetScale().x/2.0f, 0.0f, 0);
+		RigidBody::Contact * contact = body->CheckCollisionNarrow(rigidBodyModel->GetBody());
+		if(contact != NULL)
+		{	
+			body->RespondCollision(rigidBodyModel->GetBody(), contact->cA, contact->cB, contact->normal);
 
-			body->RespondCollision(rigidBodyModel->GetBody(), cpA, cpB, contactNormal);
-
-			gizmos["BetweenLine"]->SetFromTo(vec3(), contactNormal);
+			gizmos["BetweenLine"]->SetFromTo(vec3(), contact->normal);
 		
-			std::cout << "CP: " << contactNormal.x << "\t" << contactNormal.y << "\t" << contactNormal.z << std::endl;
+			delete contact;
+
+			//std::cout << "CP: " << contactNormal.x << "\t" << contactNormal.y << "\t" << contactNormal.z << std::endl;
 			//std::cout << "NARROW Collided. . . ";
 			return true;
 		}
