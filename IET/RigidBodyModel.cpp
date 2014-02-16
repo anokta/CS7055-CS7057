@@ -132,6 +132,7 @@ bool RigidBodyModel::ResolveCollision(RigidBodyModel * rigidBodyModel)
 		RigidBody::Contact * contact = body->CheckCollisionNarrow(rigidBodyModel->GetBody());
 		if(contact != NULL)
 		{	
+			std::cout << "CP: " << contact->cA.x << "\t" << contact->cA.y << "\t" << contact->cA.z << std::endl;
 			body->RespondCollision(rigidBodyModel->GetBody(), contact->cA, contact->cB, contact->normal);
 
 			gizmos["BetweenLine"]->SetFromTo(vec3(), contact->normal);

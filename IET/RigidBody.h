@@ -122,6 +122,7 @@ protected:
 	std::vector<glm::vec3> findContactPoints(RigidBody * body, glm::vec3 &normal);
 
 	glm::vec3 getFurthestPointInDirection(glm::vec3 &direction);
+	std::vector<glm::vec3> getFurthestFaceInDirection(glm::vec3 &direction);
 
 	float calculateCollisionImpulse(RigidBody *body, glm::vec3 &rA, glm::vec3 &rB, glm::vec3 &n, float e = 1.0f);
 };

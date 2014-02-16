@@ -174,7 +174,9 @@ RigidBody::Contact * RigidBody::CheckCollisionNarrow(RigidBody * body)
 			if(normal != vec3(vec3::null))
 			{	
 				vector<vec3> contactPoints = findContactPoints(body, normal);
-				
+				if(contactPoints.size() != 2)
+					return NULL;
+
 				return new Contact(normal, contactPoints[0], contactPoints[1]);
 			}
 
@@ -437,7 +439,8 @@ vec3 RigidBody::findContactNormal(RigidBody * body, vector<vec3> &simplex)
 	faces.push_back(Face(0, 2, 3, simplex));
 	faces.push_back(Face(1, 2, 3, simplex));
 
-	while(true)
+	int count = 100;
+	while(count-- > 0)
 	{
 		Face face = findClosestFace(faces);
 
@@ -465,6 +468,8 @@ vec3 RigidBody::findContactNormal(RigidBody * body, vector<vec3> &simplex)
 		faces.push_back(Face(simplex.size()-1, face.i2, face.i3, simplex)); 
 
 	}
+
+	return vec3(vec3::null);
 }
 
 RigidBody::Face RigidBody::findClosestFace(vector<Face> &faces)
@@ -493,9 +498,94 @@ RigidBody::Face RigidBody::findClosestFace(vector<Face> &faces)
 vector<vec3> RigidBody::findContactPoints(RigidBody * body, glm::vec3 &normal)
 {
 	vector<vec3> contactPoints;
+
+	vector<vec3> faceA = getFurthestFaceInDirection(-normal);
+	vector<vec3> faceB = body->getFurthestFaceInDirection(normal);
+	vec3 aNormal = normalize(cross(faceA[0] - faceA[1], faceA[0] - faceA[2]));
+	vec3 bNormal = normalize(cross(faceB[0] - faceB[1], faceB[0] - faceB[2]));
 	
-	contactPoints.push_back(position);
-	contactPoints.push_back(body->GetPosition());
+	cout << "A: " << aNormal.x << " " << aNormal.y << " " << aNormal.z << endl;
+	cout << "B: " << bNormal.x << " " << bNormal.y << " " << bNormal.z << endl;
+
+	vector<vec3> ref, inc;
+	vec3 refNormal, incNormal;
+	if(dot(normal, aNormal) > dot(normal, bNormal)) 
+	{
+		ref = faceA;
+		inc = faceB;
+
+		refNormal = aNormal;
+		incNormal = bNormal;
+	}
+	else
+	{
+		ref = faceB;
+		inc = faceA;
+
+		refNormal = bNormal;
+		incNormal = aNormal;
+	}
+
+	vector<vec3> planes;
+	planes.push_back(normalize(cross(ref[1]-ref[0], refNormal)));
+	planes.push_back(normalize(cross(ref[2]-ref[1], refNormal)));
+	planes.push_back(normalize(cross(ref[0]-ref[2], refNormal)));
+	planes.push_back(refNormal);
+
+	contactPoints.push_back(inc[0]);
+	contactPoints.push_back(inc[1]);
+	contactPoints.push_back(inc[2]);
+
+	for(int i=0; i<planes.size(); ++i)
+	{
+		for(int j=0; j<contactPoints.size(); ++j)
+		{
+			float dP = dot(contactPoints[j]-ref[i%ref.size()], planes[i]);
+			if(dP > 0)
+			{
+				vec3 victim = contactPoints[j];
+				contactPoints.erase(contactPoints.begin() + j);
+
+				if(contactPoints.size() < 1) return vector<vec3>();
+				
+				int count = 0;
+				vec3 adj = contactPoints[(j - 1) % contactPoints.size()];
+				float d = dot(adj - victim, -planes[i]);
+				if(d > 0)
+				{
+					contactPoints.insert(contactPoints.begin() + j % contactPoints.size(), victim + (dP / d) * (adj - victim));
+					count++;
+				}
+
+				adj = contactPoints[(j + count) % contactPoints.size()];
+				d = dot(adj - victim, -planes[i]);
+				if(d > 0)
+				{
+					contactPoints.insert(contactPoints.begin() + (j + count) % contactPoints.size(), victim + (dP / d) * (adj - victim));
+					count++;
+				}
+
+				j += count - 1;
+			}
+		}
+
+		cout << contactPoints.size() << endl;
+	}
+
+	if(contactPoints.size() == 0)
+	{
+		return vector<vec3>();
+	}
+
+	vec3 total = vec3();
+	for(int i=0; i<contactPoints.size(); ++i)
+		total += contactPoints[i];
+	total /= (float)contactPoints.size();
+
+	contactPoints.clear();
+	contactPoints.push_back(total);	contactPoints.push_back(total);
+	//contactPoints.push_back(position);
+	//contactPoints.push_back(body->GetPosition());
 
 	return contactPoints;
 }
@@ -563,4 +653,69 @@ vec3 RigidBody::getFurthestPointInDirection(vec3 &direction)
 	}
 
 	return vec3(GetTransformationMatrix() * vec4(points[furthestPoint], 1.0f));
+}
+
+
+vector<vec3> RigidBody::getFurthestFaceInDirection(vec3 &direction)
+{
+	vec3 d = normalize(vec3(toMat4(inverse(orientation)) * vec4(direction, 0.0f)));
+	
+	float max = FLT_MIN;
+	int i0 = 0;
+
+	for(unsigned int i=0; i<points.size(); ++i)
+	{
+		vec3 vertex = scale * points[i];
+		float projection = dot(vertex, d);
+
+		if(projection > max)
+		{
+			i0 = i;
+			max = projection;
+		}
+	}
+
+	max = FLT_MIN;
+	int i1 = 0, i2 = 0;
+	vec3 point0 = scale * points[i0];
+
+	for(int i=0; i<points.size(); ++i)
+	{
+		for(int j=i+1; j<points.size(); ++j)
+		{
+			vec3 point1 = scale * points[i];
+			vec3 point2 = scale * points[j];
+			
+			if(point1 != point0 && point2 != point0)
+			{
+				vec3 normal = cross(point0 - point1, point0 - point2);
+				if(normal != vec3())
+				{
+					float projection = abs(dot(d, normalize(normal)));
+
+					if(projection > max)
+					{
+						i1 = i;
+						i2 = j;
+
+						max = projection;
+					}
+				}
+			}
+		}
+	}
+
+	if(dot(d, cross(points[i0] - points[i1], points[i0] - points[i2])) < 0)
+	{
+		int temp = i1;
+		i1 = i2;
+		i2 = temp;
+	}
+
+	vector<vec3> face;
+	face.push_back(vec3(GetTransformationMatrix() * vec4(points[i0], 1.0f)));
+	face.push_back(vec3(GetTransformationMatrix() * vec4(points[i1], 1.0f)));
+	face.push_back(vec3(GetTransformationMatrix() * vec4(points[i2], 1.0f)));
+
+	return face;
 }
