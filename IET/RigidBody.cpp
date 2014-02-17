@@ -175,7 +175,7 @@ RigidBody::Contact * RigidBody::CheckCollisionNarrow(RigidBody * body)
 			{	
 				vector<vec3> contactPoints = findContactPoints(body, normal);
 				if(contactPoints.size() != 2)
-					return NULL;
+					return new Contact(normal, position, body->GetPosition());
 
 				return new Contact(normal, contactPoints[0], contactPoints[1]);
 			}
@@ -628,12 +628,17 @@ float RigidBody::calculateCollisionImpulse(RigidBody *body, vec3 &rA, vec3 &rB, 
 {
 	vec3 pA = GetLinearVelocity() + cross(GetAngularVelocity(), rA);
 	vec3 pB = body->GetLinearVelocity() + cross(body->GetAngularVelocity(), rB);
-	vec3 relativeV = pA - pB;
+	float relativeV = dot(n, pA - pB);
 
-	float j = (-(1 + e) * dot(n, relativeV)) / 
-		(massInverse + body->GetMassInverse() + dot(n, GetInertiaInverse() * cross(rA, n)) + dot(n, body->GetInertiaInverse() * cross(rB, n)));
+	if(relativeV < 0.0f)
+	{
+		float j = (-(1 + e) * relativeV) / 
+			(massInverse + body->GetMassInverse() + dot(n, GetInertiaInverse() * cross(rA, n)) + dot(n, body->GetInertiaInverse() * cross(rB, n)));
 
-	return j;
+		return j;
+	}
+
+	return 0.0f;
 }
 
 vec3 RigidBody::GetMinDistancePointVeronoi(vec3 &target)
