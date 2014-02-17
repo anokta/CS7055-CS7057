@@ -29,13 +29,13 @@ RigidBodyModel::RigidBodyModel(RigidBody *b, GenericShader * s, GenericShader * 
 		break;
 
 	case RigidBody::BODY_TYPE::ELLIPSOID:
-		modelMesh = MeshLoader::GenerateSphereMesh(25);
+		modelMesh = MeshLoader::GenerateSphereMesh(15);
 		textured = false;
 		//MeshLoader::LoadMesh("..\\IET\\res\\Mountain Bike.obj");//MeshLoader::GenerateSphereMesh(25);
 		break;	
 
 	case RigidBody::BODY_TYPE::PLANE:
-		modelMesh = MeshLoader::GeneratePlaneMesh();
+		modelMesh = MeshLoader::GenerateCubeMesh();
 		textured = false;
 		break;
 
@@ -132,7 +132,7 @@ bool RigidBodyModel::ResolveCollision(RigidBodyModel * rigidBodyModel)
 		RigidBody::Contact * contact = body->CheckCollisionNarrow(rigidBodyModel->GetBody());
 		if(contact != NULL)
 		{	
-			std::cout << "CP: " << contact->cA.x << "\t" << contact->cA.y << "\t" << contact->cA.z << std::endl;
+			//std::cout << "CP: " << contact->cA.x << "\t" << contact->cA.y << "\t" << contact->cA.z << std::endl;
 			body->RespondCollision(rigidBodyModel->GetBody(), contact->cA, contact->cB, contact->normal);
 
 			gizmos["BetweenLine"]->SetFromTo(vec3(), contact->normal);

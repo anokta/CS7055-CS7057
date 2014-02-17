@@ -504,8 +504,8 @@ vector<vec3> RigidBody::findContactPoints(RigidBody * body, glm::vec3 &normal)
 	vec3 aNormal = normalize(cross(faceA[0] - faceA[1], faceA[0] - faceA[2]));
 	vec3 bNormal = normalize(cross(faceB[0] - faceB[1], faceB[0] - faceB[2]));
 	
-	cout << "A: " << aNormal.x << " " << aNormal.y << " " << aNormal.z << endl;
-	cout << "B: " << bNormal.x << " " << bNormal.y << " " << bNormal.z << endl;
+	//cout << "A: " << aNormal.x << " " << aNormal.y << " " << aNormal.z << endl;
+	//cout << "B: " << bNormal.x << " " << bNormal.y << " " << bNormal.z << endl;
 
 	vector<vec3> ref, inc;
 	vec3 refNormal, incNormal;
@@ -527,14 +527,56 @@ vector<vec3> RigidBody::findContactPoints(RigidBody * body, glm::vec3 &normal)
 	}
 
 	vector<vec3> planes;
-	planes.push_back(normalize(cross(ref[1]-ref[0], refNormal)));
-	planes.push_back(normalize(cross(ref[2]-ref[1], refNormal)));
-	planes.push_back(normalize(cross(ref[0]-ref[2], refNormal)));
-	planes.push_back(refNormal);
+	
+	// hack
+#pragma region TO_BE_CHANGED
 
-	contactPoints.push_back(inc[0]);
-	contactPoints.push_back(inc[1]);
-	contactPoints.push_back(inc[2]);
+	if(ref.size() == 3)
+	{
+		planes.push_back(normalize(cross(ref[1]-ref[0], refNormal)));
+		planes.push_back(normalize(cross(ref[2]-ref[1], refNormal)));
+		planes.push_back(normalize(cross(ref[0]-ref[2], refNormal)));
+	}
+	else if(ref.size() == 4)
+	{
+		for(int i=0; i<4; ++i)
+		{
+			vec3 r = ref[i] - ref[(i+1) % 4];
+			if((r.x != 0 && r.y != 0) || (r.x != 0 && r.z != 0) || (r.y != 0 && r.z != 0))
+			{
+				vec3 tmp = ref[(i+1)%4];
+				ref[(i+1)%4] = ref[(i+2)%4];
+				ref[(i+2)%4] = tmp;
+
+				break;
+			}
+		}
+
+		if(dot(cross(ref[1] - ref[0], ref[2] - ref[1]), refNormal) < 0)
+		{
+			vec3 tmp = ref[1];
+			ref[1] = ref[3];
+			ref[3] = tmp;
+		}
+		
+		planes.push_back(normalize(cross(ref[1]-ref[0], refNormal)));
+		planes.push_back(normalize(cross(ref[2]-ref[1], refNormal)));
+		planes.push_back(normalize(cross(ref[3]-ref[2], refNormal)));
+		planes.push_back(normalize(cross(ref[0]-ref[3], refNormal)));
+
+		//for(int i=0; i<4; ++i)
+		//{
+		//	std::cout << "Q2: " << ref[i].x << " " << ref[i].y << " " << ref[i].z << endl;
+		//}
+	}
+#pragma endregion TO_BE_CHANGED
+
+	planes.push_back(refNormal);
+	
+	for(int i=0; i<inc.size(); ++i)
+	{
+		contactPoints.push_back(inc[i]);
+	}
 
 	for(int i=0; i<planes.size(); ++i)
 	{
@@ -716,6 +758,17 @@ vector<vec3> RigidBody::getFurthestFaceInDirection(vec3 &direction)
 	face.push_back(vec3(GetTransformationMatrix() * vec4(points[i0], 1.0f)));
 	face.push_back(vec3(GetTransformationMatrix() * vec4(points[i1], 1.0f)));
 	face.push_back(vec3(GetTransformationMatrix() * vec4(points[i2], 1.0f)));
+	
+
+	for(int i=0; i<points.size(); ++i)
+	{
+		if(i != i0 && i != i1 && i != i2 && dot(points[i] - points[i0], cross(points[i0] - points[i1], points[i0] - points[i2])) == 0)
+		{
+			face.push_back(vec3(GetTransformationMatrix() * vec4(points[i], 1.0f)));
+		}
+	}
+
+	if(face.size() > 4) cout << "WTFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF?????" << endl;
 
 	return face;
 }

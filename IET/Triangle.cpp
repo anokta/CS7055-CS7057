@@ -2,7 +2,7 @@
 
 using namespace glm;
 
-Triangle::Triangle(vec3 &p, quat &o, vec2 &s, float d) : RigidBody(p, o, vec3(s[0], 1.0f, s[1]))//0.0001f, s[1]))
+Triangle::Triangle(vec3 &p, quat &o, vec2 &s, float d) : RigidBody(p, o, vec3(s[0], 0.0001f, s[1]))//0.0001f, s[1]))
 {
 	type = BODY_TYPE::TRIANGLE;
 
