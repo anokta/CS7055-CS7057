@@ -213,7 +213,7 @@ void RigidBody::Update(float deltaTime)
 	force = vec3();
 
 	// angular
-	mat3 currentInverseI = toMat3(orientation) * inverseI * transpose(toMat3(orientation));
+	mat3 currentInverseI = GetInertiaInverse();
 
 	angularMomentum += torque * deltaTime;
 	orientation = normalize(toQuat(currentInverseI * toMat3(quat(angularMomentum * deltaTime))) * orientation);
@@ -504,18 +504,14 @@ vector<vec3> RigidBody::findContactPoints(RigidBody * body, glm::vec3 &normal)
 	vec3 aNormal = normalize(cross(faceA[0] - faceA[1], faceA[0] - faceA[2]));
 	vec3 bNormal = normalize(cross(faceB[0] - faceB[1], faceB[0] - faceB[2]));
 	
-	//cout << "A: " << aNormal.x << " " << aNormal.y << " " << aNormal.z << endl;
-	//cout << "B: " << bNormal.x << " " << bNormal.y << " " << bNormal.z << endl;
-
 	vector<vec3> ref, inc;
-	vec3 refNormal, incNormal;
-	if(dot(normal, aNormal) > dot(normal, bNormal)) 
+	vec3 refNormal;
+	if(dot(-normal, aNormal) > dot(normal, bNormal)) 
 	{
 		ref = faceA;
 		inc = faceB;
 
 		refNormal = aNormal;
-		incNormal = bNormal;
 	}
 	else
 	{
@@ -523,7 +519,6 @@ vector<vec3> RigidBody::findContactPoints(RigidBody * body, glm::vec3 &normal)
 		inc = faceA;
 
 		refNormal = bNormal;
-		incNormal = aNormal;
 	}
 
 	vector<vec3> planes;
@@ -592,18 +587,18 @@ vector<vec3> RigidBody::findContactPoints(RigidBody * body, glm::vec3 &normal)
 				
 				int count = 0;
 				vec3 adj = contactPoints[(j - 1) % contactPoints.size()];
-				float d = dot(adj - victim, -planes[i]);
+				float d = dot(adj - ref[i%ref.size()], -planes[i]);
 				if(d > 0)
 				{
-					contactPoints.insert(contactPoints.begin() + j % contactPoints.size(), victim + (dP / d) * (adj - victim));
+					contactPoints.insert(contactPoints.begin() + (j - 1) % contactPoints.size() + 1, victim + (dP / (dP + d)) * (adj - victim));
 					count++;
 				}
 
 				adj = contactPoints[(j + count) % contactPoints.size()];
-				d = dot(adj - victim, -planes[i]);
+				d = dot(adj - ref[i%ref.size()], -planes[i]);
 				if(d > 0)
 				{
-					contactPoints.insert(contactPoints.begin() + (j + count) % contactPoints.size(), victim + (dP / d) * (adj - victim));
+					contactPoints.insert(contactPoints.begin() + (j + count) % contactPoints.size(), victim + (dP / (dP + d)) * (adj - victim));
 					count++;
 				}
 
@@ -611,7 +606,6 @@ vector<vec3> RigidBody::findContactPoints(RigidBody * body, glm::vec3 &normal)
 			}
 		}
 
-		cout << contactPoints.size() << endl;
 	}
 
 	if(contactPoints.size() == 0)
@@ -626,8 +620,6 @@ vector<vec3> RigidBody::findContactPoints(RigidBody * body, glm::vec3 &normal)
 
 	contactPoints.clear();
 	contactPoints.push_back(total);	contactPoints.push_back(total);
-	//contactPoints.push_back(position);
-	//contactPoints.push_back(body->GetPosition());
 
 	return contactPoints;
 }
@@ -697,7 +689,6 @@ vec3 RigidBody::getFurthestPointInDirection(vec3 &direction)
 	return vec3(GetTransformationMatrix() * vec4(points[furthestPoint], 1.0f));
 }
 
-
 vector<vec3> RigidBody::getFurthestFaceInDirection(vec3 &direction)
 {
 	vec3 d = normalize(vec3(toMat4(inverse(orientation)) * vec4(direction, 0.0f)));
@@ -747,7 +738,7 @@ vector<vec3> RigidBody::getFurthestFaceInDirection(vec3 &direction)
 		}
 	}
 
-	if(dot(d, cross(points[i0] - points[i1], points[i0] - points[i2])) < 0)
+	if(dot(d, cross(point0 - scale * points[i1], scale * points[i0] - scale * points[i2])) < 0)
 	{
 		int temp = i1;
 		i1 = i2;
@@ -768,7 +759,7 @@ vector<vec3> RigidBody::getFurthestFaceInDirection(vec3 &direction)
 		}
 	}
 
-	if(face.size() > 4) cout << "WTFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF?????" << endl;
+	//if(face.size() > 4) cout << "WTFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF?????" << endl;
 
 	return face;
 }

@@ -2,7 +2,7 @@
 
 using namespace glm;
 
-Plane::Plane(vec3 &p, quat &o, vec2 &s, float d) : RigidBody(p, o, vec3(s[0], 0.25f, s[1]))//0.0001f, s[1]), d)
+Plane::Plane(vec3 &p, quat &o, vec2 &s, float d) : RigidBody(p, o, vec3(s[0], 0.5f, s[1]))//0.0001f, s[1]), d)
 {
 	type = BODY_TYPE::PLANE;
 

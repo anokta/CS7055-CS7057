@@ -529,7 +529,7 @@ void init()
 	//rigidBodies.push_back(new RigidBodyModel(new Box(vec3(7,0,0), quat(), vec3(1.0f, 0.4f, 1.5f)), shaders[currentShaderIndex+1], shaders[0]));
 	rigidBodies.push_back(new RigidBodyModel(new Ellipsoid(vec3(-1,-4,0), quat(), vec3(1.4f, 1.0f, 0.5f)), shaders[currentShaderIndex], shaders[0]));
 	rigidBodies.push_back(new RigidBodyModel(new Ellipsoid(vec3(-4,-4,0), quat(), vec3(1.0f, 1.0f, 1.0f)), shaders[currentShaderIndex], shaders[0]));
-	//rigidBodies.push_back(new RigidBodyModel(new Cat(vec3(-3.5f,1,0), quat(), vec3(1.5f, 1.0f, 2.0f)), bumpedShader, shaders[0]));
+	rigidBodies.push_back(new RigidBodyModel(new Cat(vec3(-3.5f,1,0), quat(), vec3(1.5f, 1.0f, 2.0f)), shaders[currentShaderIndex+1], shaders[0]));
 	//rigidBodies.push_back(new RigidBodyModel(new Plane(vec3(3.5,-1,0), quat(), vec2(1.0f, 2.0f)), shaders[currentShaderIndex], shaders[0]));
 	
 	//for(int i=0; i<rigidBodies.size(); ++i)
@@ -543,7 +543,7 @@ void init()
 	//rigidBodies.push_back(new RigidBodyModel(new Tetrahedron(vec3(5.0f,2.0,0)), shaders[0], shaders[0]));
 	rigidBodies.push_back(new RigidBodyModel(new Box(vec3(-2,2,0), quat(), vec3(1, 2, 0.5f)), shaders[currentShaderIndex+1], shaders[0]));
 	rigidBodies.push_back(new RigidBodyModel(new Box(vec3(0,2,0)), shaders[currentShaderIndex+1], shaders[0]));
-	rigidBodies.push_back(new RigidBodyModel(new Plane(vec3(0,0,0), quat(), vec2(3.0f, 3.0f)), shaders[currentShaderIndex], shaders[0]));
+	rigidBodies.push_back(new RigidBodyModel(new Plane(vec3(0,0,0), quat(), vec2(5.0f, 5.0f)), shaders[currentShaderIndex], shaders[0]));
 	
 	//voronoiLine = MeshLoader::GenerateLine(vec4(1,0.6f,0.1f,1));
 	//voronoiLine->SetShader(shaders[0]);

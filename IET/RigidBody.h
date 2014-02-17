@@ -51,7 +51,7 @@ public:
 	inline void SetForce(const glm::vec3 &f) { force = f; }
 	inline void SetTorque(const glm::vec3 &t) { torque = t; }
 
-	inline void ApplyGravity(const float g) { force += glm::vec3(0, 1.0f/massInverse, 0) * g; }
+	inline void ApplyGravity(const float g) { if(massInverse > 0) force += glm::vec3(0, 1.0f/massInverse, 0) * g; }
 	void ApplyForce(const glm::vec3 &point, const glm::vec3 &f);
 
 	void SetPoints(const std::vector<glm::vec3> & vertices);
