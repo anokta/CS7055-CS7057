@@ -635,7 +635,7 @@ float RigidBody::calculateCollisionImpulse(RigidBody *body, vec3 &rA, vec3 &rB, 
 		float j = (-(1 + e) * relativeV) / 
 			(massInverse + body->GetMassInverse() + dot(n, GetInertiaInverse() * cross(rA, n)) + dot(n, body->GetInertiaInverse() * cross(rB, n)));
 
-		return j;
+		return std::max(0.0f, j);
 	}
 
 	return 0.0f;
