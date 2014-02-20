@@ -1,4 +1,4 @@
-#version 330
+#version 130
 
 uniform samplerCube fCubeTexture;
                                           
@@ -13,11 +13,11 @@ in float Ratio;
 void main()
 {
 vec3 refractColor;
-refractColor.r = vec3(texture(fCubeTexture, RefractR)).r;
-refractColor.g = vec3(texture(fCubeTexture, RefractG)).g;
-refractColor.b = vec3(texture(fCubeTexture, RefractB)).b;
+refractColor.r = vec3(textureCube(fCubeTexture, RefractR)).r;
+refractColor.g = vec3(textureCube(fCubeTexture, RefractG)).g;
+refractColor.b = vec3(textureCube(fCubeTexture, RefractB)).b;
 
-vec3 reflectColor = vec3(texture(fCubeTexture, Reflect));
+vec3 reflectColor = vec3(textureCube(fCubeTexture, Reflect));
 
 vec3 color = mix(refractColor, reflectColor, Ratio);
  
