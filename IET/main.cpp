@@ -44,6 +44,8 @@ float specularIntensity;
 
 float roughness, shininess;
 
+vec3 translucentEta;
+
 // Camera
 Camera * camera; 
 Skybox * skybox;
@@ -78,14 +80,14 @@ void restart()
 	rigidBodies.push_back(new RigidBodyModel(new Ellipsoid(vec3(-4,-4,0), quat(), vec3(1.0f, 1.0f, 1.0f), 4.0f), shaders[currentShaderIndex], shaders[0]));
 	rigidBodies.push_back(new RigidBodyModel(new Cat(vec3(-5.0f,2,0), quat(), vec3(1.0f, 1.0f, 1.0f), 7.5f), shaders[currentShaderIndex+1], shaders[0]));
 	//rigidBodies.push_back(new RigidBodyModel(new Plane(vec3(3.5,-1,0), quat(), vec2(1.0f, 2.0f)), shaders[currentShaderIndex], shaders[0]));
-	
+
 	//for(int i=0; i<rigidBodies.size(); ++i)
 	//	cout << rigidBodies[i]->GetBody()->GetMass() << " -- " << rigidBodies[i]->GetBody()->GetMassInverse() << endl;
 	// Voronoi
 	//rigidBodies.push_back(new RigidBodyModel(new Ellipsoid(vec3(40,2,0), quat(), vec3(0.1f, 0.1f, 0.1f)), shaders[currentShaderIndex], shaders[0]));
 	//rigidBodies.push_back(new RigidBodyModel(new Triangle(vec3(36.0f,0,0), quat(), vec2(5,5)), shaders[0], shaders[0]));
 	//rigidBodies.push_back(new RigidBodyModel(new Tetrahedron(vec3(44.0f,0,0), quat(), vec3(5,5,5)), shaders[0], shaders[0]));
-	
+
 	rigidBodies.push_back(new RigidBodyModel(new Tetrahedron(vec3(3.0f,2.0,0)), shaders[0], shaders[0]));
 	//rigidBodies.push_back(new RigidBodyModel(new Tetrahedron(vec3(5.0f,2.0,0)), shaders[0], shaders[0]));
 	rigidBodies.push_back(new RigidBodyModel(new Box(vec3(-2,2,0), quat(), vec3(1, 1.5f, 0.75f), 2.5f), shaders[currentShaderIndex+1], shaders[0]));
@@ -103,7 +105,7 @@ void rotateBody(float x, float y, float z)
 void translateBody(float x, float y, float z)
 {
 	//rigidBodies[currentBodyIndex]->GetBody()->SetPosition(rigidBodies[currentBodyIndex]->GetBody()->GetPosition() + vec3(x, y, z));
-	rigidBodies[currentBodyIndex]->GetBody()->SetLinearMomentum(10.0f * vec3(x, y, z) * rigidBodies[currentBodyIndex]->GetBody()->GetMass());
+	rigidBodies[currentBodyIndex]->GetBody()->SetLinearMomentum(12.0f * vec3(x, y, z) * rigidBodies[currentBodyIndex]->GetBody()->GetMass());
 	//rigidBodies[currentBodyIndex]->GetBody()->ApplyForce(rigidBodies[currentBodyIndex]->GetBody()->GetPosition() + vec3(0,1,0), vec3(1,0.5f,0));
 }
 
@@ -322,8 +324,8 @@ void keyPressed(unsigned char key, int x, int y)
 		{
 			if(currentTarget == vec2())
 			{
-				currentTarget = vec2(40, 0); 
-				currentBodyIndex = 4;
+				currentTarget = vec2(30, 0); 
+				currentBodyIndex = 2;
 			}
 			else
 			{
@@ -335,6 +337,25 @@ void keyPressed(unsigned char key, int x, int y)
 
 	case '\\':
 		restart();
+		break;
+
+	case '[':
+		translucentEta = max(vec3(0.0f), translucentEta - vec3(0.1f));		
+		for(unsigned int i=0; i<shaders.size(); ++i)
+			shaders[i]->SetTranslucentEta(translucentEta);
+
+		break;
+
+	case ']':
+		translucentEta = min(vec3(1.0f), translucentEta + vec3(0.1f));
+		for(unsigned int i=0; i<shaders.size(); ++i)
+			shaders[i]->SetTranslucentEta(translucentEta);
+		break;
+
+	case '\'':
+		translucentEta = vec3(float(rand())/RAND_MAX, float(rand())/RAND_MAX, float(rand())/RAND_MAX);
+		for(unsigned int i=0; i<shaders.size(); ++i)
+			shaders[i]->SetTranslucentEta(translucentEta);
 		break;
 	}
 }
@@ -372,7 +393,7 @@ void display(){
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	EntityManager::GetInstance()->DrawEntities();
-	
+
 	//voronoiLine->Render(shaders[0]);
 	//voronoiLineTetrahedron->Render(shaders[0]);
 
@@ -428,7 +449,7 @@ void update(int frame)
 
 		}
 
-		
+
 		for(unsigned int i=0; i<rigidBodies.size(); ++i)
 			rigidBodies[i]->SetGizmoColor(vec4(0,1,0,1));
 
@@ -465,7 +486,7 @@ void update(int frame)
 					//cout << i << "\tand\t" << j << "\tis collided." << endl;
 				}
 			}
-			
+
 			rigidBodies[i]->UpdateGizmoColor();	
 		}
 
@@ -475,7 +496,7 @@ void update(int frame)
 		//	voronoiLine->SetFromTo(target, rigidBodies[5]->GetBody()->GetMinDistancePointVeronoi(target));
 		//	voronoiLineTetrahedron->SetFromTo(target, rigidBodies[6]->GetBody()->GetMinDistancePointVeronoi(target));
 		//}
-		
+
 		EntityManager::GetInstance()->UpdateEntities(DELTA_TIME);
 	}
 	else
@@ -496,7 +517,7 @@ void init()
 	// Set up the shaders
 	GenericShader * lineShader = new GenericShader("Default.vert", "Default.frag");
 	shaders.push_back(lineShader);
-	
+
 	GenericShader * skyboxShader = new GenericShader("Cubemap.vert", "Cubemap.frag", "Skybox");
 	shaders.push_back(skyboxShader);
 
@@ -525,11 +546,16 @@ void init()
 	GenericShader * orenNayarTexturedShader = new GenericShader("Textured.vert", "OrenNayarTextured.frag");
 	shaders.push_back(orenNayarTexturedShader);
 
-	GenericShader * bumpedShader = new GenericShader("Bumped.vert", "Bumped.frag", "Bumped");
-	shaders.push_back(bumpedShader);
-
 	GenericShader * translucentShader = new GenericShader("Translucent.vert", "Translucent.frag", "Translucent");
 	shaders.push_back(translucentShader);
+
+	GenericShader * bumpedShader = new GenericShader("Bumped.vert", "BumpedTextured.frag", "Bumped Textured");
+	shaders.push_back(bumpedShader);
+
+	shaders.push_back(translucentShader);
+
+	GenericShader * bumpedShaderSolid = new GenericShader("Bumped.vert", "Bumped.frag", "Bumped Solid");
+	shaders.push_back(bumpedShaderSolid);
 
 
 
@@ -541,7 +567,7 @@ void init()
 			4.0f / 3.0f, 
 			0.5f, 1000.0f
 			) );
-		
+
 		// Default model matrix
 		shaders[i]->SetModelMatrix(mat4(1.0f));
 
@@ -560,26 +586,29 @@ void init()
 
 		roughness = 1.0f;
 		shaders[i]->SetRoughness(roughness);
+
+		translucentEta = vec3(0.8f, 0.6f, 0.7f);
+		shaders[i]->SetTranslucentEta(translucentEta);
 	}
 
-	currentShaderIndex = 8;
+	currentShaderIndex = 12;
 
 	// Create the camera
 	camera = new Camera(shaders, vec3(0,0,12), vec3(0,0,0), vec3(0,1,0));
 	skybox = new Skybox(shaders[1]);	
-	
+
 	freeMode = true;
-	
+
 
 	currentBodyIndex = 0;
 
 	//restart();
 
-	rigidBodies.push_back(new RigidBodyModel(new Ball(vec3(-1,2,0)), bumpedShader, shaders[0]));
+	rigidBodies.push_back(new RigidBodyModel(new Ball(vec3(-1,0,0)), bumpedShader, shaders[0]));
+	rigidBodies.push_back(new RigidBodyModel(new Cat(vec3(1,0,0)), bumpedShader, shaders[0]));
 	////rigidBodies.push_back(new RigidBodyModel(new Box(vec3(7,0,0), quat(), vec3(1.0f, 0.4f, 1.5f)), shaders[currentShaderIndex+1], shaders[0]));
-	rigidBodies.push_back(new RigidBodyModel(new Ellipsoid(vec3(0,-4,0), quat(), vec3(1.4f, 1.0f, 0.8f)), translucentShader, shaders[0]));
-	//rigidBodies.push_back(new RigidBodyModel(new Ellipsoid(vec3(-4,-4,0), quat(), vec3(1.0f, 1.0f, 1.0f), 4.0f), shaders[currentShaderIndex], shaders[0]));
-	rigidBodies.push_back(new RigidBodyModel(new Cat(vec3(1,2,0)), bumpedShader, shaders[0]));
+	rigidBodies.push_back(new RigidBodyModel(new Ellipsoid(vec3(28,0,0), quat(), vec3(1.4f, 1.0f, 0.8f)), translucentShader, shaders[0]));
+	rigidBodies.push_back(new RigidBodyModel(new Ellipsoid(vec3(32,0,0), quat(), vec3(1.0f, 1.0f, 1.0f)), translucentShader, shaders[0]));
 	////rigidBodies.push_back(new RigidBodyModel(new Plane(vec3(3.5,-1,0), quat(), vec2(1.0f, 2.0f)), shaders[currentShaderIndex], shaders[0]));
 	//
 	////for(int i=0; i<rigidBodies.size(); ++i)
@@ -594,8 +623,8 @@ void init()
 	//rigidBodies.push_back(new RigidBodyModel(new Box(vec3(-2,2,0), quat(), vec3(1, 1.5f, 0.75f), 2.5f), shaders[currentShaderIndex+1], shaders[0]));
 	//rigidBodies.push_back(new RigidBodyModel(new Box(vec3(2,4,0), quat(), vec3(1.5f, 0.8f, 1.0f), 2.5f), shaders[currentShaderIndex+1], shaders[0]));
 	//rigidBodies.push_back(new RigidBodyModel(new Box(vec3(0,2,0), quat(), vec3(1,1,1), 2.5f), shaders[currentShaderIndex+1], shaders[0]));
-	rigidBodies.push_back(new RigidBodyModel(new Plane(vec3(0,0,0), quat(), vec2(8.0f, 4.0f)), translucentShader, shaders[0]));
-	
+	rigidBodies.push_back(new RigidBodyModel(new Plane(vec3(30,-3,0), quat(), vec2(8.0f, 4.0f)), translucentShader, shaders[0]));
+
 	//voronoiLine = MeshLoader::GenerateLine(vec4(1,0.6f,0.1f,1));
 	//voronoiLine->SetShader(shaders[0]);
 	//voronoiLineTetrahedron = MeshLoader::GenerateLine(vec4(1,0.6f,0.1f,1));

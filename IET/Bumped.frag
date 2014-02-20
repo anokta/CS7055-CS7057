@@ -33,5 +33,5 @@ void main()
 	 float H = max(0.0, dot(reflect (normalize (diffuseDirection), normalTangent), normalize (viewTangent)));
 	 vec4 specularC = vec4(specularColor, 1.0f) * specularIntensity * max(0.0, pow(H, specularShininess));
 
-	 gl_FragColor =  texture(fTexture, fUv) * (ambientC + diffuseC + specularC);
+	 gl_FragColor =  vec4(1,0,0,1) * (ambientC + diffuseC + specularC);
 }

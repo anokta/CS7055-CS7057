@@ -29,7 +29,7 @@ RigidBodyModel::RigidBodyModel(RigidBody *b, GenericShader * s, GenericShader * 
 		break;
 
 	case RigidBody::BODY_TYPE::ELLIPSOID:
-		modelMesh = MeshLoader::GenerateSphereMesh(15);
+		modelMesh = MeshLoader::GenerateSphereMesh(20); //MeshLoader::LoadMesh("..\\IET\\res\\teapot.off");//MeshLoader::GenerateSphereMesh(15);
 		textured = false;
 		//MeshLoader::LoadMesh("..\\IET\\res\\Mountain Bike.obj");//MeshLoader::GenerateSphereMesh(25);
 		break;	

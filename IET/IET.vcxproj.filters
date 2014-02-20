@@ -298,14 +298,17 @@
     <None Include="Bumped.vert">
       <Filter>Resource Files\Shaders\Textured</Filter>
     </None>
-    <None Include="Bumped.frag">
-      <Filter>Resource Files\Shaders\Textured</Filter>
-    </None>
     <None Include="Translucent.vert">
       <Filter>Resource Files\Shaders\Textured</Filter>
     </None>
     <None Include="Translucent.frag">
       <Filter>Resource Files\Shaders\Textured</Filter>
+    </None>
+    <None Include="BumpedTextured.frag">
+      <Filter>Resource Files\Shaders\Textured</Filter>
+    </None>
+    <None Include="Bumped.frag">
+      <Filter>Resource Files\Shaders\Solid</Filter>
     </None>
   </ItemGroup>
 </Project>

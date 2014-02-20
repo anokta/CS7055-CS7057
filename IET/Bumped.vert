@@ -15,7 +15,8 @@ uniform vec3 vDiffuseDirection;
 out vec3 diffuseDirection;	
 
 out vec3 viewTangent, lightTangent;
-uniform vec3 fEye;
+uniform vec3 vEye;
+out vec3 fEye;
 
 uniform mat4 M;
 uniform mat4 V;
@@ -34,6 +35,7 @@ void main()
 
 	vec3 bitangent = cross (fNormal, fTangent) * vTangent.w;
 
+	fEye = vec3(V * vec4(vEye, 1.0));
 	vec3 viewDirection = normalize(fEye - fPosition);
 
 	viewTangent = vec3 (

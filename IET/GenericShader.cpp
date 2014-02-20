@@ -38,7 +38,7 @@ GenericShader::GenericShader(string vShaderFilepath, string fShaderFilepath, str
 	viewID = glGetUniformLocation(programID, "V");
 	projectionID = glGetUniformLocation(programID, "P");
 
-	eyeID = glGetUniformLocation(programID, "fEye");
+	eyeID = glGetUniformLocation(programID, "vEye");
 
 	ambientColorID = glGetUniformLocation(programID, "ambientColor");
 	ambientIntensityID = glGetUniformLocation(programID, "ambientIntensity");
@@ -52,6 +52,8 @@ GenericShader::GenericShader(string vShaderFilepath, string fShaderFilepath, str
 	specularShininessID = glGetUniformLocation(programID, "specularShininess");
 
 	orenNayarRoughnessID = glGetUniformLocation(programID, "roughness");
+
+	translucentEtaID = glGetUniformLocation(programID, "Eta");
 
 	vUvID = glGetAttribLocation(programID, "vUv");
 	fTextureID = glGetUniformLocation(programID, "fTexture");
@@ -173,6 +175,12 @@ void GenericShader::SetRoughness(float roughness)
 {
 	glUseProgram(programID);
 	glUniform1f(orenNayarRoughnessID, roughness);
+}
+
+void GenericShader::SetTranslucentEta(glm::vec3 &eta)
+{
+	glUseProgram(programID);
+	glUniform3f(translucentEtaID, eta.r, eta.g, eta.b);
 }
 
 GLuint GenericShader::createShader(string filepath, GLenum type)

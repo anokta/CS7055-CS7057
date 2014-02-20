@@ -15,7 +15,7 @@ uniform vec3 specularColor;
 uniform float specularIntensity;
 uniform float specularShininess;
 
-uniform vec3 fEye;
+in vec3 fEye;
 
 in vec3 fPosition;
 in vec3 fNormal;

@@ -13,6 +13,9 @@ out vec2 fUv;
 uniform vec3 vDiffuseDirection;	
 out vec3 diffuseDirection;		
 
+uniform vec3 vEye;
+out vec3 fEye;
+
 uniform mat4 M;
 uniform mat4 V;
 uniform mat4 P;				  
@@ -24,6 +27,7 @@ void main()
 	gl_Position = P * vec4(fPosition, 1.0);  
 	
 	diffuseDirection = (V * vec4(vDiffuseDirection, 0.0)).xyz;
+	fEye = vec3(V * vec4(vEye, 1.0));
 
 	fUv = vUv;
 }

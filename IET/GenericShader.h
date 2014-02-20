@@ -43,6 +43,8 @@ public:
 	void SetDirectionalLight(glm::vec3 direction, glm::vec3 color, float intensity);
 	void SetSpecularComponent(glm::vec3 color, float intensity, float shininess);
 	void SetRoughness(float roughness);
+
+	void SetTranslucentEta(glm::vec3 &eta);
 	
 	enum TextureType { DIFFUSE, NORMAL };
 	void BindTexture(GLuint textureID, TextureType type = TextureType::DIFFUSE);
@@ -76,6 +78,8 @@ protected:
 	GLuint specularColorID, specularIntensityID, specularShininessID;
 	GLuint orenNayarRoughnessID;
 	
+	GLuint translucentEtaID;
+
 	glm::mat4 V, P, M;
 	
 	void setMatrix(GLuint matrixID, const GLfloat * matrixData);

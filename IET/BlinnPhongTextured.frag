@@ -9,7 +9,7 @@ uniform vec3 diffuseColor;
 uniform float diffuseIntensity;
 in vec3 diffuseDirection;
 
-uniform vec3 fEye;
+in vec3 fEye;
 uniform vec3 specularColor;
 uniform float specularIntensity;
 uniform float specularShininess;
