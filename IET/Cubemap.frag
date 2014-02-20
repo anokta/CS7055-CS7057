@@ -7,5 +7,5 @@ uniform samplerCube fCubeTexture;
 
 void main() 
 {                
-	 gl_FragColor =  0.75 * texture(fCubeTexture, fTexCoords);
+	 gl_FragColor =  0.9 * texture(fCubeTexture, fTexCoords);
 }
