@@ -301,5 +301,11 @@
     <None Include="Bumped.frag">
       <Filter>Resource Files\Shaders\Textured</Filter>
     </None>
+    <None Include="Translucent.vert">
+      <Filter>Resource Files\Shaders\Textured</Filter>
+    </None>
+    <None Include="Translucent.frag">
+      <Filter>Resource Files\Shaders\Textured</Filter>
+    </None>
   </ItemGroup>
 </Project>

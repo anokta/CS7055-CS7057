@@ -4,6 +4,7 @@
 
 using namespace glm;
 
+#include "MeshLoader.h"
 SimpleMesh::SimpleMesh(const std::vector<vec3> &v, const std::vector<vec4> &c, const std::vector<vec3> &n)
 {
 	vertices = v;
@@ -66,8 +67,12 @@ void SimpleMesh::Render(GenericShader * shader)
 {
 	shader->UseProgram();
 
+	shader->BindCubeTexture(1);
+
 	glBindVertexArray (vaoID);
 	glDrawArrays (GL_TRIANGLES, 0, vertices.size());
+	
+	shader->UnbindCubeTexture();
 
 	glBindVertexArray(0);
 }
