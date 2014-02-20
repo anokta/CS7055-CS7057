@@ -13,6 +13,7 @@ void BumpedTexturedMesh::GenerateBuffer()
 {
 	glBindVertexArray( vaoID );
 	
+	glGenBuffers (1, &tangentVboID);
 	glBindBuffer (GL_ARRAY_BUFFER, tangentVboID);
 
 	glBufferData (GL_ARRAY_BUFFER, tangents.size() * sizeof(vec4), &tangents[0], GL_STATIC_DRAW);

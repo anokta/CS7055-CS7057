@@ -15,33 +15,35 @@ uniform vec3 vDiffuseDirection;
 out vec3 diffuseDirection;	
 
 out vec3 viewTangent, lightTangent;
+uniform vec3 fEye;
 
 uniform mat4 M;
 uniform mat4 V;
-uniform mat4 P;				  
+uniform mat4 P;		
 					                                                           
 void main()                                                                     
-{                                                                                  
+{                                                                              
     fPosition = (V * M * vec4(vPosition, 1.0)).xyz;
 	fNormal = (V * M * vec4(vNormal, 0.0)).xyz;
 	gl_Position = P * vec4(fPosition, 1.0);  
 	
 	diffuseDirection = (V * vec4(vDiffuseDirection, 0.0)).xyz;
-
+	vec3 fTangent = (V * M * vec4(vTangent.xyz, 0.0)).xyz;
+	
 	fUv = vUv;
 
-	vec3 bitangent = cross (fNormal, vTangent.xyz) * vTangent.w;
+	vec3 bitangent = cross (fNormal, fTangent) * vTangent.w;
 
-	vec3 viewDirection = normalize(vUv - fPosition);
+	vec3 viewDirection = normalize(fEye - fPosition);
 
 	viewTangent = vec3 (
-    dot (vTangent.xyz, viewDirection),
+    dot (fTangent, viewDirection),
     dot (bitangent, viewDirection),
     dot (fNormal, viewDirection)
   );
 
-	lightTangent = vec3 (
-    dot (vTangent.xyz, diffuseDirection),
+	diffuseDirection = vec3 (
+    dot (fTangent, diffuseDirection),
     dot (bitangent, diffuseDirection),
     dot (fNormal, diffuseDirection)
   );

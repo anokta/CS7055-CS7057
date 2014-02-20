@@ -50,7 +50,7 @@ RigidBodyModel::RigidBodyModel(RigidBody *b, GenericShader * s, GenericShader * 
 		break;
 
 	case RigidBody::BODY_TYPE::CAT:
-		modelMesh = MeshLoader::LoadMesh("..\\IET\\res\\block.dae","..\\IET\\res\\block.tga");//MeshLoader::LoadBumpedMesh("..\\IET\\res\\Apple_Of_Eden.dae", "..\\IET\\res\\AppleOfEden_D.tga", "..\\IET\\res\\AppleOfEden_N.tga");
+		modelMesh = MeshLoader::LoadBumpedMesh("..\\IET\\res\\Apple_Of_Eden.dae", "..\\IET\\res\\AppleOfEden_D.tga", "..\\IET\\res\\AppleOfEden_N.tga");
 		textured = true;
 		break;
 	}
@@ -132,7 +132,7 @@ bool RigidBodyModel::ResolveCollision(RigidBodyModel * rigidBodyModel)
 		RigidBody::Contact * contact = body->CheckCollisionNarrow(rigidBodyModel->GetBody());
 		if(contact != NULL)
 		{	
-			std::cout << "CP: " << contact->cA.x << "\t" << contact->cA.y << "\t" << contact->cA.z << std::endl;
+			//std::cout << "CP: " << contact->cA.x << "\t" << contact->cA.y << "\t" << contact->cA.z << std::endl;
 			body->RespondCollision(rigidBodyModel->GetBody(), contact->cA, contact->cB, contact->normal);
 
 			gizmos["BetweenLine"]->SetFromTo(vec3(), contact->normal);

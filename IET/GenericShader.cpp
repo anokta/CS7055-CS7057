@@ -55,7 +55,10 @@ GenericShader::GenericShader(string vShaderFilepath, string fShaderFilepath, str
 
 	vUvID = glGetAttribLocation(programID, "vUv");
 	fTextureID = glGetUniformLocation(programID, "fTexture");
+
+	vTangentID = glGetAttribLocation(programID, "vTangent");
 	fNormalTextureID = glGetUniformLocation(programID, "fNormalTexture");
+
 
 	fCubeTextureID = glGetUniformLocation(programID, "fCubeTexture");
 }
