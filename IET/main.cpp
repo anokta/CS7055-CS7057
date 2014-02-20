@@ -68,7 +68,7 @@ bool pause;
 
 void restart()
 {
-	for(int i=0; i<rigidBodies.size(); ++i)
+	for(unsigned int i=0; i<rigidBodies.size(); ++i)
 	{
 		delete rigidBodies[i];
 	}

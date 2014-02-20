@@ -36,20 +36,15 @@ void main()
 	fEye = vec3(V * vec4(vEye, 1.0));
 	vec3 viewDirection = normalize(fPosition - fEye);
 
-	Ratio = F + (1.0 - F) * pow((1.0 - dot(-viewDirection, normalize(fNormal))), FresnelPower);
+	vec3 n = normalize(fNormal);
+
+	Ratio = F + (1.0 - F) * pow((1.0 - dot(-viewDirection, n)), FresnelPower);
 	
-	mat3 vTextureMatrix = mat3(V);
-	//RefractR = vTextureMatrix * refract(viewDirection, normalize(fNormal), Eta.r);
-	//RefractG = vTextureMatrix * refract(viewDirection, normalize(fNormal), Eta.g);
-	//RefractB = vTextureMatrix * refract(viewDirection, normalize(fNormal), Eta.b);
+	RefractR = vec3(V * vec4(refract(viewDirection, n, Eta.r), 0.0));
+	RefractG = vec3(V * vec4(refract(viewDirection, n, Eta.g), 0.0));
+	RefractB = vec3(V * vec4(refract(viewDirection, n, Eta.b), 0.0));
 
-	//Reflect = vTextureMatrix * reflect(viewDirection, normalize(fNormal));
-
-	RefractR = vec3(V * vec4(refract(viewDirection, normalize(fNormal), Eta.r), 0.0));
-	RefractG = vec3(V * vec4(refract(viewDirection, normalize(fNormal), Eta.g), 0.0));
-	RefractB = vec3(V * vec4(refract(viewDirection, normalize(fNormal), Eta.b), 0.0));
-
-	Reflect = vec3(V * vec4(reflect(viewDirection, normalize(fNormal)), 0.0));
+	Reflect = vec3(V * vec4(reflect(viewDirection, n), 0.0));
 
 
 }

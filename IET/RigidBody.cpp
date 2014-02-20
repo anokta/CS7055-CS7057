@@ -568,14 +568,14 @@ vector<vec3> RigidBody::findContactPoints(RigidBody * body, glm::vec3 &normal)
 
 	planes.push_back(refNormal);
 	
-	for(int i=0; i<inc.size(); ++i)
+	for(unsigned int i=0; i<inc.size(); ++i)
 	{
 		contactPoints.push_back(inc[i]);
 	}
 
-	for(int i=0; i<planes.size(); ++i)
+	for(unsigned int i=0; i<planes.size(); ++i)
 	{
-		for(int j=0; j<contactPoints.size(); ++j)
+		for(unsigned int j=0; j<contactPoints.size(); ++j)
 		{
 			float dP = dot(contactPoints[j]-ref[i%ref.size()], planes[i]);
 			if(dP > 0)
@@ -614,7 +614,7 @@ vector<vec3> RigidBody::findContactPoints(RigidBody * body, glm::vec3 &normal)
 	}
 
 	vec3 total = vec3();
-	for(int i=0; i<contactPoints.size(); ++i)
+	for(unsigned int i=0; i<contactPoints.size(); ++i)
 		total += contactPoints[i];
 	total /= (float)contactPoints.size();
 
@@ -644,7 +644,7 @@ float RigidBody::calculateCollisionImpulse(RigidBody *body, vec3 &rA, vec3 &rB, 
 vec3 RigidBody::GetMinDistancePointVeronoi(vec3 &target)
 {
 	vector<vec3> simplex(points);
-	for(int i=0; i<simplex.size(); ++i)
+	for(unsigned int i=0; i<simplex.size(); ++i)
 		simplex[i] = vec3(GetTransformationMatrix() * vec4(simplex[i], 1.0f));
 
 	switch(simplex.size())
@@ -717,9 +717,9 @@ vector<vec3> RigidBody::getFurthestFaceInDirection(vec3 &direction)
 	int i1 = 0, i2 = 0;
 	vec3 point0 = scale * points[i0];
 
-	for(int i=0; i<points.size(); ++i)
+	for(unsigned int i=0; i<points.size(); ++i)
 	{
-		for(int j=i+1; j<points.size(); ++j)
+		for(unsigned int j=i+1; j<points.size(); ++j)
 		{
 			vec3 point1 = scale * points[i];
 			vec3 point2 = scale * points[j];
@@ -756,15 +756,13 @@ vector<vec3> RigidBody::getFurthestFaceInDirection(vec3 &direction)
 	face.push_back(vec3(GetTransformationMatrix() * vec4(points[i2], 1.0f)));
 	
 
-	for(int i=0; i<points.size(); ++i)
+	for(unsigned int i=0; i<points.size(); ++i)
 	{
 		if(i != i0 && i != i1 && i != i2 && dot(points[i] - points[i0], cross(points[i0] - points[i1], points[i0] - points[i2])) == 0)
 		{
 			face.push_back(vec3(GetTransformationMatrix() * vec4(points[i], 1.0f)));
 		}
 	}
-
-	//if(face.size() > 4) cout << "WTFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF?????" << endl;
 
 	return face;
 }
