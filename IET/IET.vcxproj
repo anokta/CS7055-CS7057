@@ -162,8 +162,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Bumped.frag" />
-    <None Include="BumpedTextured.frag" />
     <None Include="Bumped.vert" />
+    <None Include="BumpedTextured.frag" />
     <None Include="Cubemap.frag" />
     <None Include="Default.frag" />
     <None Include="DefaultTextured.frag" />
