@@ -78,7 +78,7 @@ void restart()
 	}
 	rigidBodies.clear();
 
-	particleSystem = new ParticleSystem(shaders[2], 1000);
+	particleSystem = new ParticleSystem(shaders[2], 5000);
 
 	////rigidBodies.push_back(new RigidBodyModel(new Ball(vec3(-7,0,0)), bumpedShader, shaders[0]));
 	////rigidBodies.push_back(new RigidBodyModel(new Box(vec3(7,0,0), quat(), vec3(1.0f, 0.4f, 1.5f)), shaders[currentShaderIndex+1], shaders[0]));
@@ -192,7 +192,8 @@ void keyPressed(unsigned char key, int x, int y)
 {
 	if(key > 48 && key < 58)
 	{
-		currentBodyIndex = std::min((int)(rigidBodies.size()-1), (int)(key - 49));
+		audioManager->ChangeSong((int)(key - 49));
+		//currentBodyIndex = std::min((int)(rigidBodies.size()-1), (int)(key - 49));
 		return;
 	}
 
@@ -417,7 +418,7 @@ void update(int frame)
 	if(!pause)
 	{
 		// Update audio manager
-		//audioManager->Update();
+		audioManager->Update();
 
 		//Update camera motion
 		if(!freeMode)
@@ -652,7 +653,7 @@ void init()
 	glDepthFunc(GL_LEQUAL);
 
 	// Start music
-	//audioManager->StartMusic();
+	audioManager->StartMusic();
 } 
 
 void releaseResources()

@@ -204,6 +204,9 @@
     <ClInclude Include="ParticleSystem.h">
       <Filter>Header Files\Entities\ParticleSystem</Filter>
     </ClInclude>
+    <ClInclude Include="ParticleMesh.h">
+      <Filter>Header Files\Graphics\Meshes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -289,6 +292,9 @@
     </ClCompile>
     <ClCompile Include="Particle.cpp">
       <Filter>Source Files\Entities\ParticleSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleMesh.cpp">
+      <Filter>Source Files\Graphics\Meshes</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

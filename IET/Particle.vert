@@ -2,8 +2,7 @@
 
 #version 330                                                                  
                                                               
-in vec3 vPosition;	
-in vec4 vColor;											
+in vec3 vPosition;							
 
 out vec4 fColor;
 
@@ -15,5 +14,5 @@ void main()
 {                                                                                  
     gl_Position = P * V * M * vec4(vPosition, 1.0);  
 	
-	fColor = vColor * vec4(gl_Position.y, 1.0f - gl_Position.y, 0.0f, 0.9f);
+	fColor = vec4(gl_Position.y, 1.0f - gl_Position.y, 0.0f, 0.9f);
 }

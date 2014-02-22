@@ -65,14 +65,14 @@ void AudioManager::LoadResources() {
 	for(int i=0; i<labelSize; ++i)
 		labels[i] = "Song " + std::to_string(i+1);
 	
-	AddMusic("Song 1", "..\\IET\\res\\over.mp3", true);
-	AddMusic("Song 2", "..\\IET\\res\\insistent.mp3", true);
-	AddMusic("Song 3", "..\\IET\\res\\Dare.mp3", true);
-	AddMusic("Song 4", "..\\IET\\res\\rockstar.mp3", true);
-	AddMusic("Song 5", "..\\IET\\res\\cider.mp3", true);
-	AddMusic("Song 6", "..\\IET\\res\\sharamjey.mp3", true);
-	AddMusic("Song 7", "..\\IET\\res\\sunday.mp3", true);
-	AddMusic("Song 8", "..\\IET\\res\\lorem ipsum.mp3", true);
+	AddMusic("Song 1", "..\\IET\\res\\audio\\over.mp3", true);
+	AddMusic("Song 2", "..\\IET\\res\\audio\\insistent.mp3", true);
+	AddMusic("Song 3", "..\\IET\\res\\audio\\Dare.mp3", true);
+	AddMusic("Song 4", "..\\IET\\res\\audio\\rockstar.mp3", true);
+	AddMusic("Song 5", "..\\IET\\res\\audio\\cider.mp3", true);
+	AddMusic("Song 6", "..\\IET\\res\\audio\\sharamjey.mp3", true);
+	AddMusic("Song 7", "..\\IET\\res\\audio\\sunday.mp3", true);
+	AddMusic("Song 8", "..\\IET\\res\\audio\\lorem ipsum.mp3", true);
 	
 
 	timeInterval = 60.0f / (BEATS / 4.0f) / BPM;

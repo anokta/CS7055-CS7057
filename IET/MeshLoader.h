@@ -8,6 +8,7 @@
 #include "TexturedIndexedMesh.h"
 #include "BumpedTexturedMesh.h"
 #include "Line.h"
+#include "ParticleMesh.h"
 #include "SkyboxMesh.h"
 
 class MeshLoader
@@ -17,7 +18,7 @@ public:
 	static TexturedIndexedMesh * LoadMesh(const std::string &path, const std::string &texturePath);
 	static BumpedTexturedMesh * LoadBumpedMesh(const std::string &path, const std::string &texturePath, const std::string &normalPath);
 	
-	static SimpleMesh * GenerateParticleMesh();
+	static ParticleMesh * GenerateParticleMesh();
 	static SimpleMesh * GenerateCubeMesh();
 	static SimpleMesh * GenerateSphereMesh(int numSegments);
 	static TexturedSimpleMesh * GenerateTexturedCubeMesh(const std::string &texturePath);
