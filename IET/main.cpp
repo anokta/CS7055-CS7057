@@ -533,7 +533,7 @@ void init()
 	GenericShader * skyboxShader = new GenericShader("Cubemap.vert", "Cubemap.frag", "Skybox");
 	shaders.push_back(skyboxShader);
 
-	GenericShader * constantShader = new GenericShader("Default.vert", "Constant.frag", "Fixed Color");
+	GenericShader * constantShader = new GenericShader("Particle.vert", "Particle.frag", "Particle");
 	shaders.push_back(constantShader);
 	GenericShader * constantTexturedShader = new GenericShader("Textured.vert", "Constant.frag");
 	shaders.push_back(constantTexturedShader);	
@@ -607,7 +607,7 @@ void init()
 
 	// Create the camera
 	camera = new Camera(shaders, vec3(0,0,12), vec3(0,0,0), vec3(0,1,0));
-	skybox = new Skybox(shaders[1]);	
+	//skybox = new Skybox(shaders[1]);	
 
 	freeMode = true;
 

@@ -67,6 +67,9 @@
     <Filter Include="Header Files\Entities\ParticleSystem">
       <UniqueIdentifier>{c8e9c86a-a7ec-4070-90ea-ef88a0932535}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\Particle">
+      <UniqueIdentifier>{06e1ba17-1063-46fb-b7b7-c2e4d4bdf2fd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -324,6 +327,12 @@
     </None>
     <None Include="BumpedTextured.frag">
       <Filter>Resource Files\Shaders\Textured</Filter>
+    </None>
+    <None Include="Particle.vert">
+      <Filter>Resource Files\Particle</Filter>
+    </None>
+    <None Include="Particle.frag">
+      <Filter>Resource Files\Particle</Filter>
     </None>
   </ItemGroup>
 </Project>

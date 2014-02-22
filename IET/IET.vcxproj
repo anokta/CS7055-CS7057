@@ -172,6 +172,8 @@
     <None Include="DefaultTextured.frag" />
     <None Include="DiffuseTextured.frag" />
     <None Include="OrenNayar.frag" />
+    <None Include="Particle.frag" />
+    <None Include="Particle.vert" />
     <None Include="Textured.vert" />
     <None Include="ToonTextured.frag" />
     <None Include="Translucent.frag" />
