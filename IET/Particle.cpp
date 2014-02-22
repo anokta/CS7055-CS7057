@@ -2,7 +2,7 @@
 
 #include "EntityManager.h"
 
-#define EPSILON 0.05f
+#define EPSILON 0.3f
 #define ELASTICITY 0.3f
 #define FRICTION 0.2f
 

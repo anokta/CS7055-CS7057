@@ -86,7 +86,7 @@ void ParticleSystem::HandleCollisions(std::vector<RigidBodyModel*> & obstacles)
 	for(unsigned int i=0; i<obstacles.size(); ++i)
 	{
 		vec3 normal = toMat3(obstacles[i]->GetBody()->GetOrientation()) * vec3(0,1,0);
-		vec3 bodyPosition = obstacles[i]->GetBody()->GetPosition() + normal * obstacles[i]->GetBody()->GetScale() / 2.0f;
+		vec3 bodyPosition = obstacles[i]->GetBody()->GetPosition(); // + normal * dot(normal, obstacles[i]->GetBody()->GetScale() / 2.0f);
 
 		for(unsigned int j=0; j<particles.size(); ++j)
 		{

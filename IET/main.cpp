@@ -78,7 +78,7 @@ void restart()
 	}
 	rigidBodies.clear();
 
-	particleSystem = new ParticleSystem(shaders[2], 5000);
+	particleSystem = new ParticleSystem(shaders[2], 2500);
 
 	////rigidBodies.push_back(new RigidBodyModel(new Ball(vec3(-7,0,0)), bumpedShader, shaders[0]));
 	////rigidBodies.push_back(new RigidBodyModel(new Box(vec3(7,0,0), quat(), vec3(1.0f, 0.4f, 1.5f)), shaders[currentShaderIndex+1], shaders[0]));
@@ -100,6 +100,9 @@ void restart()
 	//rigidBodies.push_back(new RigidBodyModel(new Box(vec3(2,3.5f,0), quat(), vec3(1.5f, 0.6f, 1.0f), 2.5f), shaders[currentShaderIndex+1], shaders[0]));
 	//rigidBodies.push_back(new RigidBodyModel(new Box(vec3(0,2,0), quat(), vec3(1,1,1), 2.5f), shaders[currentShaderIndex+1], shaders[0]));
 	rigidBodies.push_back(new RigidBodyModel(new Plane(vec3(0,-4.0f,0), quat(), vec2(8.0f, 4.0f)), shaders[currentShaderIndex], shaders[0]));
+	rigidBodies.push_back(new RigidBodyModel(new Plane(vec3(0, 4.0f,0), quat(vec3(pi<float>(), 0.0f, 0.0f)), vec2(13.0f, 4.0f)), shaders[currentShaderIndex], shaders[0]));
+	rigidBodies.push_back(new RigidBodyModel(new Plane(vec3(5.0f, 0.0f,0), quat(vec3(0.0f, 0.0f, pi<float>() / 2.5f)), vec2(8.0f, 4.0f)), shaders[currentShaderIndex], shaders[0]));
+	rigidBodies.push_back(new RigidBodyModel(new Plane(vec3(-5.0f, 0.0f,0), quat(vec3(0.0f, 0.0f, -pi<float>() / 2.5f)), vec2(8.0f, 4.0f)), shaders[currentShaderIndex], shaders[0]));
 }
 
 void rotateBody(float x, float y, float z)
@@ -646,7 +649,7 @@ void init()
 	pause = false;
 
 	// OpenGL initial setup
-	glClearColor(0.01f, 0.01f, 0.02f, 0.0f);
+	glClearColor(0.04f, 0.04f, 0.05f, 0.0f);
 	glEnable(GL_DEPTH_TEST);
 
 	glEnable(GL_DEPTH_FUNC);
