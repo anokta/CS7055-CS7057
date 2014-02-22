@@ -235,6 +235,69 @@ BumpedTexturedMesh * MeshLoader::LoadBumpedMesh(const std::string &path, const s
 	return NULL;
 }
 
+SimpleMesh * MeshLoader::GenerateParticleMesh()
+{
+	vec3 vertices[] = {
+		vec3(-0.025f,-0.025f,-0.025f), // triangle 1 : begin
+		vec3(-0.025f,-0.025f, 0.025f),
+		vec3(-0.025f, 0.025f, 0.025f), // triangle 1 : end
+		vec3(0.025f, 0.025f,-0.025f), // triangle 2 : begin
+		vec3(-0.025f,-0.025f,-0.025f),
+		vec3(-0.025f, 0.025f,-0.025f), // triangle 2 : end
+		vec3(0.025f,-0.025f, 0.025f),
+		vec3(-0.025f,-0.025f,-0.025f),
+		vec3(0.025f,-0.025f,-0.025f),
+		vec3(0.025f, 0.025f,-0.025f),
+		vec3(0.025f,-0.025f,-0.025f),
+		vec3(-0.025f,-0.025f,-0.025f),
+		vec3(-0.025f,-0.025f,-0.025f),
+		vec3(-0.025f, 0.025f, 0.025f),
+		vec3(-0.025f, 0.025f,-0.025f),
+		vec3( 0.025f,-0.025f, 0.025f),
+		vec3(-0.025f,-0.025f, 0.025f),
+		vec3(-0.025f,-0.025f,-0.025f),
+		vec3(-0.025f, 0.025f, 0.025f),
+		vec3(-0.025f,-0.025f, 0.025f),
+		vec3(0.025f,-0.025f, 0.025f),
+		vec3(0.025f, 0.025f, 0.025f),
+		vec3(0.025f,-0.025f,-0.025f),
+		vec3(0.025f, 0.025f,-0.025f),
+		vec3(0.025f,-0.025f,-0.025f),
+		vec3(0.025f, 0.025f, 0.025f),
+		vec3(0.025f,-0.025f, 0.025f),
+		vec3(0.025f, 0.025f, 0.025f),
+		vec3(0.025f, 0.025f,-0.025f),
+		vec3(-0.025f, 0.025f,-0.025f),
+		vec3(0.025f, 0.025f, 0.025f),
+		vec3(-0.025f, 0.025f,-0.025f),
+		vec3(-0.025f, 0.025f, 0.025f),
+		vec3(0.025f, 0.025f, 0.025f),
+		vec3(-0.025f, 0.025f, 0.025f),
+		vec3(0.025f,-0.025f, 0.025f)
+	};
+
+	std::vector<vec3> v(std::begin(vertices), std::end(vertices));
+
+	std::vector<vec4> c;
+	vec4 color = vec4(float(rand())/RAND_MAX * 0.5f + 0.5f, float(rand())/RAND_MAX * 0.5f + 0.5f, float(rand())/RAND_MAX * 0.5f + 0.5f, 1.0f);
+	for(unsigned int i=0; i<v.size(); ++i)
+		c.push_back(color);
+
+	// Calculate Normals
+	std::vector<vec3> n;
+	for(unsigned int i=0; i<v.size(); i+=3)
+	{
+		vec3 v1 = v[i+1] - v[i];
+		vec3 v2 = v[i+2] - v[i];
+
+		vec3 norm = normalize(cross(v1, v2));
+		n.push_back(norm);
+		n.push_back(norm);
+		n.push_back(norm);
+	}
+
+	return new SimpleMesh(v, c, n);
+}
 SimpleMesh * MeshLoader::GenerateCubeMesh()
 {
 	vec3 vertices[] = {

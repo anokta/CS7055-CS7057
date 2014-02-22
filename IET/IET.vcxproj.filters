@@ -61,6 +61,12 @@
     <Filter Include="Resource Files\Shaders\Skybox">
       <UniqueIdentifier>{c0965ef4-84e4-4c95-9547-0bc5996571ae}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Entities\ParticleSystem">
+      <UniqueIdentifier>{047846c4-c094-4f81-8843-651ed86760a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Entities\ParticleSystem">
+      <UniqueIdentifier>{c8e9c86a-a7ec-4070-90ea-ef88a0932535}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -129,9 +135,6 @@
     <ClInclude Include="Camera.h">
       <Filter>Header Files\Graphics\Camera</Filter>
     </ClInclude>
-    <ClInclude Include="Particle.h">
-      <Filter>Header Files\Entities</Filter>
-    </ClInclude>
     <ClInclude Include="Line.h">
       <Filter>Header Files\Graphics\Meshes</Filter>
     </ClInclude>
@@ -189,6 +192,15 @@
     <ClInclude Include="BumpedTexturedMesh.h">
       <Filter>Header Files\Graphics\Meshes</Filter>
     </ClInclude>
+    <ClInclude Include="Entity.h">
+      <Filter>Header Files\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="Particle.h">
+      <Filter>Header Files\Entities\ParticleSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleSystem.h">
+      <Filter>Header Files\Entities\ParticleSystem</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -214,9 +226,6 @@
     </ClCompile>
     <ClCompile Include="GenericShader.cpp">
       <Filter>Source Files\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Particle.cpp">
-      <Filter>Source Files\Entities</Filter>
     </ClCompile>
     <ClCompile Include="Line.cpp">
       <Filter>Source Files\Graphics\Meshes</Filter>
@@ -271,6 +280,12 @@
     </ClCompile>
     <ClCompile Include="BumpedTexturedMesh.cpp">
       <Filter>Source Files\Graphics\Meshes</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleSystem.cpp">
+      <Filter>Source Files\Entities\ParticleSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="Particle.cpp">
+      <Filter>Source Files\Entities\ParticleSystem</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

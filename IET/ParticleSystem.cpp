@@ -1,9 +1,10 @@
 #include "ParticleSystem.h"
 
 #include "EntityManager.h"
-#include "HelperFunctions.h"
+#include "MeshLoader.h"
 
 #include "glm\gtc\matrix_transform.hpp"
+#include "glm\gtx\quaternion.hpp"
 
 using namespace glm;
 
@@ -13,8 +14,10 @@ using namespace glm;
 
 ParticleSystem::ParticleSystem(GenericShader * s, int size)
 {
-	model = HelperFunctions::GenerateCubeMesh(s);
 	shader = s;
+
+	model = MeshLoader::GenerateParticleMesh();
+	model->SetShader(shader);
 
 	for(int i=0; i<size; ++i)
 		particles.push_back(new Particle(vec3(float(rand())/RAND_MAX * 8.0f - 4.0f, float(rand())/RAND_MAX * 2.0f - 1.0f, float(rand())/RAND_MAX * 1.0f - 0.5f)));
@@ -24,7 +27,7 @@ ParticleSystem::ParticleSystem(GenericShader * s, int size)
 
 ParticleSystem::~ParticleSystem()
 {
-	for(int i=0; i<particles.size(); ++i)
+	for(unsigned int i=0; i<particles.size(); ++i)
 	{
 		delete particles[i];
 	}
@@ -36,10 +39,10 @@ ParticleSystem::~ParticleSystem()
 
 void ParticleSystem::Draw()
 {
-	for(int i=0; i<particles.size(); ++i)
+	for(unsigned int i=0; i<particles.size(); ++i)
 	{
 		shader->SetModelMatrix(translate(shader->GetModelMatrix(), particles[i]->GetPosition()));
-		model->Render();
+		model->Render(shader);
 		shader->SetModelMatrix(translate(shader->GetModelMatrix(), -particles[i]->GetPosition()));
 	}
 }
@@ -51,7 +54,7 @@ void ParticleSystem::ApplyGravity()
 
 void ParticleSystem::ApplyViscousDrag()
 {
-	for(int i=0; i<particles.size(); ++i)
+	for(unsigned int i=0; i<particles.size(); ++i)
 	{
 		particles[i]->AddForce(-K_VISCOUS * particles[i]->GetVelocity());
 	}
@@ -59,7 +62,7 @@ void ParticleSystem::ApplyViscousDrag()
 
 void ParticleSystem::ApplyGlobalForce(vec3 &f)
 {
-	for(int i=0; i<particles.size(); ++i)
+	for(unsigned int i=0; i<particles.size(); ++i)
 	{
 		particles[i]->AddForce(f);
 	}
@@ -67,9 +70,9 @@ void ParticleSystem::ApplyGlobalForce(vec3 &f)
 
 void ParticleSystem::ApplyEQForces(float * bands)
 {
-	for(int i=0; i<particles.size(); ++i)
+	for(unsigned int i=0; i<particles.size(); ++i)
 	{	
-		for(int j=0; j<8; ++j)
+		for(unsigned int j=0; j<8; ++j)
 		{
 			float deviation = abs(particles[i]->GetPosition().x - (j - 3.5f));
 			float intensity = (bands[j] > 0.42f && deviation <= 0.5f) ? min(8.0f, bands[j]) : 0;// * (particles[i]->GetPosition().y < 0.1f ? 10.0f : 1/particles[i]->GetPosition().y) : 0;
@@ -78,15 +81,18 @@ void ParticleSystem::ApplyEQForces(float * bands)
 	}
 }
 
-void ParticleSystem::HandleCollisions(std::vector<ObstaclePlane*> & obstacles)
+void ParticleSystem::HandleCollisions(std::vector<RigidBodyModel*> & obstacles)
 {
-	for(int i=0; i<particles.size(); ++i)
+	for(unsigned int i=0; i<obstacles.size(); ++i)
 	{
-		for(int j=0; j<obstacles.size(); ++j)
+		vec3 normal = toMat3(obstacles[i]->GetBody()->GetOrientation()) * vec3(0,1,0);
+		vec3 bodyPosition = obstacles[i]->GetBody()->GetPosition() + normal * obstacles[i]->GetBody()->GetScale() / 2.0f;
+
+		for(unsigned int j=0; j<particles.size(); ++j)
 		{
-			if(particles[i]->IsColliding(obstacles[j]))
+			if(particles[j]->IsColliding(bodyPosition, normal))
 			{
-				particles[i]->ResolveCollision(obstacles[j]);
+				particles[j]->RespondCollision(bodyPosition, normal);
 			}
 		}
 	}

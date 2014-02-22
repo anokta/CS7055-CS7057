@@ -107,8 +107,10 @@
     <ClInclude Include="Box.h" />
     <ClInclude Include="Ball.h" />
     <ClInclude Include="Cat.h" />
+    <ClInclude Include="Entity.h" />
     <ClInclude Include="Line.h" />
     <ClInclude Include="IndexedMesh.h" />
+    <ClInclude Include="ParticleSystem.h" />
     <ClInclude Include="Plane.h" />
     <ClInclude Include="SimpleMesh.h" />
     <ClInclude Include="Camera.h" />
@@ -141,6 +143,7 @@
     <ClCompile Include="Ellipsoid.cpp" />
     <ClCompile Include="Line.cpp" />
     <ClCompile Include="IndexedMesh.cpp" />
+    <ClCompile Include="ParticleSystem.cpp" />
     <ClCompile Include="Plane.cpp" />
     <ClCompile Include="SimpleMesh.cpp" />
     <ClCompile Include="Camera.cpp" />

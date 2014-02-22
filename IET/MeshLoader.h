@@ -16,7 +16,8 @@ public:
 	static IndexedMesh * LoadMesh(const std::string &path);
 	static TexturedIndexedMesh * LoadMesh(const std::string &path, const std::string &texturePath);
 	static BumpedTexturedMesh * LoadBumpedMesh(const std::string &path, const std::string &texturePath, const std::string &normalPath);
-
+	
+	static SimpleMesh * GenerateParticleMesh();
 	static SimpleMesh * GenerateCubeMesh();
 	static SimpleMesh * GenerateSphereMesh(int numSegments);
 	static TexturedSimpleMesh * GenerateTexturedCubeMesh(const std::string &texturePath);

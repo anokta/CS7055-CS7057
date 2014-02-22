@@ -4,7 +4,9 @@
 #include "Particle.h"
 
 #include "Drawable.h"
-#include "Mesh.h"
+#include "MeshBase.h"
+
+#include "RigidBodyModel.h"
 
 class ParticleSystem : public Drawable
 {
@@ -20,13 +22,13 @@ public:
 	void ApplyGlobalForce(glm::vec3 &f);
 	void ApplyEQForces(float * bands);
 
-	void HandleCollisions(std::vector<ObstaclePlane*> & obstacles);
+	void HandleCollisions(std::vector<RigidBodyModel*> & obstacles);
 
 private:
 	std::vector<Particle*> particles;
 
 	GenericShader * shader;
-	Mesh * model;
+	MeshBase * model;
 
 };
 
