@@ -355,10 +355,10 @@ vector<vec3> RigidBody::findClosestSimplex(vector<vec3> &simplex, vec3 &target)
 	vec3 A = simplex[3];
 
 	float distances[4];
-	distances[0] = dot(-A, normalize(cross(C-A, B-A))); //float dACB = dot(-A, cross(C-A, B-A));
-	distances[1] = dot(-A, normalize(cross(B-A, D-A))); //float dABD = dot(-A, cross(B-A, D-A));
-	distances[2] = dot(-A, normalize(cross(D-A, C-A))); //float dADC = dot(-A, cross(D-A, C-A));
-	distances[3] = dot(-B, normalize(cross(C-B, D-B))); //float dBCD = dot(-A, cross(C-B, D-B));
+	distances[0] = dot(target-A, normalize(cross(C-A, B-A))); //float dACB = dot(-A, cross(C-A, B-A));
+	distances[1] = dot(target-A, normalize(cross(B-A, D-A))); //float dABD = dot(-A, cross(B-A, D-A));
+	distances[2] = dot(target-A, normalize(cross(D-A, C-A))); //float dADC = dot(-A, cross(D-A, C-A));
+	distances[3] = dot(target-B, normalize(cross(C-B, D-B))); //float dBCD = dot(-A, cross(C-B, D-B));
 
 	int minIndex = 0;
 	for(int i=0; i<4; ++i)
@@ -401,30 +401,30 @@ void RigidBody::findSimplexWithMinDistanceInTriangle(vector<vec3> &simplex, vec3
 
 	vec3 ABC = cross(C-A, B-A);
 
-	if(dot(-A, B-A) <= 0 && dot(-A, C-A) <= 0)
+	if(dot(target-A, B-A) <= 0 && dot(target-A, C-A) <= 0)
 	{
 		simplex.erase(simplex.begin());
 		simplex.erase(simplex.begin());
 	}
-	else if(dot(-B, C-B) <= 0 && dot(-B, A-B) <= 0)
+	else if(dot(target-B, C-B) <= 0 && dot(target-B, A-B) <= 0)
 	{
 		simplex.erase(simplex.begin() + 2);
 		simplex.erase(simplex.begin());
 	}
-	else if(dot(-C, B-C) <= 0 && dot(-C, A-C) <= 0)
+	else if(dot(target-C, B-C) <= 0 && dot(target-C, A-C) <= 0)
 	{	
 		simplex.erase(simplex.begin() + 2);
 		simplex.erase(simplex.begin() + 1);
 	}
-	else if(dot(cross(ABC, B-A), -A) >= 0 && dot(-A, B-A) >= 0 && dot(-B, A-B) >= 0)
+	else if(dot(cross(ABC, B-A), target-A) >= 0 && dot(target-A, B-A) >= 0 && dot(target-B, A-B) >= 0)
 	{
 		simplex.erase(simplex.begin());
 	}
-	else if(dot(cross(ABC, A-C), -A) >= 0 && dot(-C, A-C) >= 0 && dot(-A, C-A) >= 0)
+	else if(dot(cross(ABC, A-C), target-A) >= 0 && dot(target-C, A-C) >= 0 && dot(target-A, C-A) >= 0)
 	{
 		simplex.erase(simplex.begin() + 1);
 	}
-	else if(dot(cross(ABC, C-B), -B) >= 0 && dot(-B, C-B) >= 0 && dot(-C, B-C) >= 0)
+	else if(dot(cross(ABC, C-B), target-B) >= 0 && dot(target-B, C-B) >= 0 && dot(target-C, B-C) >= 0)
 	{
 		simplex.erase(simplex.begin() + 2);
 	}

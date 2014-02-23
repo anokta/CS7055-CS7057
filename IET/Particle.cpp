@@ -48,5 +48,5 @@ void Particle::RespondCollision(vec3 &bodyPosition, vec3 &normal)
 	}
 
 	// spring penalty
-	AddForce(300 * abs(dot(position- bodyPosition, normal)) * normal);
+	AddForce(200 * abs(dot(position- bodyPosition, normal)) * normal);
 }
