@@ -94,6 +94,7 @@
     <Text Include="ReadMe.txt" />
     <Text Include="SepiaDiffuse.frag" />
     <Text Include="Cubemap.vert" />
+    <Text Include="SepiaDiffuseTextured.frag" />
     <Text Include="Toon.frag" />
     <Text Include="Default.vert" />
   </ItemGroup>
