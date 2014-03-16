@@ -39,16 +39,6 @@ RigidBodyModel::RigidBodyModel(RigidBody *b, GenericShader * s, GenericShader * 
 		textured = false;
 		break;
 
-	case RigidBody::BODY_TYPE::TETRAHEDRON:
-		modelMesh = MeshLoader::GenerateTetrahedron();//MeshLoader::GeneratePlaneMesh();
-		textured = false;
-		break;
-
-	case RigidBody::BODY_TYPE::TRIANGLE:
-		modelMesh = MeshLoader::GenerateTriangle();
-		textured = false;
-		break;
-
 	case RigidBody::BODY_TYPE::CAT:
 		modelMesh = MeshLoader::LoadMesh("..\\IET\\res\\block.dae", "..\\IET\\res\\block.tga");
 		//MeshLoader::LoadBumpedMesh("..\\IET\\res\\Apple_Of_Eden.dae", "..\\IET\\res\\AppleOfEden_D.tga", "..\\IET\\res\\AppleOfEden_N.tga");
@@ -62,8 +52,6 @@ RigidBodyModel::RigidBodyModel(RigidBody *b, GenericShader * s, GenericShader * 
 	gizmos["BoundingBox"] = MeshLoader::GenerateBoundingBox();
 	gizmos["BoundingBox"]->SetShader(lineShader);
 
-	//gizmos["FurthestPoint"] = MeshLoader::GenerateBoundingSphere();
-	//gizmos["FurthestPoint"]->SetShader(lineShader);
 	gizmos["BetweenLine"] = MeshLoader::GenerateLine(vec4(1,0,1,1));
 	gizmos["BetweenLine"]->SetShader(lineShader);
 
@@ -105,7 +93,6 @@ void RigidBodyModel::Draw()
 	if(gizmo)
 	{
 		gizmos["BetweenLine"]->Render(lineShader);
-		//gizmos["FurthestPoint"]->Render(lineShader);
 
 		M = lineShader->GetModelMatrix();
 
@@ -129,19 +116,15 @@ bool RigidBodyModel::ResolveCollision(RigidBodyModel * rigidBodyModel)
 		if(rigidBodyModel->GetGizmoColor().r == 0)
 			rigidBodyModel->SetGizmoColor(vec4(1,1,0,1));
 
-		//std::cout << "Broad Collided. . . ";
 		RigidBody::Contact * contact = body->CheckCollisionNarrow(rigidBodyModel->GetBody());
 		if(contact != NULL)
 		{	
-			//std::cout << "CP: " << contact->cA.x << "\t" << contact->cA.y << "\t" << contact->cA.z << std::endl;
 			body->RespondCollision(rigidBodyModel->GetBody(), contact->cA, contact->cB, contact->normal);
 
 			gizmos["BetweenLine"]->SetFromTo(vec3(), contact->normal);
 		
 			delete contact;
 
-			//std::cout << "CP: " << contactNormal.x << "\t" << contactNormal.y << "\t" << contactNormal.z << std::endl;
-			//std::cout << "NARROW Collided. . . ";
 			return true;
 		}
 	}

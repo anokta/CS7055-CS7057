@@ -15,7 +15,7 @@ public:
 	RigidBody(glm::vec3 &p = glm::vec3(), glm::quat &o = glm::quat(), glm::vec3 &s = glm::vec3(1,1,1));
 
 	// Type
-	enum BODY_TYPE { BOX, BALL, ELLIPSOID, PLANE, TETRAHEDRON, TRIANGLE, CAT };
+	enum BODY_TYPE { BOX, BALL, ELLIPSOID, PLANE, CAT };
 	inline BODY_TYPE GetType() { return type; }
 
 	// Getters

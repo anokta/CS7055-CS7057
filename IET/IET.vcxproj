@@ -111,8 +111,6 @@
     <ClInclude Include="Entity.h" />
     <ClInclude Include="Line.h" />
     <ClInclude Include="IndexedMesh.h" />
-    <ClInclude Include="ParticleMesh.h" />
-    <ClInclude Include="ParticleSystem.h" />
     <ClInclude Include="Plane.h" />
     <ClInclude Include="SimpleMesh.h" />
     <ClInclude Include="Camera.h" />
@@ -122,17 +120,14 @@
     <ClInclude Include="HelperFunctions.h" />
     <ClInclude Include="MeshBase.h" />
     <ClInclude Include="MeshLoader.h" />
-    <ClInclude Include="Particle.h" />
     <ClInclude Include="RigidBody.h" />
     <ClInclude Include="RigidBodyModel.h" />
     <ClInclude Include="Skybox.h" />
     <ClInclude Include="SkyboxMesh.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="Tetrahedron.h" />
     <ClInclude Include="TexturedSimpleMesh.h" />
     <ClInclude Include="TexturedIndexedMesh.h" />
-    <ClInclude Include="Triangle.h" />
     <ClInclude Include="Updatable.h" />
   </ItemGroup>
   <ItemGroup>
@@ -145,8 +140,6 @@
     <ClCompile Include="Ellipsoid.cpp" />
     <ClCompile Include="Line.cpp" />
     <ClCompile Include="IndexedMesh.cpp" />
-    <ClCompile Include="ParticleMesh.cpp" />
-    <ClCompile Include="ParticleSystem.cpp" />
     <ClCompile Include="Plane.cpp" />
     <ClCompile Include="SimpleMesh.cpp" />
     <ClCompile Include="Camera.cpp" />
@@ -155,16 +148,13 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="HelperFunctions.cpp" />
     <ClCompile Include="MeshLoader.cpp" />
-    <ClCompile Include="Particle.cpp" />
     <ClCompile Include="RigidBody.cpp" />
     <ClCompile Include="RigidBodyModel.cpp" />
     <ClCompile Include="Skybox.cpp" />
     <ClCompile Include="SkyboxMesh.cpp" />
     <ClCompile Include="stdafx.cpp" />
-    <ClCompile Include="Tetrahedron.cpp" />
     <ClCompile Include="TexturedSimpleMesh.cpp" />
     <ClCompile Include="TexturedIndexedMesh.cpp" />
-    <ClCompile Include="Triangle.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Bumped.frag" />
@@ -175,8 +165,6 @@
     <None Include="DefaultTextured.frag" />
     <None Include="DiffuseTextured.frag" />
     <None Include="OrenNayar.frag" />
-    <None Include="Particle.frag" />
-    <None Include="Particle.vert" />
     <None Include="Textured.vert" />
     <None Include="ToonTextured.frag" />
     <None Include="Translucent.frag" />

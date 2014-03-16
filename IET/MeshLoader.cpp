@@ -235,52 +235,6 @@ BumpedTexturedMesh * MeshLoader::LoadBumpedMesh(const std::string &path, const s
 	return NULL;
 }
 
-ParticleMesh * MeshLoader::GenerateParticleMesh()
-{
-	vec3 vertices[] = {
-		vec3(-0.025f,-0.025f,-0.025f), // triangle 1 : begin
-		vec3(-0.025f,-0.025f, 0.025f),
-		vec3(-0.025f, 0.025f, 0.025f), // triangle 1 : end
-		vec3(0.025f, 0.025f,-0.025f), // triangle 2 : begin
-		vec3(-0.025f,-0.025f,-0.025f),
-		vec3(-0.025f, 0.025f,-0.025f), // triangle 2 : end
-		vec3(0.025f,-0.025f, 0.025f),
-		vec3(-0.025f,-0.025f,-0.025f),
-		vec3(0.025f,-0.025f,-0.025f),
-		vec3(0.025f, 0.025f,-0.025f),
-		vec3(0.025f,-0.025f,-0.025f),
-		vec3(-0.025f,-0.025f,-0.025f),
-		vec3(-0.025f,-0.025f,-0.025f),
-		vec3(-0.025f, 0.025f, 0.025f),
-		vec3(-0.025f, 0.025f,-0.025f),
-		vec3( 0.025f,-0.025f, 0.025f),
-		vec3(-0.025f,-0.025f, 0.025f),
-		vec3(-0.025f,-0.025f,-0.025f),
-		vec3(-0.025f, 0.025f, 0.025f),
-		vec3(-0.025f,-0.025f, 0.025f),
-		vec3(0.025f,-0.025f, 0.025f),
-		vec3(0.025f, 0.025f, 0.025f),
-		vec3(0.025f,-0.025f,-0.025f),
-		vec3(0.025f, 0.025f,-0.025f),
-		vec3(0.025f,-0.025f,-0.025f),
-		vec3(0.025f, 0.025f, 0.025f),
-		vec3(0.025f,-0.025f, 0.025f),
-		vec3(0.025f, 0.025f, 0.025f),
-		vec3(0.025f, 0.025f,-0.025f),
-		vec3(-0.025f, 0.025f,-0.025f),
-		vec3(0.025f, 0.025f, 0.025f),
-		vec3(-0.025f, 0.025f,-0.025f),
-		vec3(-0.025f, 0.025f, 0.025f),
-		vec3(0.025f, 0.025f, 0.025f),
-		vec3(-0.025f, 0.025f, 0.025f),
-		vec3(0.025f,-0.025f, 0.025f)
-	};
-	
-	std::vector<vec3> v(std::begin(vertices), std::end(vertices));
-
-	return new ParticleMesh(v);
-}
-
 SimpleMesh * MeshLoader::GenerateCubeMesh()
 {
 	vec3 vertices[] = {
