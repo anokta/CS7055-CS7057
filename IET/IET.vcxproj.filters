@@ -61,6 +61,9 @@
     <Filter Include="Resource Files\Shaders\Skybox">
       <UniqueIdentifier>{c0965ef4-84e4-4c95-9547-0bc5996571ae}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\Shaders\XToon">
+      <UniqueIdentifier>{3d188d00-e18b-4e34-9543-13bf113f3ebc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -186,6 +189,9 @@
     <ClInclude Include="Entity.h">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
+    <ClInclude Include="XToonMesh.h">
+      <Filter>Header Files\Graphics\Meshes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -260,6 +266,9 @@
     <ClCompile Include="BumpedTexturedMesh.cpp">
       <Filter>Source Files\Graphics\Meshes</Filter>
     </ClCompile>
+    <ClCompile Include="XToonMesh.cpp">
+      <Filter>Source Files\Graphics\Meshes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Default.frag">
@@ -297,6 +306,12 @@
     </None>
     <None Include="BumpedTextured.frag">
       <Filter>Resource Files\Shaders\Textured</Filter>
+    </None>
+    <None Include="XToon.vert">
+      <Filter>Resource Files\Shaders\XToon</Filter>
+    </None>
+    <None Include="XToon.frag">
+      <Filter>Resource Files\Shaders\XToon</Filter>
     </None>
   </ItemGroup>
 </Project>

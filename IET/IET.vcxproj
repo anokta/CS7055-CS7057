@@ -129,6 +129,7 @@
     <ClInclude Include="TexturedSimpleMesh.h" />
     <ClInclude Include="TexturedIndexedMesh.h" />
     <ClInclude Include="Updatable.h" />
+    <ClInclude Include="XToonMesh.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AudioEventManager.cpp" />
@@ -155,6 +156,7 @@
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="TexturedSimpleMesh.cpp" />
     <ClCompile Include="TexturedIndexedMesh.cpp" />
+    <ClCompile Include="XToonMesh.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Bumped.frag" />
@@ -169,6 +171,8 @@
     <None Include="ToonTextured.frag" />
     <None Include="Translucent.frag" />
     <None Include="Translucent.vert" />
+    <None Include="XToon.frag" />
+    <None Include="XToon.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

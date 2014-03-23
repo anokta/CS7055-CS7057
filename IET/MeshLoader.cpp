@@ -143,6 +143,67 @@ TexturedIndexedMesh * MeshLoader::LoadMesh(const std::string &path, const string
 	return NULL;
 }
 
+XToonMesh * MeshLoader::LoadXToonMesh(const std::string &path, const string &texturePath)
+{
+	// Load the file
+	Assimp::Importer importer;
+	const aiScene* scene = importer.ReadFile(
+		path, 
+		aiProcess_Triangulate
+		| aiProcess_JoinIdenticalVertices
+		| aiProcess_OptimizeGraph
+		| aiProcess_OptimizeMeshes
+		| aiProcess_RemoveRedundantMaterials
+		| aiProcess_GenSmoothNormals
+		);
+
+	if (scene->HasMeshes())
+	{
+		// Get the model mesh
+		aiMesh &mesh = *scene->mMeshes[0];
+
+		if (!mesh.HasPositions() || !mesh.HasFaces()) 
+			return NULL;
+
+		// Initialize the model
+		vector<glm::vec3> vertices;
+		vector<GLuint> indices;
+		vector<glm::vec3> normals;
+
+		// Get mesh properties 
+		for (unsigned int i=0; i<mesh.mNumVertices; ++i) 
+		{
+			// Get vertices
+			vertices.push_back(glm::vec3(mesh.mVertices[i].x, mesh.mVertices[i].y, mesh.mVertices[i].z));
+			//vertices[vertices.size()-1] /= 38;
+
+			// Get normals
+			normals.push_back(glm::vec3(mesh.mNormals[i].x, mesh.mNormals[i].y, mesh.mNormals[i].z));
+		}		
+
+		// Normalize vertices
+		normalizeVertices(vertices);
+
+		// Get indices
+		for (unsigned int i=0; i<mesh.mNumFaces; ++i) 
+		{
+			aiFace face = mesh.mFaces[i];
+
+			indices.push_back(face.mIndices[0]);
+			indices.push_back(face.mIndices[1]);
+			indices.push_back(face.mIndices[2]);
+		}
+
+		XToonMesh * modelMesh =  new XToonMesh(vertices, indices, normals);
+		modelMesh->SetTexture(loadTexture(texturePath));
+
+		return modelMesh;
+	}
+
+	return NULL;
+}
+
+
 BumpedTexturedMesh * MeshLoader::LoadBumpedMesh(const std::string &path, const string &texturePath, const string &normalPath)
 {
 	// Load the file

@@ -40,7 +40,8 @@ RigidBodyModel::RigidBodyModel(RigidBody *b, GenericShader * s, GenericShader * 
 		break;
 
 	case RigidBody::BODY_TYPE::CAT:
-		modelMesh = MeshLoader::LoadMesh("..\\IET\\res\\block.dae", "..\\IET\\res\\block.tga");
+		modelMesh = MeshLoader::LoadXToonMesh("..\\IET\\res\\cat.obj", "..\\IET\\res\\xtoon\\xtoon_texture_1.png");
+			//MeshLoader::LoadMesh("..\\IET\\res\\block.dae", "..\\IET\\res\\block.tga");
 		//MeshLoader::LoadBumpedMesh("..\\IET\\res\\Apple_Of_Eden.dae", "..\\IET\\res\\AppleOfEden_D.tga", "..\\IET\\res\\AppleOfEden_N.tga");
 		textured = true;
 		break;

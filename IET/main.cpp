@@ -65,15 +65,16 @@ void restart()
 
 	//rigidBodies.push_back(new RigidBodyModel(new Ball(vec3(-7,0,0)), bumpedShader, shaders[0]));
 	//rigidBodies.push_back(new RigidBodyModel(new Box(vec3(7,0,0), quat(), vec3(1.0f, 0.4f, 1.5f)), shaders[currentShaderIndex+1], shaders[0]));
-	rigidBodies.push_back(new RigidBodyModel(new Ellipsoid(vec3(-4,-4,0), quat(), vec3(1.4f, 1.0f, 0.8f), 4.0f), shaders[currentShaderIndex], shaders[0]));
-	rigidBodies.push_back(new RigidBodyModel(new Ellipsoid(vec3(0,-4,0), quat(), vec3(1.0f, 1.0f, 1.0f), 4.0f), shaders[currentShaderIndex], shaders[0]));
-	rigidBodies.push_back(new RigidBodyModel(new Cat(vec3(-3.5f,2,0), quat(), vec3(1.0f, 1.0f, 1.0f), 7.5f), shaders[currentShaderIndex+1], shaders[0]));
+	//rigidBodies.push_back(new RigidBodyModel(new Ellipsoid(vec3(-4,-4,0), quat(), vec3(1.4f, 1.0f, 0.8f), 4.0f), shaders[currentShaderIndex], shaders[0]));
+	//rigidBodies.push_back(new RigidBodyModel(new Ellipsoid(vec3(0,-4,0), quat(), vec3(1.0f, 1.0f, 1.0f), 4.0f), shaders[currentShaderIndex], shaders[0]));
+	//rigidBodies.push_back(new RigidBodyModel(new Cat(vec3(-3.5f,2,0), quat(), vec3(1.0f, 1.0f, 1.0f), 7.5f), shaders[currentShaderIndex+1], shaders[0]));
+	rigidBodies.push_back(new RigidBodyModel(new Cat(vec3(0,0,0), quat(), vec3(1.5f, 2.5f, 4.0f)), shaders[6], shaders[0]));
 	//rigidBodies.push_back(new RigidBodyModel(new Plane(vec3(3.5,-1,0), quat(), vec2(1.0f, 2.0f)), shaders[currentShaderIndex], shaders[0]));
 
-	rigidBodies.push_back(new RigidBodyModel(new Box(vec3(4,3,0), quat(), vec3(1, 1.5f, 0.75f), 2.5f), shaders[currentShaderIndex+1], shaders[0]));
-	rigidBodies.push_back(new RigidBodyModel(new Box(vec3(2,3.5f,0), quat(), vec3(1.5f, 0.6f, 1.0f), 2.5f), shaders[currentShaderIndex+1], shaders[0]));
-	rigidBodies.push_back(new RigidBodyModel(new Box(vec3(0,2,0), quat(), vec3(1,1,1), 2.5f), shaders[currentShaderIndex+1], shaders[0]));
-	rigidBodies.push_back(new RigidBodyModel(new Plane(vec3(0,-0.5f,0), quat(), vec2(8.0f, 6.0f)), shaders[currentShaderIndex], shaders[0]));
+	//rigidBodies.push_back(new RigidBodyModel(new Box(vec3(4,3,0), quat(), vec3(1, 1.5f, 0.75f), 2.5f), shaders[currentShaderIndex+1], shaders[0]));
+	//rigidBodies.push_back(new RigidBodyModel(new Box(vec3(2,3.5f,0), quat(), vec3(1.5f, 0.6f, 1.0f), 2.5f), shaders[currentShaderIndex+1], shaders[0]));
+	//rigidBodies.push_back(new RigidBodyModel(new Box(vec3(0,2,0), quat(), vec3(1,1,1), 2.5f), shaders[currentShaderIndex+1], shaders[0]));
+	rigidBodies.push_back(new RigidBodyModel(new Plane(vec3(0,-4.0f,0), quat(), vec2(8.0f, 6.0f)), shaders[currentShaderIndex], shaders[0]));
 }
 
 void rotateBody(float x, float y, float z)
@@ -212,6 +213,11 @@ void keyPressed(unsigned char key, int x, int y)
 
 		for(unsigned int i=0; i<rigidBodies.size(); ++i) 
 		{
+			if(rigidBodies[i]->GetBody()->GetType() == RigidBody::CAT)
+			{
+				return;
+			}
+
 			if(rigidBodies[i]->IsTextured())
 				rigidBodies[i]->ChangeShader(shaders[currentShaderIndex+1]);
 			else 
@@ -225,7 +231,12 @@ void keyPressed(unsigned char key, int x, int y)
 		currentShaderIndex = currentShaderIndex % (shaders.size() - 2) + 2;
 
 		for(unsigned int i=0; i<rigidBodies.size(); ++i)
-		{
+		{			
+			if(rigidBodies[i]->GetBody()->GetType() == RigidBody::CAT)
+			{
+				return;
+			}
+
 			if(rigidBodies[i]->IsTextured())
 				rigidBodies[i]->ChangeShader(shaders[currentShaderIndex+1]);
 			else 
@@ -431,6 +442,9 @@ void init()
 	shaders.push_back(orenNayarShader);
 	GenericShader * orenNayarTexturedShader = new GenericShader("Textured.vert", "OrenNayarTextured.frag");
 	shaders.push_back(orenNayarTexturedShader);
+
+	GenericShader * xToonShader = new GenericShader("XToon.vert", "XToon.frag", "XToon");
+	shaders.push_back(xToonShader);
 
 
 	for(unsigned int i=0; i<shaders.size(); ++i)
