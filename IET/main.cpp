@@ -74,7 +74,7 @@ void restart()
 	//rigidBodies.push_back(new RigidBodyModel(new Box(vec3(4,3,0), quat(), vec3(1, 1.5f, 0.75f), 2.5f), shaders[currentShaderIndex+1], shaders[0]));
 	//rigidBodies.push_back(new RigidBodyModel(new Box(vec3(2,3.5f,0), quat(), vec3(1.5f, 0.6f, 1.0f), 2.5f), shaders[currentShaderIndex+1], shaders[0]));
 	//rigidBodies.push_back(new RigidBodyModel(new Box(vec3(0,2,0), quat(), vec3(1,1,1), 2.5f), shaders[currentShaderIndex+1], shaders[0]));
-	rigidBodies.push_back(new RigidBodyModel(new Plane(vec3(0,-4.0f,0), quat(), vec2(8.0f, 6.0f)), shaders[currentShaderIndex], shaders[0]));
+	rigidBodies.push_back(new RigidBodyModel(new Plane(vec3(0,-4.0f,0), quat(), vec2(8.0f, 6.0f)), shaders[currentShaderIndex]));
 }
 
 void rotateBody(float x, float y, float z)
@@ -202,10 +202,6 @@ void keyPressed(unsigned char key, int x, int y)
 
 	case 'c':
 		freeMode = !freeMode;
-		break;
-
-	case 'f':
-		RigidBodyModel::ToggleGizmos();
 		break;
 
 	case 8:
@@ -381,21 +377,12 @@ void update(int frame)
 		} 
 
 		for(unsigned int i=0; i<rigidBodies.size(); ++i)
-			rigidBodies[i]->SetGizmoColor(vec4(0,1,0,1));
-
-		for(unsigned int i=0; i<rigidBodies.size(); ++i)
 		{
 			// Detect collisions
 			for(unsigned int j=i+1; j<rigidBodies.size(); ++j)
 			{
-				if(rigidBodies[i]->ResolveCollision(rigidBodies[j]))//rigidBodies[i]->GetBody()->CheckCollision(rigidBodies[j]->GetBody()))
-				{
-					rigidBodies[i]->SetGizmoColor(vec4(1,0,0,1));
-					rigidBodies[j]->SetGizmoColor(vec4(1,0,0,1));
-				}
+				rigidBodies[i]->ResolveCollision(rigidBodies[j]);
 			}
-
-			rigidBodies[i]->UpdateGizmoColor();	
 		}
 
 		EntityManager::GetInstance()->UpdateEntities(DELTA_TIME);

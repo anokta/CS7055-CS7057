@@ -7,13 +7,10 @@
 
 using namespace glm;
 
-bool RigidBodyModel::gizmo = false;
-
-RigidBodyModel::RigidBodyModel(RigidBody *b, GenericShader * s, GenericShader * gs)
+RigidBodyModel::RigidBodyModel(RigidBody *b, GenericShader * s)
 {
 	body = b;
 	modelShader = s;
-	lineShader = gs;
 
 	switch(body->GetType())
 	{
@@ -50,12 +47,6 @@ RigidBodyModel::RigidBodyModel(RigidBody *b, GenericShader * s, GenericShader * 
 	modelMesh->SetShader(modelShader);
 	body->SetPoints(modelMesh->GetVertices());
 
-	gizmos["BoundingBox"] = MeshLoader::GenerateBoundingBox();
-	gizmos["BoundingBox"]->SetShader(lineShader);
-
-	gizmos["BetweenLine"] = MeshLoader::GenerateLine(vec4(1,0,1,1));
-	gizmos["BetweenLine"]->SetShader(lineShader);
-
 	EntityManager::GetInstance()->AddDrawable(this);
 	EntityManager::GetInstance()->AddUpdatable(this);
 }
@@ -68,10 +59,6 @@ RigidBodyModel::~RigidBodyModel()
 	delete body;
 
 	delete modelMesh;
-
-	for(auto gizmo : gizmos)
-		delete gizmo.second;
-	gizmos.clear();
 }
 
 void RigidBodyModel::ChangeShader(GenericShader * s)
@@ -90,17 +77,6 @@ void RigidBodyModel::Draw()
 	modelMesh->Render(modelShader);
 	modelShader->SetModelMatrix(M);
 
-	// Render gizmos
-	if(gizmo)
-	{
-		gizmos["BetweenLine"]->Render(lineShader);
-
-		M = lineShader->GetModelMatrix();
-
-		lineShader->SetModelMatrix(M * body->GetTransformationMatrix());
-		gizmos["BoundingBox"]->Render(lineShader);
-		lineShader->SetModelMatrix(M);
-	}
 }
 
 void RigidBodyModel::Update(float deltaTime)
@@ -112,17 +88,10 @@ bool RigidBodyModel::ResolveCollision(RigidBodyModel * rigidBodyModel)
 {
 	if(body->CheckCollisionBroad(rigidBodyModel->GetBody()))
 	{	
-		if(gizmoColor.r == 0)
-			gizmoColor = vec4(1,1,0,1);
-		if(rigidBodyModel->GetGizmoColor().r == 0)
-			rigidBodyModel->SetGizmoColor(vec4(1,1,0,1));
-
 		RigidBody::Contact * contact = body->CheckCollisionNarrow(rigidBodyModel->GetBody());
 		if(contact != NULL)
 		{	
 			body->RespondCollision(rigidBodyModel->GetBody(), contact->cA, contact->cB, contact->normal);
-
-			gizmos["BetweenLine"]->SetFromTo(vec3(), contact->normal);
 		
 			delete contact;
 
