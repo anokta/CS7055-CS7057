@@ -616,167 +616,114 @@ SimpleMesh * MeshLoader::GeneratePlaneMesh()
 	return new SimpleMesh(v, c, n);
 }
 
-SimpleMesh * MeshLoader::GenerateTerrainMesh(const string &path, const float mapWidth, const float mapDepth, const float maxHeight)
+IndexedMesh * MeshLoader::GenerateTerrainMesh(const string &path, const float mapWidth, const float mapDepth, const float maxHeight)
 {
-	vector<vec3> v = GenerateTerrain(path, mapWidth, mapDepth, maxHeight);
+	vector<vec3> vertices = GenerateTerrain(path, mapWidth, mapDepth, maxHeight);
+
+	int width =  64;
+
+	std::vector<GLuint> indices;
+	for(unsigned int i=0; i<vertices.size() - width; ++i)
+	{
+		if(i % width != width - 1)
+		{
+			indices.push_back(i);
+			indices.push_back(width + i);
+			indices.push_back(i + 1);
+
+			indices.push_back(i + 1);
+			indices.push_back(width + i);
+			indices.push_back(width + i + 1);
+		}
+	}
 
 	// Calculate Normals
-	std::vector<vec3> n;
-	for(unsigned int i=0; i<v.size(); i+=3)
+	std::vector<vec3> rawNormals;
+	for(unsigned int i=0; i<indices.size(); i+=3)
 	{
-		vec3 v1 = v[i+1] - v[i];
-		vec3 v2 = v[i+2] - v[i];
+		vec3 v1 = vertices[indices[i+1]] - vertices[indices[i]];
+		vec3 v2 = vertices[indices[i+2]] - vertices[indices[i]];
 
 		vec3 norm = normalize(cross(v1, v2));
-		n.push_back(norm);
-		n.push_back(norm);
-		n.push_back(norm);
+		rawNormals.push_back(norm);
+		rawNormals.push_back(norm);
+		rawNormals.push_back(norm);
 	}
-/*
-#pragma region SMOOTH
-	// Smooth Normals
-		for(int i=0; i<v.size(); ++i)
+
+	std::vector<vec3> normals;
+	for(int v=0; v<vertices.size(); ++v)
 	{
-		bool flag = true;
-		for(int k=0; k<i; ++k)
+		vec3 norm = vec3();
+		int counter = 0;
+		for(unsigned int i=0; i<indices.size(); ++i)
 		{
-			if(v[i] == v[k])
+			if(indices[i] == v)
 			{
-				flag = false;
-				break;
+				norm += rawNormals[i];
+				counter++;
 			}
 		}
-
-		if(flag)
-		{
-			int count = 1;
-			for(int j=0; j<v.size(); ++j)
-			{
-				if(v[i] == v[j])
-				{
-					n[i] += n[j];
-					count++;
-				}
-			}
-			n[i] /= count;
-			n[i] = normalize(n[i]);
-		}
+		normals.push_back(norm / (float)counter);
 	}
-
-	for(int i=0; i<v.size(); ++i)
-	{
-		bool flag = true;
-		for(int k=0; k<i; ++k)
-		{
-			if(v[i] == v[k])
-			{
-				flag = false;
-				break;
-			}
-		}
-
-		if(flag)
-		{
-			for(int j=0; j<v.size(); ++j)
-			{
-				if(v[i] == v[j])
-				{
-					n[j] = n[i];
-				}
-			}
-		}
-	}
-#pragma endregion
-*/
-
 	// Colors?
-	std::vector<vec4> c;
-	for(unsigned int i=0; i<v.size(); ++i)
-		c.push_back(vec4(1.0f, 0.5f, 0.5f, 1.0f));
+	std::vector<vec4> colors;
+	for(unsigned int i=0; i<vertices.size(); ++i)
+		colors.push_back(vec4(1.0f, 0.5f, 0.5f, 1.0f));
 
-	return new SimpleMesh(v, c, n);
+	return new IndexedMesh(vertices, indices, colors, normals);
 }
 
 XToonMesh * MeshLoader::GenerateTerrainMeshXToon(const string &path, const float mapWidth, const float mapDepth, const float maxHeight, const string &texturePath)
 {
-	vector<vec3> v = GenerateTerrain(path, mapWidth, mapDepth, maxHeight);
+	vector<vec3> vertices = GenerateTerrain(path, mapWidth, mapDepth, maxHeight);
 
-	// Calculate Normals
-	std::vector<vec3> n;
-	for(unsigned int i=0; i<v.size(); i+=3)
-	{
-		vec3 v1 = v[i+1] - v[i];
-		vec3 v2 = v[i+2] - v[i];
-
-		vec3 norm = normalize(cross(v1, v2));
-		n.push_back(norm);
-		n.push_back(norm);
-		n.push_back(norm);
-	}
-/*
-#pragma region SMOOTH
-	// Smooth Normals
-		for(int i=0; i<v.size(); ++i)
-	{
-		bool flag = true;
-		for(int k=0; k<i; ++k)
-		{
-			if(v[i] == v[k])
-			{
-				flag = false;
-				break;
-			}
-		}
-
-		if(flag)
-		{
-			int count = 1;
-			for(int j=0; j<v.size(); ++j)
-			{
-				if(v[i] == v[j])
-				{
-					n[i] += n[j];
-					count++;
-				}
-			}
-			n[i] /= count;
-			n[i] = normalize(n[i]);
-		}
-	}
-
-	for(int i=0; i<v.size(); ++i)
-	{
-		bool flag = true;
-		for(int k=0; k<i; ++k)
-		{
-			if(v[i] == v[k])
-			{
-				flag = false;
-				break;
-			}
-		}
-
-		if(flag)
-		{
-			for(int j=0; j<v.size(); ++j)
-			{
-				if(v[i] == v[j])
-				{
-					n[j] = n[i];
-				}
-			}
-		}
-	}
-#pragma endregion
-*/
+	int width =  64;
 
 	std::vector<GLuint> indices;
-	for(unsigned int i=0; i<v.size(); ++i)
+	for(unsigned int i=0; i<vertices.size() - width; ++i)
 	{
-		indices.push_back(i);
+		if(i % width != width - 1)
+		{
+			indices.push_back(i);
+			indices.push_back(width + i);
+			indices.push_back(i + 1);
+
+			indices.push_back(i + 1);
+			indices.push_back(width + i);
+			indices.push_back(width + i + 1);
+		}
 	}
 
-	XToonMesh * modelMesh =  new XToonMesh(v, indices, n);
+	// Calculate Normals
+	std::vector<vec3> rawNormals;
+	for(unsigned int i=0; i<indices.size(); i+=3)
+	{
+		vec3 v1 = vertices[indices[i+1]] - vertices[indices[i]];
+		vec3 v2 = vertices[indices[i+2]] - vertices[indices[i]];
+
+		vec3 norm = normalize(cross(v1, v2));
+		rawNormals.push_back(norm);
+		rawNormals.push_back(norm);
+		rawNormals.push_back(norm);
+	}
+
+	std::vector<vec3> normals;
+	for(int v=0; v<vertices.size(); ++v)
+	{
+		vec3 norm = vec3();
+		int counter = 0;
+		for(unsigned int i=0; i<indices.size(); ++i)
+		{
+			if(indices[i] == v)
+			{
+				norm += rawNormals[i];
+				counter++;
+			}
+		}
+		normals.push_back(norm / (float)counter);
+	}
+
+	XToonMesh * modelMesh =  new XToonMesh(vertices, indices, normals);
 	modelMesh->SetTexture(loadTexture(texturePath));
 
 	return modelMesh;
@@ -974,6 +921,32 @@ SkyboxMesh * MeshLoader::GenerateCubemapMesh(
 	return cubemap;
 }
 
+vector<vec3> MeshLoader::GenerateTerrain(const string &path, float mapWidth, float mapDepth, float maxHeight)
+{
+	// Calculate vertices
+	unsigned char ** heightMap = loadImage(path);
+	int width = 64;
+	int depth = 64;
+
+
+	float scaleX = mapWidth / width;
+	float scaleZ = mapDepth / depth;
+	float scaleY = maxHeight / 255; // rgb max value : 255
+
+	std::vector<vec3> v;
+	for(int z=0; z<depth; ++z)
+	{
+		for(int x=0; x<width; ++x)
+		{
+			v.push_back(vec3(x * scaleX - mapWidth / 2.0f, heightMap[z][x] * scaleY, z * scaleZ - mapDepth / 2.0f));
+		}
+	}
+
+	delete heightMap;
+
+	return v;
+}
+
 GLuint MeshLoader::loadTexture(const std::string &path)
 {
 	GLuint id = SOIL_load_OGL_texture
@@ -989,36 +962,6 @@ GLuint MeshLoader::loadTexture(const std::string &path)
 	return id;
 }
 
-vector<vec3> MeshLoader::GenerateTerrain(const string &path, float mapWidth, float mapDepth, float maxHeight)
-{
-	// Calculate vertices
-	unsigned char ** heightMap = loadImage(path);
-	int width = 64;
-	int depth = 64;
-
-
-	float scaleX = mapWidth / width;
-	float scaleZ = mapDepth / depth;
-	float scaleY = maxHeight / 255; // rgb max value : 255
-
-	std::vector<vec3> v;
-	for(int z=0; z<depth-1; ++z)
-	{
-		for(int x=0; x<width-1; ++x)
-		{
-			v.push_back(vec3(x * scaleX - mapWidth / 2.0f, heightMap[z][x] * scaleY, z * scaleZ - mapDepth / 2.0f));
-			v.push_back(vec3(x * scaleX - mapWidth / 2.0f, heightMap[z+1][x] * scaleY, (z+1) * scaleZ - mapDepth / 2.0f));
-			v.push_back(vec3((x+1) * scaleX - mapWidth / 2.0f, heightMap[z][x+1] * scaleY, z * scaleZ - mapDepth / 2.0f));
-			v.push_back(v[v.size()-1]);
-			v.push_back(v[v.size()-3]);
-			v.push_back(vec3((x+1) * scaleX - mapWidth / 2.0f, heightMap[z+1][x+1] * scaleY, (z+1) * scaleZ - mapDepth / 2.0f));
-		}
-	}
-
-	delete heightMap;
-
-	return v;
-}
 
 unsigned char ** MeshLoader::loadImage(const std::string & path)
 {

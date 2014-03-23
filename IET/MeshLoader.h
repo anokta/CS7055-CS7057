@@ -25,7 +25,7 @@ public:
 
 	static SimpleMesh * GeneratePlaneMesh();
 	
-	static SimpleMesh * GenerateTerrainMesh(const std::string &path, const float mapWidth, const float mapDepth, const float maxHeight);
+	static IndexedMesh * GenerateTerrainMesh(const std::string &path, const float mapWidth, const float mapDepth, const float maxHeight);
 	static XToonMesh * GenerateTerrainMeshXToon(const std::string &path, const float mapWidth, const float mapDepth, const float maxHeight, const std::string &texturePath);
 
 	static Line * GenerateBoundingBox();
