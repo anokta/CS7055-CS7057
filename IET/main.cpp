@@ -68,7 +68,7 @@ void restart()
 	//rigidBodies.push_back(new RigidBodyModel(new Ellipsoid(vec3(-4,-4,0), quat(), vec3(1.4f, 1.0f, 0.8f), 4.0f), shaders[currentShaderIndex], shaders[0]));
 	//rigidBodies.push_back(new RigidBodyModel(new Ellipsoid(vec3(0,-4,0), quat(), vec3(1.0f, 1.0f, 1.0f), 4.0f), shaders[currentShaderIndex], shaders[0]));
 	//rigidBodies.push_back(new RigidBodyModel(new Cat(vec3(-3.5f,2,0), quat(), vec3(1.0f, 1.0f, 1.0f), 7.5f), shaders[currentShaderIndex+1], shaders[0]));
-	rigidBodies.push_back(new RigidBodyModel(new Cat(vec3(0,0,0), quat(), vec3(1.5f, 2.5f, 4.0f)), shaders[6], shaders[0]));
+	//rigidBodies.push_back(new RigidBodyModel(new Cat(vec3(0,0,0), quat(), vec3(1.5f, 2.5f, 4.0f)), shaders[6], shaders[0]));
 	//rigidBodies.push_back(new RigidBodyModel(new Plane(vec3(3.5,-1,0), quat(), vec2(1.0f, 2.0f)), shaders[currentShaderIndex], shaders[0]));
 
 	//rigidBodies.push_back(new RigidBodyModel(new Box(vec3(4,3,0), quat(), vec3(1, 1.5f, 0.75f), 2.5f), shaders[currentShaderIndex+1], shaders[0]));

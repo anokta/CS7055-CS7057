@@ -35,12 +35,12 @@ RigidBodyModel::RigidBodyModel(RigidBody *b, GenericShader * s, GenericShader * 
 		break;	
 
 	case RigidBody::BODY_TYPE::PLANE:
-		modelMesh = MeshLoader::GenerateCubeMesh();
+		modelMesh = MeshLoader::GenerateTerrainMesh("..\\IET\\res\\heightmaps\\heightmap_test.png", 16, 16, 64);//MeshLoader::GenerateCubeMesh();
 		textured = false;
 		break;
 
 	case RigidBody::BODY_TYPE::CAT:
-		modelMesh = MeshLoader::LoadXToonMesh("..\\IET\\res\\cat.obj", "..\\IET\\res\\xtoon\\xtoon_texture_1.png");
+		modelMesh = MeshLoader::LoadXToonMesh("..\\IET\\res\\cat.obj", "..\\IET\\res\\xtoon\\xtoon_texture_0d.png");
 			//MeshLoader::LoadMesh("..\\IET\\res\\block.dae", "..\\IET\\res\\block.tga");
 		//MeshLoader::LoadBumpedMesh("..\\IET\\res\\Apple_Of_Eden.dae", "..\\IET\\res\\AppleOfEden_D.tga", "..\\IET\\res\\AppleOfEden_N.tga");
 		textured = true;

@@ -25,6 +25,8 @@ public:
 
 	static SimpleMesh * GeneratePlaneMesh();
 
+	static SimpleMesh * GenerateTerrainMesh(const std::string &path, float mapWidth, float mapDepth, float maxHeight);
+
 	static Line * GenerateBoundingBox();
 	static Line * GenerateBoundingSphere();
 	static Line * GenerateLine(glm::vec4 &color);
@@ -39,6 +41,7 @@ public:
 		const std::string& NegZFilename);
 
 private:
+	static unsigned char ** loadImage(const std::string & path);
 	static GLuint loadTexture(const std::string &path);
 	static GLuint loadCubemapTexture(
 		const std::string& PosXFilename,
