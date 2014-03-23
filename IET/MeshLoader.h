@@ -24,8 +24,9 @@ public:
 	static TexturedSimpleMesh * GenerateTexturedCubeMesh(const std::string &texturePath);
 
 	static SimpleMesh * GeneratePlaneMesh();
-
-	static SimpleMesh * GenerateTerrainMesh(const std::string &path, float mapWidth, float mapDepth, float maxHeight);
+	
+	static SimpleMesh * GenerateTerrainMesh(const std::string &path, const float mapWidth, const float mapDepth, const float maxHeight);
+	static XToonMesh * GenerateTerrainMeshXToon(const std::string &path, const float mapWidth, const float mapDepth, const float maxHeight, const std::string &texturePath);
 
 	static Line * GenerateBoundingBox();
 	static Line * GenerateBoundingSphere();
@@ -41,6 +42,8 @@ public:
 		const std::string& NegZFilename);
 
 private:
+	static std::vector<glm::vec3> GenerateTerrain(const std::string &path, const float mapWidth, const float mapDepth, const float maxHeight);
+
 	static unsigned char ** loadImage(const std::string & path);
 	static GLuint loadTexture(const std::string &path);
 	static GLuint loadCubemapTexture(

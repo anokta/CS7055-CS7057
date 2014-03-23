@@ -30,8 +30,8 @@ void main()
 	diffuseDirection = (V * vec4(vDiffuseDirection, 0.0)).xyz;
 	fEye = vec3(V * vec4(vEye, 1.0));
 
-	float zMax = 10.0f;
-	float zMin = 4.0f;
+	float zMax = 80.0f;
+	float zMin = 25.0f;
 
 	//depth of field
 	float z = length(fEye - fPosition);

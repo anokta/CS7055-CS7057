@@ -32,7 +32,7 @@ RigidBodyModel::RigidBodyModel(RigidBody *b, GenericShader * s)
 		break;	
 
 	case RigidBody::BODY_TYPE::PLANE:
-		modelMesh = MeshLoader::GenerateTerrainMesh("..\\IET\\res\\heightmaps\\heightmap_test.png", 16, 16, 64);//MeshLoader::GenerateCubeMesh();
+		modelMesh = MeshLoader::GenerateTerrainMeshXToon("..\\IET\\res\\heightmaps\\heightmap_test.png", 16, 16, 64, "..\\IET\\res\\xtoon\\xtoon_texture_3.png");//MeshLoader::GenerateCubeMesh();
 		textured = false;
 		break;
 

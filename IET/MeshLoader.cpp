@@ -197,8 +197,6 @@ XToonMesh * MeshLoader::LoadXToonMesh(const std::string &path, const string &tex
 		XToonMesh * modelMesh =  new XToonMesh(vertices, indices, normals);
 		modelMesh->SetTexture(loadTexture(texturePath));
 
-		loadImage(texturePath);
-
 		return modelMesh;
 	}
 
@@ -618,35 +616,9 @@ SimpleMesh * MeshLoader::GeneratePlaneMesh()
 	return new SimpleMesh(v, c, n);
 }
 
-SimpleMesh * MeshLoader::GenerateTerrainMesh(const string &path, float mapWidth, float mapDepth, float maxHeight)
+SimpleMesh * MeshLoader::GenerateTerrainMesh(const string &path, const float mapWidth, const float mapDepth, const float maxHeight)
 {
-
-	// Calculate vertices
-	unsigned char ** heightMap = loadImage(path);
-	int width = 64;
-	int depth = 64;
-
-
-	float scaleX = mapWidth / width;
-	float scaleZ = mapDepth / depth;
-	float scaleY = maxHeight / 255; // rgb max value : 255
-
-	std::vector<vec3> v;
-	for(int z=0; z<depth-1; ++z)
-	{
-		for(int x=0; x<width-1; ++x)
-		{
-			v.push_back(vec3(x * scaleX - mapWidth / 2.0f, heightMap[z][x] * scaleY, z * scaleZ - mapDepth / 2.0f));
-			v.push_back(vec3(x * scaleX - mapWidth / 2.0f, heightMap[z+1][x] * scaleY, (z+1) * scaleZ - mapDepth / 2.0f));
-			v.push_back(vec3((x+1) * scaleX - mapWidth / 2.0f, heightMap[z][x+1] * scaleY, z * scaleZ - mapDepth / 2.0f));
-			v.push_back(v[v.size()-1]);
-			v.push_back(v[v.size()-3]);
-			v.push_back(vec3((x+1) * scaleX - mapWidth / 2.0f, heightMap[z+1][x+1] * scaleY, (z+1) * scaleZ - mapDepth / 2.0f));
-		}
-	}
-
-	delete heightMap;
-
+	vector<vec3> v = GenerateTerrain(path, mapWidth, mapDepth, maxHeight);
 
 	// Calculate Normals
 	std::vector<vec3> n;
@@ -723,6 +695,91 @@ SimpleMesh * MeshLoader::GenerateTerrainMesh(const string &path, float mapWidth,
 		c.push_back(vec4(1.0f, 0.5f, 0.5f, 1.0f));
 
 	return new SimpleMesh(v, c, n);
+}
+
+XToonMesh * MeshLoader::GenerateTerrainMeshXToon(const string &path, const float mapWidth, const float mapDepth, const float maxHeight, const string &texturePath)
+{
+	vector<vec3> v = GenerateTerrain(path, mapWidth, mapDepth, maxHeight);
+
+	// Calculate Normals
+	std::vector<vec3> n;
+	for(unsigned int i=0; i<v.size(); i+=3)
+	{
+		vec3 v1 = v[i+1] - v[i];
+		vec3 v2 = v[i+2] - v[i];
+
+		vec3 norm = normalize(cross(v1, v2));
+		n.push_back(norm);
+		n.push_back(norm);
+		n.push_back(norm);
+	}
+/*
+#pragma region SMOOTH
+	// Smooth Normals
+		for(int i=0; i<v.size(); ++i)
+	{
+		bool flag = true;
+		for(int k=0; k<i; ++k)
+		{
+			if(v[i] == v[k])
+			{
+				flag = false;
+				break;
+			}
+		}
+
+		if(flag)
+		{
+			int count = 1;
+			for(int j=0; j<v.size(); ++j)
+			{
+				if(v[i] == v[j])
+				{
+					n[i] += n[j];
+					count++;
+				}
+			}
+			n[i] /= count;
+			n[i] = normalize(n[i]);
+		}
+	}
+
+	for(int i=0; i<v.size(); ++i)
+	{
+		bool flag = true;
+		for(int k=0; k<i; ++k)
+		{
+			if(v[i] == v[k])
+			{
+				flag = false;
+				break;
+			}
+		}
+
+		if(flag)
+		{
+			for(int j=0; j<v.size(); ++j)
+			{
+				if(v[i] == v[j])
+				{
+					n[j] = n[i];
+				}
+			}
+		}
+	}
+#pragma endregion
+*/
+
+	std::vector<GLuint> indices;
+	for(unsigned int i=0; i<v.size(); ++i)
+	{
+		indices.push_back(i);
+	}
+
+	XToonMesh * modelMesh =  new XToonMesh(v, indices, n);
+	modelMesh->SetTexture(loadTexture(texturePath));
+
+	return modelMesh;
 }
 
 Line * MeshLoader::GenerateBoundingBox()
@@ -932,6 +989,37 @@ GLuint MeshLoader::loadTexture(const std::string &path)
 	return id;
 }
 
+vector<vec3> MeshLoader::GenerateTerrain(const string &path, float mapWidth, float mapDepth, float maxHeight)
+{
+	// Calculate vertices
+	unsigned char ** heightMap = loadImage(path);
+	int width = 64;
+	int depth = 64;
+
+
+	float scaleX = mapWidth / width;
+	float scaleZ = mapDepth / depth;
+	float scaleY = maxHeight / 255; // rgb max value : 255
+
+	std::vector<vec3> v;
+	for(int z=0; z<depth-1; ++z)
+	{
+		for(int x=0; x<width-1; ++x)
+		{
+			v.push_back(vec3(x * scaleX - mapWidth / 2.0f, heightMap[z][x] * scaleY, z * scaleZ - mapDepth / 2.0f));
+			v.push_back(vec3(x * scaleX - mapWidth / 2.0f, heightMap[z+1][x] * scaleY, (z+1) * scaleZ - mapDepth / 2.0f));
+			v.push_back(vec3((x+1) * scaleX - mapWidth / 2.0f, heightMap[z][x+1] * scaleY, z * scaleZ - mapDepth / 2.0f));
+			v.push_back(v[v.size()-1]);
+			v.push_back(v[v.size()-3]);
+			v.push_back(vec3((x+1) * scaleX - mapWidth / 2.0f, heightMap[z+1][x+1] * scaleY, (z+1) * scaleZ - mapDepth / 2.0f));
+		}
+	}
+
+	delete heightMap;
+
+	return v;
+}
+
 unsigned char ** MeshLoader::loadImage(const std::string & path)
 {
 	int width, height, channels;
@@ -951,16 +1039,6 @@ unsigned char ** MeshLoader::loadImage(const std::string & path)
 			imageData[y][x] = image[y*width + x];
 		}
 	}
-
-	//for(int i=0; i<4; ++i)
-	//{
-	//	for(int j=0; j<4; ++j)
-	//	{
-	//		cout << width << " " << height << " ";
-	//		//cout << (int)imageData[i * (height / 4)][j * (width / 4)] << " " ;
-	//	}
-	//	cout << endl;
-	//}
 
 	return imageData;
 }
