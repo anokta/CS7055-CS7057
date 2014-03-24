@@ -69,7 +69,6 @@ int xtoonCurrentTexture;
 // Camera
 Camera * camera; 
 float cameraXY[2], cameraZ;
-Skybox * skybox;
 int freeMode;
 vec2 currentTarget;
 
@@ -88,10 +87,10 @@ void restart()
 	}
 	rigidBodies.clear();
 	
-	rigidBodies.push_back(new RigidBodyModel(new ModelBody(string("bunny.obj"), vec3(2.0f, 0.0f, 0.0f), quat(), vec3(12.0f, 9.0f, 8.0f)), shaders[2]));
-	rigidBodies.push_back(new RigidBodyModel(new ModelBody(string("suzanne.obj"), vec3(102.0f, 0.0f, 0.0f), quat(), vec3(10.0f, 12.0f, 10.0f)), shaders[2]));
-	rigidBodies.push_back(new RigidBodyModel(new Terrain(vec3(202.0f, 0.0f, 0.0f), quat(), vec3(36.0f, 16.0f, 36.0f)), shaders[2]));
-	rigidBodies.push_back(new RigidBodyModel(new ModelBody(string("elephal.obj"), vec3(302.0f, 0.0f, 0.0f), quat(), vec3(8.0f, 10.0f, 15.0f)), shaders[2]));
+	rigidBodies.push_back(new RigidBodyModel(new ModelBody(string("suzanne.obj"), vec3(2.0f, 0.0f, 0.0f), quat(), vec3(12.0f, 9.0f, 8.0f)), shaders[1]));
+	rigidBodies.push_back(new RigidBodyModel(new ModelBody(string("bunny.obj"), vec3(102.0f, 0.0f, 0.0f), quat(), vec3(11.0f, 12.0f, 10.0f)), shaders[1]));
+	rigidBodies.push_back(new RigidBodyModel(new Terrain(vec3(202.0f, 0.0f, 0.0f), quat(), vec3(36.0f, 16.0f, 36.0f)), shaders[1]));
+	rigidBodies.push_back(new RigidBodyModel(new ModelBody(string("elephal.obj"), vec3(302.0f, 0.0f, 0.0f), quat(), vec3(8.0f, 10.0f, 15.0f)), shaders[1]));
 }
 
 void translateBody(float x, float y, float z)
@@ -386,9 +385,6 @@ void init()
 	GenericShader * lineShader = new GenericShader("Default.vert", "Default.frag");
 	shaders.push_back(lineShader);
 
-	GenericShader * skyboxShader = new GenericShader("Cubemap.vert", "Cubemap.frag", "Skybox");
-	shaders.push_back(skyboxShader);
-
 	GenericShader * xToonShader = new GenericShader("XToon.vert", "XToon.frag", "XToon");
 	shaders.push_back(xToonShader);
 
@@ -432,7 +428,6 @@ void init()
 
 	// Create the camera
 	camera = new Camera(shaders, vec3(0,0,20), vec3(0,0,0), vec3(0,1,0));
-	skybox = new Skybox(shaders[1]);	
 
 	freeMode = true;
 
