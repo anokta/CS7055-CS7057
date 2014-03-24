@@ -19,6 +19,8 @@ public:
 	static XToonMesh * LoadXToonMesh(const std::string &path, const std::string &texturePath);
 	static BumpedTexturedMesh * LoadBumpedMesh(const std::string &path, const std::string &texturePath, const std::string &normalPath);
 	
+	static GLuint loadTexture(const std::string &path);
+
 	static SimpleMesh * GenerateCubeMesh();
 	static SimpleMesh * GenerateSphereMesh(int numSegments);
 	static TexturedSimpleMesh * GenerateTexturedCubeMesh(const std::string &texturePath);
@@ -42,10 +44,18 @@ public:
 		const std::string& NegZFilename);
 
 private:
-	static std::vector<glm::vec3> GenerateTerrain(const std::string &path, const float mapWidth, const float mapDepth, const float maxHeight);
+	struct BufferData
+	{
+		BufferData(std::vector<glm::vec3> &v, std::vector<GLuint> &i, std::vector<glm::vec3> &n) : vertices(v), indices(i), normals(n) {}
 
-	static unsigned char ** loadImage(const std::string & path);
-	static GLuint loadTexture(const std::string &path);
+		std::vector<glm::vec3> vertices;
+		std::vector<GLuint> indices;
+		std::vector<glm::vec3> normals;
+	};
+	
+	static BufferData generateTerrain(const std::string &path, const float mapWidth, const float mapDepth, const float maxHeight);
+	
+	static unsigned char ** loadImage(const std::string & path, int &width, int &height);
 	static GLuint loadCubemapTexture(
 		const std::string& PosXFilename,
 		const std::string& NegXFilename,

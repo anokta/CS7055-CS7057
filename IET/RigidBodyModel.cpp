@@ -32,14 +32,19 @@ RigidBodyModel::RigidBodyModel(RigidBody *b, GenericShader * s)
 		break;	
 
 	case RigidBody::BODY_TYPE::PLANE:
-		modelMesh = MeshLoader::GenerateTerrainMeshXToon("..\\IET\\res\\heightmaps\\heightmap_test.png", 16, 16, 64, "..\\IET\\res\\xtoon\\xtoon_texture_3.png");//MeshLoader::GenerateCubeMesh();
+		modelMesh = MeshLoader::GenerateCubeMesh();
 		textured = false;
+		break;	
+	
+	case RigidBody::BODY_TYPE::TERRAIN:
+		modelMesh = MeshLoader::GenerateTerrainMeshXToon("..\\IET\\res\\heightmaps\\heightmap_test.png", body->GetScale().x, body->GetScale().z, body->GetScale().y, "..\\IET\\res\\xtoon\\xtoon_texture_3.png");
+		textured = false;
+		body->SetScale(vec3(1.0f));
+
 		break;
 
 	case RigidBody::BODY_TYPE::CAT:
-		modelMesh = MeshLoader::LoadXToonMesh("..\\IET\\res\\cat.obj", "..\\IET\\res\\xtoon\\xtoon_texture_0d.png");
-			//MeshLoader::LoadMesh("..\\IET\\res\\block.dae", "..\\IET\\res\\block.tga");
-		//MeshLoader::LoadBumpedMesh("..\\IET\\res\\Apple_Of_Eden.dae", "..\\IET\\res\\AppleOfEden_D.tga", "..\\IET\\res\\AppleOfEden_N.tga");
+		modelMesh = MeshLoader::LoadXToonMesh("..\\IET\\res\\elephal.obj", "..\\IET\\res\\xtoon\\xtoon_texture_2.png");
 		textured = true;
 		break;
 	}

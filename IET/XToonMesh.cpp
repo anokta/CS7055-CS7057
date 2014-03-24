@@ -1,4 +1,5 @@
 #include "XToonMesh.h"
+#include "MeshLoader.h"
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
@@ -16,6 +17,7 @@ XToonMesh::XToonMesh(const std::vector<vec3> &v, const std::vector<GLuint> &i, c
 XToonMesh::~XToonMesh()
 {
 	glDeleteBuffers(1, &iboID);
+	glDeleteTextures( 1, &textureID );
 }
 
 void XToonMesh::GenerateBuffer()
@@ -88,4 +90,12 @@ void XToonMesh::Render(GenericShader * shader)
 	glBindVertexArray(0);
 
 	shader->UnbindTexture();
+}
+
+
+void XToonMesh::ChangeTexture(std::string &texturePath)
+{
+	glDeleteTextures( 1, &textureID );
+
+	textureID = MeshLoader::loadTexture(texturePath);
 }

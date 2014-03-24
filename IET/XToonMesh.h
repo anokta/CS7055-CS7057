@@ -15,6 +15,7 @@ public:
 	void Render(GenericShader * shader);
 
 	inline void SetTexture(GLuint id) { textureID = id; }
+	void ChangeTexture(std::string &texturePath);
 
 private:
 	std::vector<glm::vec3> normals;

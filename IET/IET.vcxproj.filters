@@ -192,6 +192,9 @@
     <ClInclude Include="XToonMesh.h">
       <Filter>Header Files\Graphics\Meshes</Filter>
     </ClInclude>
+    <ClInclude Include="Terrain.h">
+      <Filter>Header Files\Entities\RigidBody</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -268,6 +271,9 @@
     </ClCompile>
     <ClCompile Include="XToonMesh.cpp">
       <Filter>Source Files\Graphics\Meshes</Filter>
+    </ClCompile>
+    <ClCompile Include="Terrain.cpp">
+      <Filter>Source Files\Entities\RigidBody</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -126,6 +126,7 @@
     <ClInclude Include="SkyboxMesh.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="Terrain.h" />
     <ClInclude Include="TexturedSimpleMesh.h" />
     <ClInclude Include="TexturedIndexedMesh.h" />
     <ClInclude Include="Updatable.h" />
@@ -154,6 +155,7 @@
     <ClCompile Include="Skybox.cpp" />
     <ClCompile Include="SkyboxMesh.cpp" />
     <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="Terrain.cpp" />
     <ClCompile Include="TexturedSimpleMesh.cpp" />
     <ClCompile Include="TexturedIndexedMesh.cpp" />
     <ClCompile Include="XToonMesh.cpp" />

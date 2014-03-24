@@ -11,9 +11,8 @@
 
 #include "RigidBodyModel.h"
 #include "Box.h"
-#include "Ball.h"
-#include "Ellipsoid.h"5
 #include "Plane.h"
+#include "Terrain.h"
 #include "Cat.h"
 
 #include "MeshLoader.h"
@@ -44,7 +43,7 @@ float roughness, shininess;
 
 // Camera
 Camera * camera; 
-//Skybox * skybox;
+Skybox * skybox;
 bool freeMode;
 vec2 currentTarget;
 
@@ -68,13 +67,13 @@ void restart()
 	//rigidBodies.push_back(new RigidBodyModel(new Ellipsoid(vec3(-4,-4,0), quat(), vec3(1.4f, 1.0f, 0.8f), 4.0f), shaders[currentShaderIndex], shaders[0]));
 	//rigidBodies.push_back(new RigidBodyModel(new Ellipsoid(vec3(0,-4,0), quat(), vec3(1.0f, 1.0f, 1.0f), 4.0f), shaders[currentShaderIndex], shaders[0]));
 	//rigidBodies.push_back(new RigidBodyModel(new Cat(vec3(-3.5f,2,0), quat(), vec3(1.0f, 1.0f, 1.0f), 7.5f), shaders[currentShaderIndex+1], shaders[0]));
-	//rigidBodies.push_back(new RigidBodyModel(new Cat(vec3(0,0,0), quat(), vec3(1.5f, 2.5f, 4.0f)), shaders[6], shaders[0]));
+	rigidBodies.push_back(new RigidBodyModel(new Cat(vec3(0,0,0), quat(), vec3(2.0f, 4.0f, 5.0f)), shaders[4]));
 	//rigidBodies.push_back(new RigidBodyModel(new Plane(vec3(3.5,-1,0), quat(), vec2(1.0f, 2.0f)), shaders[currentShaderIndex], shaders[0]));
 
 	//rigidBodies.push_back(new RigidBodyModel(new Box(vec3(4,3,0), quat(), vec3(1, 1.5f, 0.75f), 2.5f), shaders[currentShaderIndex+1], shaders[0]));
 	//rigidBodies.push_back(new RigidBodyModel(new Box(vec3(2,3.5f,0), quat(), vec3(1.5f, 0.6f, 1.0f), 2.5f), shaders[currentShaderIndex+1], shaders[0]));
 	//rigidBodies.push_back(new RigidBodyModel(new Box(vec3(0,2,0), quat(), vec3(1,1,1), 2.5f), shaders[currentShaderIndex+1], shaders[0]));
-	rigidBodies.push_back(new RigidBodyModel(new Plane(vec3(0,-4.0f,0), quat(), vec2(8.0f, 6.0f)), shaders[6]));//shaders[currentShaderIndex]));
+	rigidBodies.push_back(new RigidBodyModel(new Terrain(vec3(), quat(), vec3(32.0f, 16.0f, 32.0f)), shaders[4]));
 }
 
 void rotateBody(float x, float y, float z)
@@ -202,45 +201,6 @@ void keyPressed(unsigned char key, int x, int y)
 
 	case 'c':
 		freeMode = !freeMode;
-		break;
-
-	case 8:
-		currentShaderIndex = (currentShaderIndex + shaders.size() - 6) % (shaders.size() - 2) + 2;
-
-		for(unsigned int i=0; i<rigidBodies.size(); ++i) 
-		{
-			if(rigidBodies[i]->GetBody()->GetType() == RigidBody::CAT)
-			{
-				return;
-			}
-
-			if(rigidBodies[i]->IsTextured())
-				rigidBodies[i]->ChangeShader(shaders[currentShaderIndex+1]);
-			else 
-				rigidBodies[i]->ChangeShader(shaders[currentShaderIndex]);
-		}
-
-		cout << "Current shader pair: " << shaders[currentShaderIndex]->GetName() << endl << endl;
-
-		break;
-	case 13:
-		currentShaderIndex = currentShaderIndex % (shaders.size() - 2) + 2;
-
-		for(unsigned int i=0; i<rigidBodies.size(); ++i)
-		{			
-			if(rigidBodies[i]->GetBody()->GetType() == RigidBody::CAT)
-			{
-				return;
-			}
-
-			if(rigidBodies[i]->IsTextured())
-				rigidBodies[i]->ChangeShader(shaders[currentShaderIndex+1]);
-			else 
-				rigidBodies[i]->ChangeShader(shaders[currentShaderIndex]);
-		}
-
-		cout << "Current shader pair: " << shaders[currentShaderIndex]->GetName() << endl << endl;
-
 		break;
 
 	case 'u':
@@ -410,20 +370,10 @@ void init()
 	GenericShader * skyboxShader = new GenericShader("Cubemap.vert", "Cubemap.frag", "Skybox");
 	shaders.push_back(skyboxShader);
 
-	GenericShader * diffuseShader = new GenericShader("Default.vert", "Diffuse.frag", "Lambertian Diffuse");
-	shaders.push_back(diffuseShader);
-	GenericShader * diffuseTexturedShader = new GenericShader("Textured.vert", "DiffuseTextured.frag");
-	shaders.push_back(diffuseTexturedShader);
-
 	//GenericShader * toonShader = new GenericShader("Default.vert", "Toon.frag", "Toon");
 	//shaders.push_back(toonShader);
 	//GenericShader * toonTexturedShader = new GenericShader("Textured.vert", "ToonTextured.frag");
 	//shaders.push_back(toonTexturedShader);
-
-	//GenericShader * phongShader = new GenericShader("Default.vert", "BlinnPhong.frag", "Blinn Phong + Lambertian");
-	//shaders.push_back(phongShader);
-	//GenericShader * phongTexturedShader = new GenericShader("Textured.vert", "BlinnPhongTextured.frag");
-	//shaders.push_back(phongTexturedShader);
 
 	GenericShader * orenNayarShader = new GenericShader("Default.vert", "OrenNayar.frag", "Blinn Phong + Oren Nayar");
 	shaders.push_back(orenNayarShader);
@@ -461,16 +411,13 @@ void init()
 
 		roughness = 1.0f;
 		shaders[i]->SetRoughness(roughness);
-
-		//translucentEta = vec3(0.8f, 0.6f, 0.7f);
-		//shaders[i]->SetTranslucentEta(translucentEta);
 	}
 
 	currentShaderIndex = 4;
 
 	// Create the camera
-	camera = new Camera(shaders, vec3(0,0,12), vec3(0,0,0), vec3(0,1,0));
-	//skybox = new Skybox(shaders[1]);	
+	camera = new Camera(shaders, vec3(0,0,20), vec3(0,0,0), vec3(0,1,0));
+	skybox = new Skybox(shaders[1]);	
 
 	freeMode = true;
 
