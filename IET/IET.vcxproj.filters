@@ -13,9 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Header Files\Audio">
-      <UniqueIdentifier>{6fda80d0-0c0b-4478-b791-63a75a77643e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Entities">
       <UniqueIdentifier>{52109466-d136-4eaa-8adc-0904fa2c48cf}</UniqueIdentifier>
     </Filter>
@@ -24,9 +21,6 @@
     </Filter>
     <Filter Include="Header Files\Graphics\Camera">
       <UniqueIdentifier>{93e6e3cb-d446-4410-a053-4e842783c416}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Audio">
-      <UniqueIdentifier>{58a7e5e8-8eb1-4d1e-b2c5-83bb2bafc6a1}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Entities">
       <UniqueIdentifier>{1d851baa-d634-4c6e-b79c-c7c2449177e5}</UniqueIdentifier>
@@ -108,18 +102,6 @@
     <ClInclude Include="HelperFunctions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="AudioManager.h">
-      <Filter>Header Files\Audio</Filter>
-    </ClInclude>
-    <ClInclude Include="AudioListener.h">
-      <Filter>Header Files\Audio</Filter>
-    </ClInclude>
-    <ClInclude Include="AudioEventManager.h">
-      <Filter>Header Files\Audio</Filter>
-    </ClInclude>
-    <ClInclude Include="AudioEvent.h">
-      <Filter>Header Files\Audio</Filter>
-    </ClInclude>
     <ClInclude Include="Drawable.h">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
@@ -162,9 +144,6 @@
     <ClInclude Include="Box.h">
       <Filter>Header Files\Entities\RigidBody</Filter>
     </ClInclude>
-    <ClInclude Include="Cat.h">
-      <Filter>Header Files\Entities\RigidBody</Filter>
-    </ClInclude>
     <ClInclude Include="RigidBody.h">
       <Filter>Header Files\Entities\RigidBody</Filter>
     </ClInclude>
@@ -195,6 +174,9 @@
     <ClInclude Include="Terrain.h">
       <Filter>Header Files\Entities\RigidBody</Filter>
     </ClInclude>
+    <ClInclude Include="ModelBody.h">
+      <Filter>Header Files\Entities\RigidBody</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -205,12 +187,6 @@
     </ClCompile>
     <ClCompile Include="HelperFunctions.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="AudioEventManager.cpp">
-      <Filter>Source Files\Audio</Filter>
-    </ClCompile>
-    <ClCompile Include="AudioManager.cpp">
-      <Filter>Source Files\Audio</Filter>
     </ClCompile>
     <ClCompile Include="EntitiyManager.cpp">
       <Filter>Source Files\Entities</Filter>
@@ -245,9 +221,6 @@
     <ClCompile Include="Box.cpp">
       <Filter>Source Files\Entities\RigidBody</Filter>
     </ClCompile>
-    <ClCompile Include="Cat.cpp">
-      <Filter>Source Files\Entities\RigidBody</Filter>
-    </ClCompile>
     <ClCompile Include="RigidBody.cpp">
       <Filter>Source Files\Entities\RigidBody</Filter>
     </ClCompile>
@@ -273,6 +246,9 @@
       <Filter>Source Files\Graphics\Meshes</Filter>
     </ClCompile>
     <ClCompile Include="Terrain.cpp">
+      <Filter>Source Files\Entities\RigidBody</Filter>
+    </ClCompile>
+    <ClCompile Include="ModelBody.cpp">
       <Filter>Source Files\Entities\RigidBody</Filter>
     </ClCompile>
   </ItemGroup>

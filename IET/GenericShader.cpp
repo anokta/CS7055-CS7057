@@ -63,6 +63,9 @@ GenericShader::GenericShader(string vShaderFilepath, string fShaderFilepath, str
 
 
 	fCubeTextureID = glGetUniformLocation(programID, "fCubeTexture");
+	
+	zMaxID = glGetUniformLocation(programID, "zMax");
+	zMinID = glGetUniformLocation(programID, "zMin");
 }
 
 GenericShader::~GenericShader()
@@ -181,6 +184,13 @@ void GenericShader::SetTranslucentEta(glm::vec3 &eta)
 {
 	glUseProgram(programID);
 	glUniform3f(translucentEtaID, eta.r, eta.g, eta.b);
+}
+
+void GenericShader::SetDistanceThresholds(float zMin, float zMax)
+{
+	glUseProgram(programID);
+	glUniform1f(zMinID, zMin);
+	glUniform1f(zMaxID, zMax);
 }
 
 GLuint GenericShader::createShader(string filepath, GLenum type)

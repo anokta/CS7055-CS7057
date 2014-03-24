@@ -15,8 +15,9 @@ class RigidBodyModel : public Drawable, public Updatable
 public:
 	RigidBodyModel(RigidBody *b, GenericShader * s);
 	~RigidBodyModel();
-
+	
 	inline RigidBody * GetBody() { return body; }
+	inline MeshBase * GetModel() { return modelMesh; }
 	
 	void ChangeShader(GenericShader * s);
 	inline bool IsTextured() { return textured; }

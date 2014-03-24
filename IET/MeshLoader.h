@@ -44,6 +44,8 @@ public:
 		const std::string& NegZFilename);
 
 private:
+	static std::string ResourcePath;
+
 	struct BufferData
 	{
 		BufferData(std::vector<glm::vec3> &v, std::vector<GLuint> &i, std::vector<glm::vec3> &n) : vertices(v), indices(i), normals(n) {}

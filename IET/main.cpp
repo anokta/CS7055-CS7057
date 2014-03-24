@@ -2,9 +2,9 @@
 
 #include <GL/glew.h>
 #include <GL/freeglut.h>
+#include <GL/glui.h>
 
 #include "EntityManager.h"
-#include "AudioManager.h"
 
 #include "Camera.h"
 #include "Skybox.h"
@@ -13,7 +13,7 @@
 #include "Box.h"
 #include "Plane.h"
 #include "Terrain.h"
-#include "Cat.h"
+#include "ModelBody.h"
 
 #include "MeshLoader.h"
 
@@ -22,18 +22,20 @@
 using namespace std;
 using namespace glm;
 
+int main_window;
+
+enum GUI_CONTROLLER_TYPE { CAMERA_TRANSLATION, BODY_ROTATION, LIGHT_ROTATION, XTOON_DISTANCE };
+
 // Update interval
 const int FrameRate = 40;
 const float DELTA_TIME = 1.0f/FrameRate;
-
-// Audio
-AudioManager * audioManager;
 
 // Shading properties
 vector<GenericShader*> shaders;
 int currentShaderIndex;
 
 vec3 directionalLightDirection;
+float lightDirectionRotation[16];
 
 float ambientLightIntensity;
 float directionalLightIntensity;
@@ -41,18 +43,21 @@ float specularIntensity;
 
 float roughness, shininess;
 
+float minZ, maxZ;
+
 // Camera
 Camera * camera; 
+float cameraXY[2], cameraZ;
 Skybox * skybox;
-bool freeMode;
+int freeMode;
 vec2 currentTarget;
 
 vector<RigidBodyModel*> rigidBodies;
 int currentBodyIndex;
+float currentBodyRotation[16];
+//int spinning;
 
 bool pause;
-
-
 
 void restart()
 {
@@ -62,24 +67,11 @@ void restart()
 	}
 	rigidBodies.clear();
 
-	//rigidBodies.push_back(new RigidBodyModel(new Ball(vec3(-7,0,0)), bumpedShader, shaders[0]));
-	//rigidBodies.push_back(new RigidBodyModel(new Box(vec3(7,0,0), quat(), vec3(1.0f, 0.4f, 1.5f)), shaders[currentShaderIndex+1], shaders[0]));
-	//rigidBodies.push_back(new RigidBodyModel(new Ellipsoid(vec3(-4,-4,0), quat(), vec3(1.4f, 1.0f, 0.8f), 4.0f), shaders[currentShaderIndex], shaders[0]));
-	//rigidBodies.push_back(new RigidBodyModel(new Ellipsoid(vec3(0,-4,0), quat(), vec3(1.0f, 1.0f, 1.0f), 4.0f), shaders[currentShaderIndex], shaders[0]));
-	//rigidBodies.push_back(new RigidBodyModel(new Cat(vec3(-3.5f,2,0), quat(), vec3(1.0f, 1.0f, 1.0f), 7.5f), shaders[currentShaderIndex+1], shaders[0]));
-	rigidBodies.push_back(new RigidBodyModel(new Cat(vec3(0,0,0), quat(), vec3(2.0f, 4.0f, 5.0f)), shaders[4]));
-	//rigidBodies.push_back(new RigidBodyModel(new Plane(vec3(3.5,-1,0), quat(), vec2(1.0f, 2.0f)), shaders[currentShaderIndex], shaders[0]));
-
-	//rigidBodies.push_back(new RigidBodyModel(new Box(vec3(4,3,0), quat(), vec3(1, 1.5f, 0.75f), 2.5f), shaders[currentShaderIndex+1], shaders[0]));
-	//rigidBodies.push_back(new RigidBodyModel(new Box(vec3(2,3.5f,0), quat(), vec3(1.5f, 0.6f, 1.0f), 2.5f), shaders[currentShaderIndex+1], shaders[0]));
-	//rigidBodies.push_back(new RigidBodyModel(new Box(vec3(0,2,0), quat(), vec3(1,1,1), 2.5f), shaders[currentShaderIndex+1], shaders[0]));
+	rigidBodies.push_back(new RigidBodyModel(new ModelBody(string("elephal.obj"), vec3(4.0f, 0.0f, 0.0f), quat(), vec3(5.0f, 6.0f, 7.0f)), shaders[4]));
+	rigidBodies.push_back(new RigidBodyModel(new ModelBody(string("bunny.obj"), vec3(-4.0f, 0.0f, 0.0f), quat(), vec3(4.0f, 4.0f, 2.0f)), shaders[4]));
 	rigidBodies.push_back(new RigidBodyModel(new Terrain(vec3(), quat(), vec3(32.0f, 16.0f, 32.0f)), shaders[4]));
-}
 
-void rotateBody(float x, float y, float z)
-{
-	quat q(vec3(x, y, z));
-	rigidBodies[currentBodyIndex]->GetBody()->SetOrientation(rigidBodies[currentBodyIndex]->GetBody()->GetOrientation() * q);
+	((XToonMesh*)rigidBodies[0]->GetModel())->ChangeTexture(string("xtoon\\xtoon_texture_1.png"));
 }
 
 void translateBody(float x, float y, float z)
@@ -98,7 +90,10 @@ float mult = 0.5f;
 float translationMult = 0.125f;
 
 void mousePressed(int btn, int state, int x, int y)
-{
+{	
+	if ( glutGetWindow() != main_window )
+		glutSetWindow(main_window);
+
 	if(state == GLUT_DOWN)
 	{
 		mouseX = x;
@@ -125,6 +120,7 @@ void mouseWheel(int btn, int dir, int x, int y)
 		vec3 translation = vec3(vec3(toMat4(HelperFunctions::RotationBetweenVectors(vec3(0,0,-1), forward)) * vec4(0, 0, (dir>0) ? -mult : mult, 1.0f)));
 
 		camera->SetEyeVector(camera->GetEyeVector() + translation);
+		camera->SetTargetVector(camera->GetTargetVector() + translation);
 	}
 }
 
@@ -161,7 +157,10 @@ void mouseDragged(int x, int y)
 }
 
 void keyPressed(unsigned char key, int x, int y)
-{
+{	
+	if ( glutGetWindow() != main_window )
+		glutSetWindow(main_window);
+
 	if(key > 48 && key < 58)
 	{
 		//audioManager->ChangeSong((int)(key - 49));
@@ -201,34 +200,6 @@ void keyPressed(unsigned char key, int x, int y)
 
 	case 'c':
 		freeMode = !freeMode;
-		break;
-
-	case 'u':
-		rotateBody(-0.1f, 0.0f, 0.0f);
-		break;
-
-	case 'j':
-		rotateBody(0.1f, 0.0f, 0.0f);
-		break;
-
-	case 'h':
-		rotateBody(0.0f, -0.1f, 0.0f);
-		break;
-
-	case 'k':
-		rotateBody(0.0f, 0.1f, 0.0f);
-		break;
-
-	case 'i':
-		rotateBody(0.0f, 0.0f, -0.1f);
-		break;
-	case 'o':
-		rigidBodies[currentBodyIndex]->GetBody()->SetAngularMomentum(vec3());
-		break;
-
-
-	case 'y':
-		rotateBody(0.0f, 0.0f, 0.1f);
 		break;
 
 	case 'a':
@@ -279,29 +250,44 @@ void keyPressed(unsigned char key, int x, int y)
 	}
 }
 
-void specialKeyPressed(int key, int x, int y)
+void valueModified(int id)
 {
-	switch(key)
+	switch((GUI_CONTROLLER_TYPE)id)
 	{
-	case GLUT_KEY_LEFT:
-		directionalLightDirection = normalize(toMat3(quat(vec3(0.0f, -0.1f, 0.0f))) * directionalLightDirection);
+	case GUI_CONTROLLER_TYPE::CAMERA_TRANSLATION:
+		camera->SetEyeVector(vec3(cameraXY[0], cameraXY[1], -cameraZ + 20));
+		camera->SetTargetVector(vec3(cameraXY[0], cameraXY[1], -cameraZ));
+	
+		break;
+
+	case GUI_CONTROLLER_TYPE::BODY_ROTATION:
+		{
+			mat4 rotation = mat4(
+				currentBodyRotation[0],currentBodyRotation[1],currentBodyRotation[2], currentBodyRotation[3],
+				currentBodyRotation[4],currentBodyRotation[5],currentBodyRotation[6], currentBodyRotation[7],
+				currentBodyRotation[8],currentBodyRotation[9],currentBodyRotation[10], currentBodyRotation[11],
+				currentBodyRotation[12],currentBodyRotation[13],currentBodyRotation[14], currentBodyRotation[15]
+			);
+			rigidBodies[currentBodyIndex]->GetBody()->SetOrientation(quat(rotation));
+		}
+		break;
+
+	case GUI_CONTROLLER_TYPE::LIGHT_ROTATION:
+		{
+			mat3 rotation = mat3(
+				lightDirectionRotation[0],lightDirectionRotation[1],lightDirectionRotation[2],
+				lightDirectionRotation[4],lightDirectionRotation[5],lightDirectionRotation[6],
+				lightDirectionRotation[8],lightDirectionRotation[9],lightDirectionRotation[10]
+			);
+			directionalLightDirection = normalize(rotation * vec3(1, 1, 1));
+		}
 		for(unsigned int i=0; i<shaders.size(); ++i)
 			shaders[i]->SetDirectionalLight(directionalLightDirection, vec3(1,1,1), directionalLightIntensity);
 		break;
-	case GLUT_KEY_RIGHT:
-		directionalLightDirection = normalize(toMat3(quat(vec3(0.0f, 0.1f, 0.0f))) * directionalLightDirection);
+
+	case GUI_CONTROLLER_TYPE::XTOON_DISTANCE:
 		for(unsigned int i=0; i<shaders.size(); ++i)
-			shaders[i]->SetDirectionalLight(directionalLightDirection, vec3(1,1,1), directionalLightIntensity);
-		break;
-	case GLUT_KEY_UP:
-		directionalLightDirection = normalize(toMat3(quat(vec3(-0.1f, 0.0f, 0.0f))) * directionalLightDirection);
-		for(unsigned int i=0; i<shaders.size(); ++i)
-			shaders[i]->SetDirectionalLight(directionalLightDirection, vec3(1,1,1), directionalLightIntensity);
-		break;
-	case GLUT_KEY_DOWN:
-		directionalLightDirection = normalize(toMat3(quat(vec3(0.1f, 0.0f, 0.0f))) * directionalLightDirection);
-		for(unsigned int i=0; i<shaders.size(); ++i)
-			shaders[i]->SetDirectionalLight(directionalLightDirection, vec3(1,1,1), directionalLightIntensity);
+			shaders[i]->SetDistanceThresholds(minZ, maxZ);
 		break;
 	}
 }
@@ -317,7 +303,10 @@ void display(){
 }
 
 void idle()
-{
+{  
+	if ( glutGetWindow() != main_window )
+		glutSetWindow(main_window);
+
 	glutPostRedisplay();
 }
 
@@ -332,18 +321,18 @@ void update(int frame)
 		//Update camera motion
 		if(!freeMode)
 		{
-			camera->SetEyeVector(mix(camera->GetEyeVector(), vec3(currentTarget, 12), DELTA_TIME));
+			camera->SetEyeVector(mix(camera->GetEyeVector(), vec3(currentTarget, 20), DELTA_TIME));
 			camera->SetTargetVector(mix(camera->GetTargetVector(), vec3(currentTarget, 0), DELTA_TIME * 2));
 		} 
 
-		for(unsigned int i=0; i<rigidBodies.size(); ++i)
-		{
-			// Detect collisions
-			for(unsigned int j=i+1; j<rigidBodies.size(); ++j)
-			{
-				rigidBodies[i]->ResolveCollision(rigidBodies[j]);
-			}
-		}
+		//for(unsigned int i=0; i<rigidBodies.size(); ++i)
+		//{
+		//	// Detect collisions
+		//	for(unsigned int j=i+1; j<rigidBodies.size(); ++j)
+		//	{
+		//		rigidBodies[i]->ResolveCollision(rigidBodies[j]);
+		//	}
+		//}
 
 		EntityManager::GetInstance()->UpdateEntities(DELTA_TIME);
 
@@ -359,10 +348,6 @@ void update(int frame)
 
 void init()
 {
-	// Initialize audio manager
-	//audioManager->Initialize();
-	//audioManager->LoadResources();
-
 	// Set up the shaders
 	GenericShader * lineShader = new GenericShader("Default.vert", "Default.frag");
 	shaders.push_back(lineShader);
@@ -403,7 +388,7 @@ void init()
 
 		shaders[i]->SetAmbientLight(vec3(1,1,1), ambientLightIntensity);
 
-		directionalLightDirection = vec3(0, 0, -1);
+		directionalLightDirection = vec3(1, 1, 1);
 		shaders[i]->SetDirectionalLight(directionalLightDirection, vec3(1,1,1), directionalLightIntensity);
 
 		shininess = 64.0f;
@@ -411,6 +396,10 @@ void init()
 
 		roughness = 1.0f;
 		shaders[i]->SetRoughness(roughness);
+
+		minZ = 5.0f;
+		maxZ = 50.0f;
+		shaders[i]->SetDistanceThresholds(minZ, maxZ);
 	}
 
 	currentShaderIndex = 4;
@@ -434,9 +423,6 @@ void init()
 
 	glEnable(GL_DEPTH_FUNC);
 	glDepthFunc(GL_LEQUAL);
-
-	// Start music
-	//audioManager->StartMusic();
 } 
 
 void releaseResources()
@@ -444,9 +430,6 @@ void releaseResources()
 	for(unsigned int i=0; i<shaders.size(); ++i)
 		delete shaders[i];
 	shaders.clear();
-
-	AudioManager::Destroy();
-	audioManager = NULL;
 
 	EntityManager::Destroy();
 
@@ -458,22 +441,22 @@ int main(int argc, char** argv){
 	// Set up the window
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGB);
-	glutInitWindowSize(800, 600);
-	glutCreateWindow("IET");
+	glutInitWindowSize(1024, 768);
+	main_window = glutCreateWindow("[IET] CS7055");
 
 	// Tell glut where the display function is
 	glutDisplayFunc(display);
 
-	glutIdleFunc(idle);
+	//glutIdleFunc(idle);
 	glutTimerFunc(1000/FrameRate, update, 0);
 
 	// Input handling functions
-	glutMouseFunc(mousePressed);
+	//glutMouseFunc(mousePressed);
 	glutMouseWheelFunc(mouseWheel);
 	glutMotionFunc(mouseDragged);
 
-	glutKeyboardFunc(keyPressed);
-	glutSpecialFunc(specialKeyPressed);
+	//glutKeyboardFunc(keyPressed);
+	//glutSpecialFunc(specialKeyPressed);
 
 	// A call to glewInit() must be done after glut is initialized!
 	GLenum res = glewInit();
@@ -487,12 +470,53 @@ int main(int argc, char** argv){
 	// Entity handler
 	EntityManager::Create();
 
-	// Audio handlers
-	AudioManager::Create();
-	audioManager = AudioManager::GetInstance();
-
 	// Set up your objects and shaders
 	init();
+
+	// GLUI init  
+	GLUI *glui = GLUI_Master.create_glui_subwindow(main_window, GLUI_SUBWINDOW_LEFT);
+	glui->set_main_gfx_window( main_window );
+
+	// Controls  
+	GLUI_Panel *cameraPanel = glui->add_panel ("Camera Controls");
+	GLUI_Translation * xyTranslation = glui->add_translation_to_panel(cameraPanel, "Move", GLUI_TRANSLATION_XY, cameraXY, GUI_CONTROLLER_TYPE::CAMERA_TRANSLATION, valueModified);
+	GLUI_Translation * zTranslation = glui->add_translation_to_panel(cameraPanel, "Zoom", GLUI_TRANSLATION_Z, &cameraZ, GUI_CONTROLLER_TYPE::CAMERA_TRANSLATION, valueModified);
+	
+	glui->add_separator();
+
+	GLUI_Panel *entityPanel = glui->add_panel ("Entity Controls");
+	GLUI_Spinner *bodyIndex_spinner = glui->add_spinner_to_panel(entityPanel, "Current Body:", GLUI_SPINNER_INT, &currentBodyIndex );
+	bodyIndex_spinner->set_int_limits( 0, rigidBodies.size() );
+	GLUI_Rotation *bodyRotation = glui->add_rotation_to_panel(entityPanel, "Orientation", currentBodyRotation, GUI_CONTROLLER_TYPE::BODY_ROTATION, valueModified);
+	//GLUI_Checkbox *keepSpinning = glui->add_checkbox_to_panel(entityPanel, "Keep spinning", &spinning);
+	//bodyRotation->set_spin(0.5f);
+	bodyRotation->reset();
+
+	glui->add_separator();
+
+	GLUI_Panel *lightPanel = glui->add_panel ("Light Source");
+	GLUI_Rotation *lightRotation = glui->add_rotation_to_panel(lightPanel, "Direction", lightDirectionRotation, GUI_CONTROLLER_TYPE::LIGHT_ROTATION, valueModified);
+	lightRotation->reset();
+
+	glui->add_separator();
+
+	GLUI_Panel *xtoonPanel = glui->add_panel ("X-Toon Controls");
+
+	GLUI_Panel *xtoonDistancePanel = glui->add_panel_to_panel(xtoonPanel, "Distance");
+	GLUI_Spinner *minZ_spinner = glui->add_spinner_to_panel(xtoonDistancePanel, "Min Z", GLUI_SPINNER_FLOAT, &minZ, GUI_CONTROLLER_TYPE::XTOON_DISTANCE, valueModified);
+	minZ_spinner->set_float_limits( 1.0f, 20.0f );
+	GLUI_Spinner *maxZ_spinner = glui->add_spinner_to_panel(xtoonDistancePanel, "Max Z", GLUI_SPINNER_FLOAT, &maxZ, GUI_CONTROLLER_TYPE::XTOON_DISTANCE, valueModified);
+	maxZ_spinner->set_float_limits( 21.0f, 100.0f );
+
+	glui->add_separator();
+	glui->add_separator();
+
+	glui->add_button("Quit",0,(GLUI_Update_CB)exit);
+
+	GLUI_Master.set_glutIdleFunc( idle ); 
+	GLUI_Master.set_glutKeyboardFunc( keyPressed );
+	GLUI_Master.set_glutMouseFunc( mousePressed );
+
 
 	// Begin infinite event loop
 	glutMainLoop();

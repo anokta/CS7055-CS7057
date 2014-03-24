@@ -5,6 +5,8 @@
 #include "glm\gtx\quaternion.hpp"
 #include "glm\gtx\transform.hpp"
 
+#include "ModelBody.h"
+
 using namespace glm;
 
 RigidBodyModel::RigidBodyModel(RigidBody *b, GenericShader * s)
@@ -15,20 +17,18 @@ RigidBodyModel::RigidBodyModel(RigidBody *b, GenericShader * s)
 	switch(body->GetType())
 	{
 	case RigidBody::BODY_TYPE::BOX:
-		modelMesh = MeshLoader::GenerateTexturedCubeMesh("..\\IET\\res\\box.jpg");
-		//MeshLoader::LoadMesh("..\\IET\\res\\block.dae", "..\\IET\\res\\block.tga");
+		modelMesh = MeshLoader::GenerateTexturedCubeMesh("box.jpg");
 		textured = false;
 		break;
 
 	case RigidBody::BODY_TYPE::BALL:
-		modelMesh = MeshLoader::LoadBumpedMesh("..\\IET\\res\\Earth.dae", "..\\IET\\res\\Earth_D.tga", "..\\IET\\res\\Earth_N.tga");		
+		modelMesh = MeshLoader::LoadBumpedMesh("Earth.dae", "Earth_D.tga", "Earth_N.tga");		
 		textured = true;
 		break;
 
 	case RigidBody::BODY_TYPE::ELLIPSOID:
-		modelMesh = MeshLoader::GenerateSphereMesh(15); //MeshLoader::LoadMesh("..\\IET\\res\\teapot.off");//MeshLoader::GenerateSphereMesh(15);
+		modelMesh = MeshLoader::GenerateSphereMesh(15);
 		textured = false;
-		//MeshLoader::LoadMesh("..\\IET\\res\\Mountain Bike.obj");//MeshLoader::GenerateSphereMesh(25);
 		break;	
 
 	case RigidBody::BODY_TYPE::PLANE:
@@ -37,14 +37,14 @@ RigidBodyModel::RigidBodyModel(RigidBody *b, GenericShader * s)
 		break;	
 	
 	case RigidBody::BODY_TYPE::TERRAIN:
-		modelMesh = MeshLoader::GenerateTerrainMeshXToon("..\\IET\\res\\heightmaps\\heightmap_test.png", body->GetScale().x, body->GetScale().z, body->GetScale().y, "..\\IET\\res\\xtoon\\xtoon_texture_3.png");
+		modelMesh = MeshLoader::GenerateTerrainMeshXToon("heightmaps\\heightmap_test.png", body->GetScale().x, body->GetScale().z, body->GetScale().y, "xtoon\\xtoon_texture_3.png");
 		textured = false;
 		body->SetScale(vec3(1.0f));
 
 		break;
 
-	case RigidBody::BODY_TYPE::CAT:
-		modelMesh = MeshLoader::LoadXToonMesh("..\\IET\\res\\elephal.obj", "..\\IET\\res\\xtoon\\xtoon_texture_2.png");
+	case RigidBody::BODY_TYPE::MODEL_BODY:
+		modelMesh = MeshLoader::LoadXToonMesh(((ModelBody*)body)->GetModelPath(), "xtoon\\xtoon_texture_2.png");
 		textured = true;
 		break;
 	}

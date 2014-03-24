@@ -11,13 +11,14 @@
 using namespace glm;
 using namespace std;
 
+string MeshLoader::ResourcePath = "..\\IET\\res\\";
 
 IndexedMesh * MeshLoader::LoadMesh(const std::string &path)
 {
 	// Load the file
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile(
-		path, 
+		ResourcePath + path, 
 		aiProcess_Triangulate
 		| aiProcess_JoinIdenticalVertices
 		| aiProcess_OptimizeGraph
@@ -84,7 +85,7 @@ TexturedIndexedMesh * MeshLoader::LoadMesh(const std::string &path, const string
 	// Load the file
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile(
-		path, 
+		ResourcePath + path, 
 		aiProcess_Triangulate
 		| aiProcess_JoinIdenticalVertices
 		| aiProcess_OptimizeGraph
@@ -148,7 +149,7 @@ XToonMesh * MeshLoader::LoadXToonMesh(const std::string &path, const string &tex
 	// Load the file
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile(
-		path, 
+		ResourcePath + path, 
 		aiProcess_Triangulate
 		| aiProcess_JoinIdenticalVertices
 		| aiProcess_OptimizeGraph
@@ -209,7 +210,7 @@ BumpedTexturedMesh * MeshLoader::LoadBumpedMesh(const std::string &path, const s
 	// Load the file
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile(
-		path, 
+		ResourcePath + path, 
 		aiProcess_Triangulate
 		| aiProcess_JoinIdenticalVertices
 		| aiProcess_OptimizeGraph
@@ -904,7 +905,7 @@ unsigned char ** MeshLoader::loadImage(const std::string & path, int &width, int
 	int channels;
 	unsigned char *image = SOIL_load_image
 		(
-		path.c_str(),
+		(ResourcePath + path).c_str(),
 		&width, &height, &channels,
 		SOIL_LOAD_L
 		);
@@ -926,7 +927,7 @@ GLuint MeshLoader::loadTexture(const std::string &path)
 {
 	GLuint id = SOIL_load_OGL_texture
 		(
-		path.c_str(),
+		(ResourcePath + path).c_str(),
 		SOIL_LOAD_AUTO,
 		SOIL_CREATE_NEW_ID,
 		SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT

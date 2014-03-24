@@ -44,6 +44,8 @@ public:
 	void SetSpecularComponent(glm::vec3 color, float intensity, float shininess);
 	void SetRoughness(float roughness);
 
+	void SetDistanceThresholds(float zMin, float zMax);
+
 	void SetTranslucentEta(glm::vec3 &eta);
 	
 	enum TextureType { DIFFUSE, NORMAL };
@@ -79,6 +81,8 @@ protected:
 	GLuint orenNayarRoughnessID;
 	
 	GLuint translucentEtaID;
+
+	GLuint zMinID, zMaxID;
 
 	glm::mat4 V, P, M;
 	

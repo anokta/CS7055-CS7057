@@ -55,13 +55,13 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)$(SolutionName)\glew-1.10.0\include;$(SolutionDir)$(SolutionName)\fmod\lowlevel\lib;$(SolutionDir)$(SolutionName)\freeglut\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)$(SolutionName)\glui-2.35\include;$(SolutionDir)$(SolutionName)\glew-1.10.0\include;$(SolutionDir)$(SolutionName)\fmod\lowlevel\lib;$(SolutionDir)$(SolutionName)\freeglut\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)$(SolutionName)\glew-1.10.0\lib\Win32;$(SolutionDir)$(SolutionName)\freeglut\lib;$(SolutionDir)$(SolutionName)\Assimp\lib\x86;$(SolutionDir)$(SolutionName)\SOIL\lib;$(SolutionDir)$(SolutionName)\fmod\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>freeglut.lib;glew32.lib;assimp.lib;SOIL.lib;fmodexL_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)$(SolutionName)\glui-2.35\lib;$(SolutionDir)$(SolutionName)\glew-1.10.0\lib\Win32;$(SolutionDir)$(SolutionName)\freeglut\lib;$(SolutionDir)$(SolutionName)\Assimp\lib\x86;$(SolutionDir)$(SolutionName)\SOIL\lib;$(SolutionDir)$(SolutionName)\fmod\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>freeglut.lib;glew32.lib;glui32_d.lib;assimp.lib;SOIL.lib;fmodexL_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -74,15 +74,15 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)$(SolutionName)\glew-1.10.0\include;$(SolutionDir)$(SolutionName)\fmod\lowlevel\lib;$(SolutionDir)$(SolutionName)\freeglut\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)$(SolutionName)\glui-2.35\include;$(SolutionDir)$(SolutionName)\glew-1.10.0\include;$(SolutionDir)$(SolutionName)\fmod\lowlevel\lib;$(SolutionDir)$(SolutionName)\freeglut\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(SolutionDir)$(SolutionName)\glew-1.10.0\lib\Win32;$(SolutionDir)$(SolutionName)\freeglut\lib;$(SolutionDir)$(SolutionName)\Assimp\lib\x86;$(SolutionDir)$(SolutionName)\SOIL\lib;$(SolutionDir)$(SolutionName)\fmod\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>freeglut.lib;glew32.lib;assimp.lib;SOIL.lib;fmodex_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)$(SolutionName)\glui-2.35\lib;$(SolutionDir)$(SolutionName)\glew-1.10.0\lib\Win32;$(SolutionDir)$(SolutionName)\freeglut\lib;$(SolutionDir)$(SolutionName)\Assimp\lib\x86;$(SolutionDir)$(SolutionName)\SOIL\lib;$(SolutionDir)$(SolutionName)\fmod\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>freeglut.lib;glew32.lib;glui32.lib;assimp.lib;SOIL.lib;fmodex_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -99,15 +99,11 @@
     <Text Include="Default.vert" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AudioListener.h" />
-    <ClInclude Include="AudioManager.h" />
-    <ClInclude Include="AudioEventManager.h" />
-    <ClInclude Include="AudioEvent.h" />
     <ClInclude Include="BumpedTexturedMesh.h" />
     <ClInclude Include="Ellipsoid.h" />
     <ClInclude Include="Box.h" />
     <ClInclude Include="Ball.h" />
-    <ClInclude Include="Cat.h" />
+    <ClInclude Include="ModelBody.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="Line.h" />
     <ClInclude Include="IndexedMesh.h" />
@@ -133,12 +129,10 @@
     <ClInclude Include="XToonMesh.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="AudioEventManager.cpp" />
-    <ClCompile Include="AudioManager.cpp" />
     <ClCompile Include="Ball.cpp" />
     <ClCompile Include="Box.cpp" />
     <ClCompile Include="BumpedTexturedMesh.cpp" />
-    <ClCompile Include="Cat.cpp" />
+    <ClCompile Include="ModelBody.cpp" />
     <ClCompile Include="Ellipsoid.cpp" />
     <ClCompile Include="Line.cpp" />
     <ClCompile Include="IndexedMesh.cpp" />
