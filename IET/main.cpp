@@ -24,7 +24,8 @@ using namespace glm;
 
 int main_window;
 
-enum GUI_CONTROLLER_TYPE { CAMERA_TRANSLATION, BODY_ROTATION, LIGHT_ROTATION, XTOON_TEXTURE, XTOON_DISTANCE };
+enum GUI_CONTROLLER_TYPE { CAMERA_TRANSLATION, TARGET_CHANGE, BODY_ROTATION, LIGHT_ROTATION, XTOON_TEXTURE, XTOON_DISTANCE };
+GLUI_RadioButton * xtoonTextureButtons[4];
 
 // Update interval
 const int FrameRate = 40;
@@ -46,20 +47,22 @@ float roughness, shininess;
 float minZ, maxZ;
 string xtoonTexturePaths[] = 
 {
-	"xtoon\\default.png",
-	"xtoon\\aerial_1.png",
-	"xtoon\\aerial_2.png",
-	"xtoon\\aerial_3.png",
-	"xtoon\\backlighting_1.png",
-	"xtoon\\backlighting_2.png",
-	"xtoon\\backlighting_3.png",
-	"xtoon\\highlighting_1.png",
-	"xtoon\\highlighting_2.png",
-	"xtoon\\highlighting_3.png",
-	"xtoon\\loa_1.png",
-	"xtoon\\loa_2.png",
-	"xtoon\\loa_3.png"
-
+	"default.png",
+	"loa_1.png",
+	"loa_2.png",
+	"loa_3.png",
+	"default.png",
+	"backlighting_1.png",
+	"backlighting_2.png",
+	"backlighting_3.png",
+	"default.png",
+	"aerial_1.png",
+	"aerial_2.png",
+	"aerial_3.png",
+	"default.png",
+	"highlighting_1.png",
+	"highlighting_2.png",
+	"highlighting_3.png"
 };
 int xtoonCurrentTexture;
 
@@ -84,10 +87,11 @@ void restart()
 		delete rigidBodies[i];
 	}
 	rigidBodies.clear();
-
-	rigidBodies.push_back(new RigidBodyModel(new ModelBody(string("elephal.obj"), vec3(4.0f, 0.0f, 0.0f), quat(), vec3(5.0f, 6.0f, 7.0f)), shaders[4]));
-	rigidBodies.push_back(new RigidBodyModel(new ModelBody(string("bunny.obj"), vec3(-4.0f, 0.0f, 0.0f), quat(), vec3(4.0f, 4.0f, 2.0f)), shaders[4]));
-	rigidBodies.push_back(new RigidBodyModel(new Terrain(vec3(), quat(), vec3(32.0f, 16.0f, 32.0f)), shaders[4]));
+	
+	rigidBodies.push_back(new RigidBodyModel(new ModelBody(string("bunny.obj"), vec3(2.0f, 0.0f, 0.0f), quat(), vec3(12.0f, 9.0f, 8.0f)), shaders[2]));
+	rigidBodies.push_back(new RigidBodyModel(new ModelBody(string("suzanne.obj"), vec3(102.0f, 0.0f, 0.0f), quat(), vec3(10.0f, 12.0f, 10.0f)), shaders[2]));
+	rigidBodies.push_back(new RigidBodyModel(new Terrain(vec3(202.0f, 0.0f, 0.0f), quat(), vec3(36.0f, 16.0f, 36.0f)), shaders[2]));
+	rigidBodies.push_back(new RigidBodyModel(new ModelBody(string("elephal.obj"), vec3(302.0f, 0.0f, 0.0f), quat(), vec3(8.0f, 10.0f, 15.0f)), shaders[2]));
 }
 
 void translateBody(float x, float y, float z)
@@ -276,6 +280,20 @@ void valueModified(int id)
 	
 		break;
 
+	case GUI_CONTROLLER_TYPE::TARGET_CHANGE:
+		freeMode = false;
+		currentTarget = vec2(currentBodyIndex * 100.0f, 0.0f);
+
+		xtoonCurrentTexture = 0;
+		for(int i=0; i<4; ++i)
+		{
+			string path = xtoonTexturePaths[(currentBodyIndex * 4) + i];
+			path = path.substr(0, path.length() - 4);
+
+			xtoonTextureButtons[i]->set_name(path.c_str());
+		}
+		break;
+
 	case GUI_CONTROLLER_TYPE::BODY_ROTATION:
 		{
 			mat4 rotation = mat4(
@@ -302,7 +320,7 @@ void valueModified(int id)
 		break;
 	
 	case GUI_CONTROLLER_TYPE::XTOON_TEXTURE:
-		((XToonMesh*)(rigidBodies[currentBodyIndex])->GetModel())->ChangeTexture(xtoonTexturePaths[xtoonCurrentTexture+1]);
+		((XToonMesh*)(rigidBodies[currentBodyIndex])->GetModel())->ChangeTexture("xtoon\\" + xtoonTexturePaths[currentBodyIndex * 4 + xtoonCurrentTexture]);
 		break;
 	
 	case GUI_CONTROLLER_TYPE::XTOON_DISTANCE:
@@ -343,16 +361,12 @@ void update(int frame)
 		{
 			camera->SetEyeVector(mix(camera->GetEyeVector(), vec3(currentTarget, 20), DELTA_TIME));
 			camera->SetTargetVector(mix(camera->GetTargetVector(), vec3(currentTarget, 0), DELTA_TIME * 2));
-		} 
 
-		//for(unsigned int i=0; i<rigidBodies.size(); ++i)
-		//{
-		//	// Detect collisions
-		//	for(unsigned int j=i+1; j<rigidBodies.size(); ++j)
-		//	{
-		//		rigidBodies[i]->ResolveCollision(rigidBodies[j]);
-		//	}
-		//}
+			if(abs(camera->GetEyeVector().x - currentTarget.x) < 0.5f && abs(camera->GetTargetVector().x - currentTarget.x) < 0.5f)
+			{
+				freeMode = true;
+			}
+		} 
 
 		EntityManager::GetInstance()->UpdateEntities(DELTA_TIME);
 
@@ -375,18 +389,10 @@ void init()
 	GenericShader * skyboxShader = new GenericShader("Cubemap.vert", "Cubemap.frag", "Skybox");
 	shaders.push_back(skyboxShader);
 
-	//GenericShader * toonShader = new GenericShader("Default.vert", "Toon.frag", "Toon");
-	//shaders.push_back(toonShader);
-	//GenericShader * toonTexturedShader = new GenericShader("Textured.vert", "ToonTextured.frag");
-	//shaders.push_back(toonTexturedShader);
-
-	GenericShader * orenNayarShader = new GenericShader("Default.vert", "OrenNayar.frag", "Blinn Phong + Oren Nayar");
-	shaders.push_back(orenNayarShader);
-	GenericShader * orenNayarTexturedShader = new GenericShader("Textured.vert", "OrenNayarTextured.frag");
-	shaders.push_back(orenNayarTexturedShader);
-
 	GenericShader * xToonShader = new GenericShader("XToon.vert", "XToon.frag", "XToon");
 	shaders.push_back(xToonShader);
+
+
 
 
 	for(unsigned int i=0; i<shaders.size(); ++i)
@@ -417,12 +423,12 @@ void init()
 		roughness = 1.0f;
 		shaders[i]->SetRoughness(roughness);
 
-		minZ = 5.0f;
-		maxZ = 50.0f;
+		minZ = 10.0f;
+		maxZ = 30.0f;
 		shaders[i]->SetDistanceThresholds(minZ, maxZ);
 	}
 
-	currentShaderIndex = 4;
+	currentShaderIndex = 2;
 
 	// Create the camera
 	camera = new Camera(shaders, vec3(0,0,20), vec3(0,0,0), vec3(0,1,0));
@@ -505,11 +511,14 @@ int main(int argc, char** argv){
 	glui->add_separator();
 
 	GLUI_Panel *entityPanel = glui->add_panel ("Entity Controls");
-	GLUI_Spinner *bodyIndex_spinner = glui->add_spinner_to_panel(entityPanel, "Current Body:", GLUI_SPINNER_INT, &currentBodyIndex );
-	bodyIndex_spinner->set_int_limits( 0, rigidBodies.size() );
+	GLUI_Rollout *bodyIndexRollout = glui->add_rollout_to_panel(entityPanel, "Shading Examples", 1);
+	GLUI_RadioGroup *bodyIndex_selector = glui->add_radiogroup_to_panel(bodyIndexRollout, &currentBodyIndex, TARGET_CHANGE, valueModified);
+	glui->add_radiobutton_to_group(bodyIndex_selector, "Level-of-Abstraction");
+	glui->add_radiobutton_to_group(bodyIndex_selector, "Backlighting");
+	glui->add_radiobutton_to_group(bodyIndex_selector, "Aerial Perspective");
+	glui->add_radiobutton_to_group(bodyIndex_selector, "Highlighting");
+
 	GLUI_Rotation *bodyRotation = glui->add_rotation_to_panel(entityPanel, "Orientation", currentBodyRotation, GUI_CONTROLLER_TYPE::BODY_ROTATION, valueModified);
-	//GLUI_Checkbox *keepSpinning = glui->add_checkbox_to_panel(entityPanel, "Keep spinning", &spinning);
-	//bodyRotation->set_spin(0.5f);
 	bodyRotation->reset();
 
 	glui->add_separator();
@@ -530,21 +539,15 @@ int main(int argc, char** argv){
 	
 	GLUI_Panel *textureLabel = glui->add_panel_to_panel(xtoonPanel, "Current Texture");
 	GLUI_Rollout *xtoonTextureRollout = glui->add_rollout_to_panel(textureLabel, "Texture Types", 0);
-	GLUI_RadioGroup *xtoonTextures = glui->add_radiogroup_to_panel(xtoonTextureRollout, &xtoonCurrentTexture, GUI_CONTROLLER_TYPE::XTOON_TEXTURE, valueModified);
-	//glui->add_radiobutton_to_group(xtoonTextures, "Default (1D)");
-	glui->add_radiobutton_to_group(xtoonTextures, "Areial 1");
-	glui->add_radiobutton_to_group(xtoonTextures, "Areial 2");
-	glui->add_radiobutton_to_group(xtoonTextures, "Areial 3");	
-	glui->add_radiobutton_to_group(xtoonTextures, "BackLighting 1");
-	glui->add_radiobutton_to_group(xtoonTextures, "BackLighting 2");
-	glui->add_radiobutton_to_group(xtoonTextures, "BackLighting 3");
-	glui->add_radiobutton_to_group(xtoonTextures, "Highlighting 1");	
-	glui->add_radiobutton_to_group(xtoonTextures, "Highlighting 2");
-	glui->add_radiobutton_to_group(xtoonTextures, "Highlighting 3");
-	//glui->add_radiobutton_to_group(xtoonTextures, "LOA 1");	
-	//glui->add_radiobutton_to_group(xtoonTextures, "LOA 2");
-	//glui->add_radiobutton_to_group(xtoonTextures, "LOA 3");
-	
+	GLUI_RadioGroup *xtoonTextures = glui->add_radiogroup_to_panel(xtoonTextureRollout, &xtoonCurrentTexture, GUI_CONTROLLER_TYPE::XTOON_TEXTURE, valueModified);	
+	for(int i=0; i<4; ++i)
+	{
+		string path = xtoonTexturePaths[(currentBodyIndex * 4) + i];
+		path = path.substr(0, path.length() - 4);
+
+		xtoonTextureButtons[i] = glui->add_radiobutton_to_group(xtoonTextures, path.c_str());
+	}
+
 	glui->add_separator();
 	glui->add_separator();
 
