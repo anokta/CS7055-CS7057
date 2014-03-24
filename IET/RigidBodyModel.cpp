@@ -37,14 +37,14 @@ RigidBodyModel::RigidBodyModel(RigidBody *b, GenericShader * s)
 		break;	
 	
 	case RigidBody::BODY_TYPE::TERRAIN:
-		modelMesh = MeshLoader::GenerateTerrainMeshXToon("heightmaps\\heightmap_test.png", body->GetScale().x, body->GetScale().z, body->GetScale().y, "xtoon\\xtoon_texture_3.png");
+		modelMesh = MeshLoader::GenerateTerrainMeshXToon("heightmaps\\heightmap_test.png", body->GetScale().x, body->GetScale().z, body->GetScale().y, "xtoon\\default.png");
 		textured = false;
 		body->SetScale(vec3(1.0f));
 
 		break;
 
 	case RigidBody::BODY_TYPE::MODEL_BODY:
-		modelMesh = MeshLoader::LoadXToonMesh(((ModelBody*)body)->GetModelPath(), "xtoon\\xtoon_texture_2.png");
+		modelMesh = MeshLoader::LoadXToonMesh(((ModelBody*)body)->GetModelPath(), "xtoon\\default.png");
 		textured = true;
 		break;
 	}

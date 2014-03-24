@@ -24,7 +24,7 @@ using namespace glm;
 
 int main_window;
 
-enum GUI_CONTROLLER_TYPE { CAMERA_TRANSLATION, BODY_ROTATION, LIGHT_ROTATION, XTOON_DISTANCE };
+enum GUI_CONTROLLER_TYPE { CAMERA_TRANSLATION, BODY_ROTATION, LIGHT_ROTATION, XTOON_TEXTURE, XTOON_DISTANCE };
 
 // Update interval
 const int FrameRate = 40;
@@ -44,6 +44,24 @@ float specularIntensity;
 float roughness, shininess;
 
 float minZ, maxZ;
+string xtoonTexturePaths[] = 
+{
+	"xtoon\\default.png",
+	"xtoon\\aerial_1.png",
+	"xtoon\\aerial_2.png",
+	"xtoon\\aerial_3.png",
+	"xtoon\\backlighting_1.png",
+	"xtoon\\backlighting_2.png",
+	"xtoon\\backlighting_3.png",
+	"xtoon\\highlighting_1.png",
+	"xtoon\\highlighting_2.png",
+	"xtoon\\highlighting_3.png",
+	"xtoon\\loa_1.png",
+	"xtoon\\loa_2.png",
+	"xtoon\\loa_3.png"
+
+};
+int xtoonCurrentTexture;
 
 // Camera
 Camera * camera; 
@@ -70,8 +88,6 @@ void restart()
 	rigidBodies.push_back(new RigidBodyModel(new ModelBody(string("elephal.obj"), vec3(4.0f, 0.0f, 0.0f), quat(), vec3(5.0f, 6.0f, 7.0f)), shaders[4]));
 	rigidBodies.push_back(new RigidBodyModel(new ModelBody(string("bunny.obj"), vec3(-4.0f, 0.0f, 0.0f), quat(), vec3(4.0f, 4.0f, 2.0f)), shaders[4]));
 	rigidBodies.push_back(new RigidBodyModel(new Terrain(vec3(), quat(), vec3(32.0f, 16.0f, 32.0f)), shaders[4]));
-
-	((XToonMesh*)rigidBodies[0]->GetModel())->ChangeTexture(string("xtoon\\xtoon_texture_1.png"));
 }
 
 void translateBody(float x, float y, float z)
@@ -284,7 +300,11 @@ void valueModified(int id)
 		for(unsigned int i=0; i<shaders.size(); ++i)
 			shaders[i]->SetDirectionalLight(directionalLightDirection, vec3(1,1,1), directionalLightIntensity);
 		break;
-
+	
+	case GUI_CONTROLLER_TYPE::XTOON_TEXTURE:
+		((XToonMesh*)(rigidBodies[currentBodyIndex])->GetModel())->ChangeTexture(xtoonTexturePaths[xtoonCurrentTexture+1]);
+		break;
+	
 	case GUI_CONTROLLER_TYPE::XTOON_DISTANCE:
 		for(unsigned int i=0; i<shaders.size(); ++i)
 			shaders[i]->SetDistanceThresholds(minZ, maxZ);
@@ -501,13 +521,30 @@ int main(int argc, char** argv){
 	glui->add_separator();
 
 	GLUI_Panel *xtoonPanel = glui->add_panel ("X-Toon Controls");
-
+	
 	GLUI_Panel *xtoonDistancePanel = glui->add_panel_to_panel(xtoonPanel, "Distance");
 	GLUI_Spinner *minZ_spinner = glui->add_spinner_to_panel(xtoonDistancePanel, "Min Z", GLUI_SPINNER_FLOAT, &minZ, GUI_CONTROLLER_TYPE::XTOON_DISTANCE, valueModified);
 	minZ_spinner->set_float_limits( 1.0f, 20.0f );
 	GLUI_Spinner *maxZ_spinner = glui->add_spinner_to_panel(xtoonDistancePanel, "Max Z", GLUI_SPINNER_FLOAT, &maxZ, GUI_CONTROLLER_TYPE::XTOON_DISTANCE, valueModified);
 	maxZ_spinner->set_float_limits( 21.0f, 100.0f );
-
+	
+	GLUI_Panel *textureLabel = glui->add_panel_to_panel(xtoonPanel, "Current Texture");
+	GLUI_Rollout *xtoonTextureRollout = glui->add_rollout_to_panel(textureLabel, "Texture Types", 0);
+	GLUI_RadioGroup *xtoonTextures = glui->add_radiogroup_to_panel(xtoonTextureRollout, &xtoonCurrentTexture, GUI_CONTROLLER_TYPE::XTOON_TEXTURE, valueModified);
+	//glui->add_radiobutton_to_group(xtoonTextures, "Default (1D)");
+	glui->add_radiobutton_to_group(xtoonTextures, "Areial 1");
+	glui->add_radiobutton_to_group(xtoonTextures, "Areial 2");
+	glui->add_radiobutton_to_group(xtoonTextures, "Areial 3");	
+	glui->add_radiobutton_to_group(xtoonTextures, "BackLighting 1");
+	glui->add_radiobutton_to_group(xtoonTextures, "BackLighting 2");
+	glui->add_radiobutton_to_group(xtoonTextures, "BackLighting 3");
+	glui->add_radiobutton_to_group(xtoonTextures, "Highlighting 1");	
+	glui->add_radiobutton_to_group(xtoonTextures, "Highlighting 2");
+	glui->add_radiobutton_to_group(xtoonTextures, "Highlighting 3");
+	//glui->add_radiobutton_to_group(xtoonTextures, "LOA 1");	
+	//glui->add_radiobutton_to_group(xtoonTextures, "LOA 2");
+	//glui->add_radiobutton_to_group(xtoonTextures, "LOA 3");
+	
 	glui->add_separator();
 	glui->add_separator();
 
