@@ -103,6 +103,7 @@
     <ClInclude Include="Ellipsoid.h" />
     <ClInclude Include="Box.h" />
     <ClInclude Include="Ball.h" />
+    <ClInclude Include="Image2D.h" />
     <ClInclude Include="ModelBody.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="Line.h" />
@@ -132,6 +133,7 @@
     <ClCompile Include="Ball.cpp" />
     <ClCompile Include="Box.cpp" />
     <ClCompile Include="BumpedTexturedMesh.cpp" />
+    <ClCompile Include="Image2D.cpp" />
     <ClCompile Include="ModelBody.cpp" />
     <ClCompile Include="Ellipsoid.cpp" />
     <ClCompile Include="Line.cpp" />

@@ -69,8 +69,6 @@ void SimpleMesh::Render(GenericShader * shader)
 
 	glBindVertexArray (vaoID);
 	glDrawArrays (GL_TRIANGLES, 0, vertices.size());
-	
-	shader->UnbindCubeTexture();
 
 	glBindVertexArray(0);
 }

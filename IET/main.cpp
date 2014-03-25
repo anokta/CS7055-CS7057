@@ -14,6 +14,7 @@
 #include "Plane.h"
 #include "Terrain.h"
 #include "ModelBody.h"
+#include "Image2D.h"
 
 #include "MeshLoader.h"
 
@@ -25,7 +26,10 @@ using namespace glm;
 int main_window;
 
 enum GUI_CONTROLLER_TYPE { CAMERA_TRANSLATION, TARGET_CHANGE, BODY_ROTATION, LIGHT_ROTATION, XTOON_TEXTURE, XTOON_DISTANCE };
+GLUI_RadioGroup *xtoonTexturesGroup;
 GLUI_RadioButton * xtoonTextureButtons[4];
+int xtoonTextureIndices[4];
+int xtoonCurrentTexture;
 
 // Update interval
 const int FrameRate = 40;
@@ -64,7 +68,6 @@ string xtoonTexturePaths[] =
 	"highlighting_2.png",
 	"highlighting_3.png"
 };
-int xtoonCurrentTexture;
 
 // Camera
 Camera * camera; 
@@ -77,6 +80,9 @@ int currentBodyIndex;
 float currentBodyRotation[16];
 //int spinning;
 
+Image2D *textureThumb, *textureLabel;
+GenericShader *imageShader;
+
 bool pause;
 
 void restart()
@@ -87,10 +93,16 @@ void restart()
 	}
 	rigidBodies.clear();
 	
-	rigidBodies.push_back(new RigidBodyModel(new ModelBody(string("suzanne.obj"), vec3(2.0f, 0.0f, 0.0f), quat(), vec3(12.0f, 9.0f, 8.0f)), shaders[1]));
-	rigidBodies.push_back(new RigidBodyModel(new ModelBody(string("bunny.obj"), vec3(102.0f, 0.0f, 0.0f), quat(), vec3(11.0f, 12.0f, 10.0f)), shaders[1]));
-	rigidBodies.push_back(new RigidBodyModel(new Terrain(vec3(202.0f, 0.0f, 0.0f), quat(), vec3(36.0f, 16.0f, 36.0f)), shaders[1]));
-	rigidBodies.push_back(new RigidBodyModel(new ModelBody(string("elephal.obj"), vec3(302.0f, 0.0f, 0.0f), quat(), vec3(8.0f, 10.0f, 15.0f)), shaders[1]));
+	rigidBodies.push_back(new RigidBodyModel(new ModelBody(string("suzanne.obj"), vec3(2.0f, 0.0f, 0.0f), quat(), vec3(12.0f, 9.0f, 8.0f)), shaders[0]));
+	rigidBodies.push_back(new RigidBodyModel(new ModelBody(string("bunny.obj"), vec3(102.0f, 0.0f, 0.0f), quat(), vec3(11.0f, 12.0f, 10.0f)), shaders[0]));
+	rigidBodies.push_back(new RigidBodyModel(new Terrain(vec3(202.0f, 0.0f, 0.0f), quat(), vec3(36.0f, 16.0f, 36.0f)), shaders[0]));
+	rigidBodies.push_back(new RigidBodyModel(new ModelBody(string("elephal.obj"), vec3(302.0f, 0.0f, 0.0f), quat(), vec3(8.0f, 10.0f, 15.0f)), shaders[0]));
+
+	xtoonTextureIndices[0] = xtoonTextureIndices[1] = xtoonTextureIndices[2] = xtoonTextureIndices[3] = 0;
+	textureThumb = new Image2D(string("xtoon\\default.png"), vec2(1.25f, 0.875f), 0.25f);
+	textureThumb->SetShader(imageShader);
+	textureLabel = new Image2D(string("xtoon\\label2.png"), vec2(1.0f, 0.875f), 0.25f);
+	textureLabel->SetShader(imageShader);
 }
 
 void translateBody(float x, float y, float z)
@@ -283,7 +295,8 @@ void valueModified(int id)
 		freeMode = false;
 		currentTarget = vec2(currentBodyIndex * 100.0f, 0.0f);
 
-		xtoonCurrentTexture = 0;
+		xtoonCurrentTexture = xtoonTextureIndices[currentBodyIndex];
+		xtoonTexturesGroup->set_int_val(xtoonCurrentTexture);
 		for(int i=0; i<4; ++i)
 		{
 			string path = xtoonTexturePaths[(currentBodyIndex * 4) + i];
@@ -291,6 +304,7 @@ void valueModified(int id)
 
 			xtoonTextureButtons[i]->set_name(path.c_str());
 		}
+		textureThumb->ChangeTexture("xtoon\\" + xtoonTexturePaths[currentBodyIndex * 4 + xtoonCurrentTexture]);
 		break;
 
 	case GUI_CONTROLLER_TYPE::BODY_ROTATION:
@@ -320,6 +334,8 @@ void valueModified(int id)
 	
 	case GUI_CONTROLLER_TYPE::XTOON_TEXTURE:
 		((XToonMesh*)(rigidBodies[currentBodyIndex])->GetModel())->ChangeTexture("xtoon\\" + xtoonTexturePaths[currentBodyIndex * 4 + xtoonCurrentTexture]);
+		textureThumb->ChangeTexture("xtoon\\" + xtoonTexturePaths[currentBodyIndex * 4 + xtoonCurrentTexture]);
+		xtoonTextureIndices[currentBodyIndex] = xtoonCurrentTexture;
 		break;
 	
 	case GUI_CONTROLLER_TYPE::XTOON_DISTANCE:
@@ -333,8 +349,15 @@ void valueModified(int id)
 
 void display(){
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+	
 	EntityManager::GetInstance()->DrawEntities();
+		
+	textureThumb->Render(imageShader);
+	
+	glEnable(GL_BLEND);
+glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	textureLabel->Render(imageShader);
+	glDisable(GL_BLEND);
 
 	glutSwapBuffers();
 }
@@ -347,6 +370,12 @@ void idle()
 	glutPostRedisplay();
 }
 
+void reshaped( int w, int h )
+{
+	glViewport(0, 0, (GLsizei)w, (GLsizei)h);
+
+	glutPostRedisplay();
+}
 
 void update(int frame)
 {
@@ -382,14 +411,17 @@ void update(int frame)
 void init()
 {
 	// Set up the shaders
-	GenericShader * lineShader = new GenericShader("Default.vert", "Default.frag");
-	shaders.push_back(lineShader);
+	imageShader = new GenericShader("Textured.vert", "DefaultTextured.frag");
+	imageShader->SetProjectionMatrix( perspective(
+			60.0f, 
+			4.0f / 3.0f, 
+			1.0f, 10.0f
+			) );
+	imageShader->SetModelMatrix(mat4(1.0f));
+	imageShader->SetViewMatrix(lookAt(vec3(0,0,2.0f),vec3(0,0,0), vec3(0,1,0))); 
 
 	GenericShader * xToonShader = new GenericShader("XToon.vert", "XToon.frag", "XToon");
 	shaders.push_back(xToonShader);
-
-
-
 
 	for(unsigned int i=0; i<shaders.size(); ++i)
 	{
@@ -424,7 +456,7 @@ void init()
 		shaders[i]->SetDistanceThresholds(minZ, maxZ);
 	}
 
-	currentShaderIndex = 2;
+	currentShaderIndex = 0;
 
 	// Create the camera
 	camera = new Camera(shaders, vec3(0,0,20), vec3(0,0,0), vec3(0,1,0));
@@ -446,65 +478,17 @@ void init()
 	glDepthFunc(GL_LEQUAL);
 } 
 
-void releaseResources()
+void initGUI()
 {
-	for(unsigned int i=0; i<shaders.size(); ++i)
-		delete shaders[i];
-	shaders.clear();
-
-	EntityManager::Destroy();
-
-}
-
-int main(int argc, char** argv){
-	srand((unsigned int)time(NULL));
-
-	// Set up the window
-	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGB);
-	glutInitWindowSize(1024, 768);
-	main_window = glutCreateWindow("[IET] CS7055");
-
-	// Tell glut where the display function is
-	glutDisplayFunc(display);
-
-	//glutIdleFunc(idle);
-	glutTimerFunc(1000/FrameRate, update, 0);
-
-	// Input handling functions
-	//glutMouseFunc(mousePressed);
-	glutMouseWheelFunc(mouseWheel);
-	glutMotionFunc(mouseDragged);
-
-	//glutKeyboardFunc(keyPressed);
-	//glutSpecialFunc(specialKeyPressed);
-
-	// A call to glewInit() must be done after glut is initialized!
-	GLenum res = glewInit();
-
-	// Check for any errors
-	if (res != GLEW_OK) {
-		fprintf(stderr, "Error: '%s'\n", glewGetErrorString(res));
-		return 1;
-	}
-
-	// Entity handler
-	EntityManager::Create();
-
-	// Set up your objects and shaders
-	init();
-
-	// GLUI init  
 	GLUI *glui = GLUI_Master.create_glui_subwindow(main_window, GLUI_SUBWINDOW_LEFT);
 	glui->set_main_gfx_window( main_window );
-
 	// Controls  
-	GLUI_Panel *cameraPanel = glui->add_panel ("Camera Controls");
-	GLUI_Translation * xyTranslation = glui->add_translation_to_panel(cameraPanel, "Move", GLUI_TRANSLATION_XY, cameraXY, GUI_CONTROLLER_TYPE::CAMERA_TRANSLATION, valueModified);
-	GLUI_Translation * zTranslation = glui->add_translation_to_panel(cameraPanel, "Zoom", GLUI_TRANSLATION_Z, &cameraZ, GUI_CONTROLLER_TYPE::CAMERA_TRANSLATION, valueModified);
+	//GLUI_Panel *cameraPanel = glui->add_panel ("Camera Controls");
+	//GLUI_Translation * xyTranslation = glui->add_translation_to_panel(cameraPanel, "Move", GLUI_TRANSLATION_XY, cameraXY, GUI_CONTROLLER_TYPE::CAMERA_TRANSLATION, valueModified);
+	//GLUI_Translation * zTranslation = glui->add_translation_to_panel(cameraPanel, "Zoom", GLUI_TRANSLATION_Z, &cameraZ, GUI_CONTROLLER_TYPE::CAMERA_TRANSLATION, valueModified);
+	//
+	//glui->add_separator();
 	
-	glui->add_separator();
-
 	GLUI_Panel *entityPanel = glui->add_panel ("Entity Controls");
 	GLUI_Rollout *bodyIndexRollout = glui->add_rollout_to_panel(entityPanel, "Shading Examples", 1);
 	GLUI_RadioGroup *bodyIndex_selector = glui->add_radiogroup_to_panel(bodyIndexRollout, &currentBodyIndex, TARGET_CHANGE, valueModified);
@@ -534,13 +518,13 @@ int main(int argc, char** argv){
 	
 	GLUI_Panel *textureLabel = glui->add_panel_to_panel(xtoonPanel, "Current Texture");
 	GLUI_Rollout *xtoonTextureRollout = glui->add_rollout_to_panel(textureLabel, "Texture Types", 0);
-	GLUI_RadioGroup *xtoonTextures = glui->add_radiogroup_to_panel(xtoonTextureRollout, &xtoonCurrentTexture, GUI_CONTROLLER_TYPE::XTOON_TEXTURE, valueModified);	
+	xtoonTexturesGroup = glui->add_radiogroup_to_panel(xtoonTextureRollout, &xtoonCurrentTexture, GUI_CONTROLLER_TYPE::XTOON_TEXTURE, valueModified);	
 	for(int i=0; i<4; ++i)
 	{
 		string path = xtoonTexturePaths[(currentBodyIndex * 4) + i];
 		path = path.substr(0, path.length() - 4);
 
-		xtoonTextureButtons[i] = glui->add_radiobutton_to_group(xtoonTextures, path.c_str());
+		xtoonTextureButtons[i] = glui->add_radiobutton_to_group(xtoonTexturesGroup, path.c_str());
 	}
 
 	glui->add_separator();
@@ -551,7 +535,61 @@ int main(int argc, char** argv){
 	GLUI_Master.set_glutIdleFunc( idle ); 
 	GLUI_Master.set_glutKeyboardFunc( keyPressed );
 	GLUI_Master.set_glutMouseFunc( mousePressed );
+	GLUI_Master.set_glutReshapeFunc( reshaped );
+}
 
+void releaseResources()
+{
+	for(unsigned int i=0; i<shaders.size(); ++i)
+		delete shaders[i];
+	shaders.clear();
+
+	delete textureThumb;
+	delete textureLabel;
+
+	EntityManager::Destroy();
+}
+
+int main(int argc, char** argv){
+	srand((unsigned int)time(NULL));
+
+	// Set up the window
+	glutInit(&argc, argv);
+	glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGB);
+	glutInitWindowSize(1024, 768);
+	main_window = glutCreateWindow("[IET] CS7055");
+
+	// Tell glut where the display function is
+	glutDisplayFunc(display);
+
+	glutIdleFunc(idle);
+	glutTimerFunc(1000/FrameRate, update, 0);
+
+	// Input handling functions
+	//glutMouseFunc(mousePressed);
+	glutMouseWheelFunc(mouseWheel);
+	glutMotionFunc(mouseDragged);
+
+	//glutKeyboardFunc(keyPressed);
+	//glutSpecialFunc(specialKeyPressed);
+
+	// A call to glewInit() must be done after glut is initialized!
+	GLenum res = glewInit();
+
+	// Check for any errors
+	if (res != GLEW_OK) {
+		fprintf(stderr, "Error: '%s'\n", glewGetErrorString(res));
+		return 1;
+	}
+
+	// Entity handler
+	EntityManager::Create();
+
+	// Set up your objects and shaders
+	init();
+
+	// GLUI setup
+	initGUI();
 
 	// Begin infinite event loop
 	glutMainLoop();
