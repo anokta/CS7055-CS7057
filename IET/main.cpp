@@ -25,9 +25,12 @@ using namespace glm;
 
 int main_window;
 
-enum GUI_CONTROLLER_TYPE { CAMERA_TRANSLATION, TARGET_CHANGE, BODY_ROTATION, LIGHT_ROTATION, XTOON_TEXTURE, XTOON_DISTANCE };
+enum GUI_CONTROLLER_TYPE { CAMERA_TRANSLATION, TARGET_CHANGE, BODY_ROTATION, LIGHT_ROTATION, XTOON_TEXTURE, XTOON_DISTANCE, XTOON_SHININESS };
 GLUI_RadioGroup *xtoonTexturesGroup;
 GLUI_RadioButton * xtoonTextureButtons[4];
+GLUI_Panel *xtoonDistancePanel, *xtoonBacklightPanel, *xtoonSpecularPanel; 
+GLUI_Spinner *magnitude_spinner, *shininess_spinner;
+
 int xtoonTextureIndices[4];
 int xtoonCurrentTexture;
 
@@ -83,8 +86,6 @@ float currentBodyRotation[16];
 Image2D *textureThumb, *textureLabel;
 GenericShader *imageShader;
 
-bool pause;
-
 void restart()
 {
 	for(unsigned int i=0; i<rigidBodies.size(); ++i)
@@ -95,13 +96,13 @@ void restart()
 	
 	rigidBodies.push_back(new RigidBodyModel(new ModelBody(string("suzanne.obj"), vec3(2.0f, 0.0f, 0.0f), quat(), vec3(12.0f, 9.0f, 8.0f)), shaders[0]));
 	rigidBodies.push_back(new RigidBodyModel(new ModelBody(string("bunny.obj"), vec3(102.0f, 0.0f, 0.0f), quat(), vec3(11.0f, 12.0f, 10.0f)), shaders[0]));
-	rigidBodies.push_back(new RigidBodyModel(new Terrain(vec3(202.0f, 0.0f, 0.0f), quat(), vec3(36.0f, 16.0f, 36.0f)), shaders[0]));
+	rigidBodies.push_back(new RigidBodyModel(new Terrain(vec3(202.0f, 0.0f, 0.0f), quat(), vec3(64.0f, 16.0f, 64.0f)), shaders[0]));
 	rigidBodies.push_back(new RigidBodyModel(new ModelBody(string("elephal.obj"), vec3(302.0f, 0.0f, 0.0f), quat(), vec3(8.0f, 10.0f, 15.0f)), shaders[0]));
 
 	xtoonTextureIndices[0] = xtoonTextureIndices[1] = xtoonTextureIndices[2] = xtoonTextureIndices[3] = 0;
 	textureThumb = new Image2D(string("xtoon\\default.png"), vec2(1.25f, 0.875f), 0.25f);
 	textureThumb->SetShader(imageShader);
-	textureLabel = new Image2D(string("xtoon\\label2.png"), vec2(1.0f, 0.875f), 0.25f);
+	textureLabel = new Image2D(string("xtoon\\label.png"), vec2(1.0f, 0.875f), 0.25f);
 	textureLabel->SetShader(imageShader);
 }
 
@@ -255,10 +256,6 @@ void keyPressed(unsigned char key, int x, int y)
 		translateBody(0.0f, 0.0f, 0.0f);
 		break;
 
-	case 'p':
-		pause = !pause;
-		break;
-
 	case ' ':
 		if(!freeMode)
 		{
@@ -294,6 +291,38 @@ void valueModified(int id)
 	case GUI_CONTROLLER_TYPE::TARGET_CHANGE:
 		freeMode = false;
 		currentTarget = vec2(currentBodyIndex * 100.0f, 0.0f);
+
+		for(unsigned int i=0; i<shaders.size(); ++i)
+			shaders[i]->SetXtoonType(currentBodyIndex);
+
+		if(currentBodyIndex % 2 == 0)
+		{
+			xtoonDistancePanel->enable();
+			xtoonBacklightPanel->disable();
+			xtoonSpecularPanel->disable();
+		}
+		else
+		{
+			xtoonDistancePanel->disable();
+			
+			if(currentBodyIndex == 1)
+			{
+				xtoonBacklightPanel->enable();
+				xtoonSpecularPanel->disable();
+
+				shininess = magnitude_spinner->get_float_val();
+			}
+			else if (currentBodyIndex == 3)
+			{
+				xtoonBacklightPanel->disable();
+				xtoonSpecularPanel->enable();
+				
+				shininess = shininess_spinner->get_float_val();
+			}
+			
+			for(unsigned int i=0; i<shaders.size(); ++i)
+				shaders[i]->SetSpecularComponent(vec3(), 1.0f, shininess);
+		}
 
 		xtoonCurrentTexture = xtoonTextureIndices[currentBodyIndex];
 		xtoonTexturesGroup->set_int_val(xtoonCurrentTexture);
@@ -338,6 +367,11 @@ void valueModified(int id)
 		xtoonTextureIndices[currentBodyIndex] = xtoonCurrentTexture;
 		break;
 	
+	case GUI_CONTROLLER_TYPE::XTOON_SHININESS:
+		for(unsigned int i=0; i<shaders.size(); ++i)
+			shaders[i]->SetSpecularComponent(vec3(), 1.0f, shininess);
+		break;
+
 	case GUI_CONTROLLER_TYPE::XTOON_DISTANCE:
 		for(unsigned int i=0; i<shaders.size(); ++i)
 			shaders[i]->SetDistanceThresholds(minZ, maxZ);
@@ -379,30 +413,22 @@ void reshaped( int w, int h )
 
 void update(int frame)
 {
-	if(!pause)
+	//Update camera motion
+	if(!freeMode)
 	{
-		// Update audio manager
-		//audioManager->Update();
+		vec3 eye = camera->GetEyeVector();
+		vec3 target = camera->GetTargetVector();
 
-		//Update camera motion
-		if(!freeMode)
+		camera->SetEyeVector(mix(eye, vec3(currentTarget, 20), DELTA_TIME * 2));
+		camera->SetTargetVector(mix(target, vec3(currentTarget, 0), DELTA_TIME * 4));
+
+		if(abs(eye.x - currentTarget.x) < 0.5f && abs(target.x - currentTarget.x) < 0.5f)
 		{
-			camera->SetEyeVector(mix(camera->GetEyeVector(), vec3(currentTarget, 20), DELTA_TIME));
-			camera->SetTargetVector(mix(camera->GetTargetVector(), vec3(currentTarget, 0), DELTA_TIME * 2));
+			freeMode = true;
+		}
+	} 
 
-			if(abs(camera->GetEyeVector().x - currentTarget.x) < 0.5f && abs(camera->GetTargetVector().x - currentTarget.x) < 0.5f)
-			{
-				freeMode = true;
-			}
-		} 
-
-		EntityManager::GetInstance()->UpdateEntities(DELTA_TIME);
-
-	}
-	else
-	{
-		camera->Update(DELTA_TIME);
-	}
+	EntityManager::GetInstance()->UpdateEntities(DELTA_TIME);
 
 	// Re-trigger update callback
 	glutTimerFunc(unsigned int(DELTA_TIME * 1000.0f), update, (frame+1) % 1000);
@@ -463,12 +489,9 @@ void init()
 
 	freeMode = true;
 
-
 	currentBodyIndex = 0;
 
 	restart();
-
-	pause = false;
 
 	// OpenGL initial setup
 	glClearColor(0.04f, 0.04f, 0.05f, 0.0f);
@@ -489,7 +512,7 @@ void initGUI()
 	//
 	//glui->add_separator();
 	
-	GLUI_Panel *entityPanel = glui->add_panel ("Entity Controls");
+	GLUI_Panel *entityPanel = glui->add_panel ("Scene Controls");
 	GLUI_Rollout *bodyIndexRollout = glui->add_rollout_to_panel(entityPanel, "Shading Examples", 1);
 	GLUI_RadioGroup *bodyIndex_selector = glui->add_radiogroup_to_panel(bodyIndexRollout, &currentBodyIndex, TARGET_CHANGE, valueModified);
 	glui->add_radiobutton_to_group(bodyIndex_selector, "Level-of-Abstraction");
@@ -497,12 +520,13 @@ void initGUI()
 	glui->add_radiobutton_to_group(bodyIndex_selector, "Aerial Perspective");
 	glui->add_radiobutton_to_group(bodyIndex_selector, "Highlighting");
 
-	GLUI_Rotation *bodyRotation = glui->add_rotation_to_panel(entityPanel, "Orientation", currentBodyRotation, GUI_CONTROLLER_TYPE::BODY_ROTATION, valueModified);
+	GLUI_Panel *objectPanel = glui->add_panel_to_panel (entityPanel, "Current Entity");
+	GLUI_Rotation *bodyRotation = glui->add_rotation_to_panel(objectPanel, "Orientation", currentBodyRotation, GUI_CONTROLLER_TYPE::BODY_ROTATION, valueModified);
 	bodyRotation->reset();
 
 	glui->add_separator();
 
-	GLUI_Panel *lightPanel = glui->add_panel ("Light Source");
+	GLUI_Panel *lightPanel = glui->add_panel_to_panel (entityPanel, "Light Source");
 	GLUI_Rotation *lightRotation = glui->add_rotation_to_panel(lightPanel, "Direction", lightDirectionRotation, GUI_CONTROLLER_TYPE::LIGHT_ROTATION, valueModified);
 	lightRotation->reset();
 
@@ -510,11 +534,21 @@ void initGUI()
 
 	GLUI_Panel *xtoonPanel = glui->add_panel ("X-Toon Controls");
 	
-	GLUI_Panel *xtoonDistancePanel = glui->add_panel_to_panel(xtoonPanel, "Distance");
+	xtoonDistancePanel = glui->add_panel_to_panel(xtoonPanel, "Distance");
 	GLUI_Spinner *minZ_spinner = glui->add_spinner_to_panel(xtoonDistancePanel, "Min Z", GLUI_SPINNER_FLOAT, &minZ, GUI_CONTROLLER_TYPE::XTOON_DISTANCE, valueModified);
 	minZ_spinner->set_float_limits( 1.0f, 20.0f );
 	GLUI_Spinner *maxZ_spinner = glui->add_spinner_to_panel(xtoonDistancePanel, "Max Z", GLUI_SPINNER_FLOAT, &maxZ, GUI_CONTROLLER_TYPE::XTOON_DISTANCE, valueModified);
 	maxZ_spinner->set_float_limits( 21.0f, 100.0f );
+	
+	xtoonBacklightPanel = glui->add_panel_to_panel(xtoonPanel, "Backlight");
+	magnitude_spinner = glui->add_spinner_to_panel(xtoonBacklightPanel, "Magnitude", GLUI_SPINNER_FLOAT, &shininess, GUI_CONTROLLER_TYPE::XTOON_SHININESS, valueModified);
+	magnitude_spinner->set_float_limits( 1.0f, 10.0f );
+	xtoonBacklightPanel->disable();
+
+	xtoonSpecularPanel = glui->add_panel_to_panel(xtoonPanel, "Specular");
+	shininess_spinner = glui->add_spinner_to_panel(xtoonSpecularPanel, "Shininess", GLUI_SPINNER_FLOAT, &shininess, GUI_CONTROLLER_TYPE::XTOON_SHININESS, valueModified);
+	shininess_spinner->set_float_limits( 4.0f, 128.0f );
+	xtoonSpecularPanel->disable();
 	
 	GLUI_Panel *textureLabel = glui->add_panel_to_panel(xtoonPanel, "Current Texture");
 	GLUI_Rollout *xtoonTextureRollout = glui->add_rollout_to_panel(textureLabel, "Texture Types", 0);

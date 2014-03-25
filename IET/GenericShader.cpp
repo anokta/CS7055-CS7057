@@ -37,8 +37,9 @@ GenericShader::GenericShader(string vShaderFilepath, string fShaderFilepath, str
 	modelID = glGetUniformLocation(programID, "M");
 	viewID = glGetUniformLocation(programID, "V");
 	projectionID = glGetUniformLocation(programID, "P");
-
+	
 	eyeID = glGetUniformLocation(programID, "vEye");
+	targetID = glGetUniformLocation(programID, "vTarget");
 
 	ambientColorID = glGetUniformLocation(programID, "ambientColor");
 	ambientIntensityID = glGetUniformLocation(programID, "ambientIntensity");
@@ -66,6 +67,8 @@ GenericShader::GenericShader(string vShaderFilepath, string fShaderFilepath, str
 	
 	zMaxID = glGetUniformLocation(programID, "zMax");
 	zMinID = glGetUniformLocation(programID, "zMin");
+
+	xtoonTypeID = glGetUniformLocation(programID, "xtoonType");
 }
 
 GenericShader::~GenericShader()
@@ -151,6 +154,12 @@ void GenericShader::SetEyeVector(const glm::vec3 &eye)
 	glUniform3f(eyeID, eye.x, eye.y, eye.z);
 }
 
+void GenericShader::SetTargetVector(const glm::vec3 &target)
+{
+	glUseProgram(programID);
+	glUniform3f(targetID, target.x, target.y, target.z);
+}
+
 void GenericShader::SetAmbientLight(glm::vec3 color, float intensity)
 {
 	glUseProgram(programID);
@@ -184,6 +193,12 @@ void GenericShader::SetTranslucentEta(glm::vec3 &eta)
 {
 	glUseProgram(programID);
 	glUniform3f(translucentEtaID, eta.r, eta.g, eta.b);
+}
+
+void GenericShader::SetXtoonType(int type)
+	{
+	glUseProgram(programID);
+	glUniform1i(xtoonTypeID, type);
 }
 
 void GenericShader::SetDistanceThresholds(float zMin, float zMax)

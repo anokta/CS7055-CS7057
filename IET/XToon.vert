@@ -14,9 +14,6 @@ out vec3 diffuseDirection;
 uniform vec3 vEye;
 out vec3 fEye;
 
-uniform float zMin, zMax;
-out float D;
-
 uniform mat4 M;
 uniform mat4 V;
 uniform mat4 P;				  
@@ -29,14 +26,4 @@ void main()
 	
 	diffuseDirection = (V * vec4(vDiffuseDirection, 0.0)).xyz;
 	fEye = vec3(V * vec4(vEye, 1.0));
-
-	//depth of field
-	float z = length(fEye - fPosition);
-	D = 1 - log(z/zMin) / log(zMax/zMin);
-
-	//backlight
-	//vec3 viewDirection = normalize(fEye - fPosition);
-	//D = pow(dot(normalize(fNormal), normalize(viewDirection)), 1);
-
-	//D = pow(dot(normalize(viewDirection), reflect (normalize (diffuseDirection), normalize(fNormal))), 8);
 }

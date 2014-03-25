@@ -36,14 +36,16 @@ public:
 	void SetViewMatrix(const glm::mat4 &matrix);
 	void SetProjectionMatrix(const glm::mat4 &matrix);
 	void SetModelMatrix(const glm::mat4 &matrix);
-
+	
 	void SetEyeVector(const glm::vec3 &eye);
+	void SetTargetVector(const glm::vec3 &target);
 
 	void SetAmbientLight(glm::vec3 color, float intensity);
 	void SetDirectionalLight(glm::vec3 direction, glm::vec3 color, float intensity);
 	void SetSpecularComponent(glm::vec3 color, float intensity, float shininess);
 	void SetRoughness(float roughness);
 
+	void SetXtoonType(int type);
 	void SetDistanceThresholds(float zMin, float zMax);
 
 	void SetTranslucentEta(glm::vec3 &eta);
@@ -70,7 +72,8 @@ protected:
 	GLuint vUvID, fTextureID;
 	GLuint vTangentID;
 	GLuint viewID, projectionID, modelID;
-	GLuint eyeID;
+	GLuint eyeID, targetID;
+	GLuint xtoonTypeID;
 	
 	GLuint fNormalTextureID;
 	GLuint fCubeTextureID;

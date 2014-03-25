@@ -14,17 +14,18 @@ void Camera::Update(float deltaTime)
 	for(unsigned int i=0; i<shaders.size(); ++i)
 	{
 		// skybox shader
-		if(shaders[i]->GetName().compare("Skybox") == 0)
-		{
-			glm::mat4 Vcopy(V);
-			Vcopy[3] = shaders[i]->GetViewMatrix()[3];
-			shaders[i]->SetViewMatrix(Vcopy);
-		}
-		// model shaders
-		else
-		{
-			shaders[i]->SetViewMatrix(V);
-			shaders[i]->SetEyeVector(eye);
-		}
+		//if(shaders[i]->GetName().compare("Skybox") == 0)
+		//{
+		//	glm::mat4 Vcopy(V);
+		//	Vcopy[3] = shaders[i]->GetViewMatrix()[3];
+		//	shaders[i]->SetViewMatrix(Vcopy);
+		//}
+		//// model shaders
+		//else
+		//{
+		shaders[i]->SetViewMatrix(V);
+		shaders[i]->SetEyeVector(eye);
+		//shaders[i]->SetTargetVector(target);
+		//}
 	}
 }
