@@ -87,6 +87,11 @@ void preloadXtoonTextures()
 	}
 }
 
+void deleteTextures()
+{
+	glDeleteTextures(textureCount, (const GLuint*)(&xtoonTextureIDs));
+}
+
 void restart()
 {
 	for(unsigned int i=0; i<rigidBodies.size(); ++i)
@@ -518,6 +523,8 @@ void releaseResources()
 	delete textureLabel;
 
 	EntityManager::Destroy();
+
+	deleteTextures();
 
 	GLUI_Master.close_all();
 }
