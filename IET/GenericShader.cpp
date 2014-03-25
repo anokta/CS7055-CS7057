@@ -67,6 +67,7 @@ GenericShader::GenericShader(string vShaderFilepath, string fShaderFilepath, str
 	
 	zMaxID = glGetUniformLocation(programID, "zMax");
 	zMinID = glGetUniformLocation(programID, "zMin");
+	zFocusID = glGetUniformLocation(programID, "zFocus");
 
 	xtoonTypeID = glGetUniformLocation(programID, "xtoonType");
 }
@@ -206,6 +207,12 @@ void GenericShader::SetDistanceThresholds(float zMin, float zMax)
 	glUseProgram(programID);
 	glUniform1f(zMinID, zMin);
 	glUniform1f(zMaxID, zMax);
+}
+
+void GenericShader::SetDistanceFocus(float zFocus)
+{
+	glUseProgram(programID);
+	glUniform1f(zMinID, zFocus);
 }
 
 GLuint GenericShader::createShader(string filepath, GLenum type)

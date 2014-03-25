@@ -46,6 +46,7 @@ public:
 	void SetRoughness(float roughness);
 
 	void SetXtoonType(int type);
+	void SetDistanceFocus(float zFocus);
 	void SetDistanceThresholds(float zMin, float zMax);
 
 	void SetTranslucentEta(glm::vec3 &eta);
@@ -85,7 +86,7 @@ protected:
 	
 	GLuint translucentEtaID;
 
-	GLuint zMinID, zMaxID;
+	GLuint zMinID, zMaxID, zFocusID;
 
 	glm::mat4 V, P, M;
 	

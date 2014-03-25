@@ -25,11 +25,11 @@ using namespace glm;
 
 int main_window;
 
-enum GUI_CONTROLLER_TYPE { CAMERA_TRANSLATION, TARGET_CHANGE, BODY_ROTATION, LIGHT_ROTATION, XTOON_TEXTURE, XTOON_DISTANCE, XTOON_SHININESS };
+enum GUI_CONTROLLER_TYPE { CAMERA_TRANSLATION, TARGET_CHANGE, BODY_ROTATION, LIGHT_ROTATION, XTOON_TEXTURE, XTOON_DISTANCE, XTOON_FOCUS, XTOON_SHININESS };
 GLUI_RadioGroup *xtoonTexturesGroup;
 GLUI_RadioButton * xtoonTextureButtons[4];
 GLUI_Panel *xtoonDistancePanel, *xtoonBacklightPanel, *xtoonSpecularPanel; 
-GLUI_Spinner *magnitude_spinner, *shininess_spinner;
+GLUI_Spinner *magnitude_spinner, *shininess_spinner, *focusZ_spinner;
 
 int xtoonTextureIndices[4];
 int xtoonCurrentTexture;
@@ -49,9 +49,9 @@ float ambientLightIntensity;
 float directionalLightIntensity;
 float specularIntensity;
 
-float roughness, shininess;
+float shininess;
 
-float minZ, maxZ;
+float minZ, maxZ, focusZ;
 string xtoonTexturePaths[] = 
 {
 	"default.png",
@@ -193,29 +193,10 @@ void keyPressed(unsigned char key, int x, int y)
 	if ( glutGetWindow() != main_window )
 		glutSetWindow(main_window);
 
-	if(key > 48 && key < 58)
-	{
-		//audioManager->ChangeSong((int)(key - 49));
-		currentBodyIndex = std::min((int)(rigidBodies.size()-1), (int)(key - 49));
-		return;
-	}
-
 	switch(key)
 	{
 	case 27:
 		exit(1);
-		break;
-
-	case 'n':
-		roughness = std::max(0.0f, roughness - 0.1f);
-		for(unsigned int i=0; i<shaders.size(); ++i)
-			shaders[i]->SetRoughness(roughness);
-		break;
-
-	case 'm':
-		roughness = std::min(1.0f, roughness + 0.1f);
-		for(unsigned int i=0; i<shaders.size(); ++i)
-			shaders[i]->SetRoughness(roughness);
 		break;
 
 	case ',':
@@ -298,6 +279,18 @@ void valueModified(int id)
 		if(currentBodyIndex % 2 == 0)
 		{
 			xtoonDistancePanel->enable();
+			
+			if(currentBodyIndex == 0)
+			{
+				focusZ_spinner->enable();
+			
+				focusZ_spinner->set_float_limits(minZ + 0.5f, maxZ - 0.5f);
+				for(unsigned int i=0; i<shaders.size(); ++i)
+					shaders[i]->SetDistanceFocus(focusZ);
+			}
+			else
+				focusZ_spinner->disable();
+
 			xtoonBacklightPanel->disable();
 			xtoonSpecularPanel->disable();
 		}
@@ -375,6 +368,18 @@ void valueModified(int id)
 	case GUI_CONTROLLER_TYPE::XTOON_DISTANCE:
 		for(unsigned int i=0; i<shaders.size(); ++i)
 			shaders[i]->SetDistanceThresholds(minZ, maxZ);
+
+		if(focusZ_spinner->enabled)
+		{
+			focusZ_spinner->set_float_limits(minZ + 0.5f, maxZ - 0.5f);
+			for(unsigned int i=0; i<shaders.size(); ++i)
+				shaders[i]->SetDistanceFocus(focusZ);
+		}
+		break;
+
+	case GUI_CONTROLLER_TYPE::XTOON_FOCUS:
+		for(unsigned int i=0; i<shaders.size(); ++i)
+			shaders[i]->SetDistanceFocus(focusZ);
 		break;
 	}
 }
@@ -389,7 +394,7 @@ void display(){
 	textureThumb->Render(imageShader);
 	
 	glEnable(GL_BLEND);
-glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	textureLabel->Render(imageShader);
 	glDisable(GL_BLEND);
 
@@ -474,12 +479,12 @@ void init()
 		shininess = 64.0f;
 		shaders[i]->SetSpecularComponent(vec3(1, 1, 1), specularIntensity, shininess);
 
-		roughness = 1.0f;
-		shaders[i]->SetRoughness(roughness);
-
 		minZ = 10.0f;
 		maxZ = 30.0f;
 		shaders[i]->SetDistanceThresholds(minZ, maxZ);
+
+		focusZ = 15.0f;
+		shaders[i]->SetDistanceFocus(focusZ);
 	}
 
 	currentShaderIndex = 0;
@@ -494,7 +499,7 @@ void init()
 	restart();
 
 	// OpenGL initial setup
-	glClearColor(0.04f, 0.04f, 0.05f, 0.0f);
+	glClearColor(0.06f, 0.07f, 0.08f, 0.0f);
 	glEnable(GL_DEPTH_TEST);
 
 	glEnable(GL_DEPTH_FUNC);
@@ -537,6 +542,10 @@ void initGUI()
 	xtoonDistancePanel = glui->add_panel_to_panel(xtoonPanel, "Distance");
 	GLUI_Spinner *minZ_spinner = glui->add_spinner_to_panel(xtoonDistancePanel, "Min Z", GLUI_SPINNER_FLOAT, &minZ, GUI_CONTROLLER_TYPE::XTOON_DISTANCE, valueModified);
 	minZ_spinner->set_float_limits( 1.0f, 20.0f );
+	
+	focusZ_spinner = glui->add_spinner_to_panel(xtoonDistancePanel, "Focus Z", GLUI_SPINNER_FLOAT, &focusZ, GUI_CONTROLLER_TYPE::XTOON_FOCUS, valueModified);
+	focusZ_spinner->set_float_limits( 11.0f, 29.0f );
+
 	GLUI_Spinner *maxZ_spinner = glui->add_spinner_to_panel(xtoonDistancePanel, "Max Z", GLUI_SPINNER_FLOAT, &maxZ, GUI_CONTROLLER_TYPE::XTOON_DISTANCE, valueModified);
 	maxZ_spinner->set_float_limits( 21.0f, 100.0f );
 	
@@ -551,7 +560,7 @@ void initGUI()
 	xtoonSpecularPanel->disable();
 	
 	GLUI_Panel *textureLabel = glui->add_panel_to_panel(xtoonPanel, "Current Texture");
-	GLUI_Rollout *xtoonTextureRollout = glui->add_rollout_to_panel(textureLabel, "Texture Types", 0);
+	GLUI_Rollout *xtoonTextureRollout = glui->add_rollout_to_panel(textureLabel, "Texture Types", 1);
 	xtoonTexturesGroup = glui->add_radiogroup_to_panel(xtoonTextureRollout, &xtoonCurrentTexture, GUI_CONTROLLER_TYPE::XTOON_TEXTURE, valueModified);	
 	for(int i=0; i<4; ++i)
 	{

@@ -10,6 +10,7 @@ in vec3 fNormal;
 in vec3 fEye;
 
 uniform float zMin, zMax;
+uniform float zFocus;
 
 uniform int xtoonType;
 
@@ -26,7 +27,20 @@ void main()
 	case 0: // loa
 		{
 			float z = length(fEye - fPosition);
-			D = 1 - log(z/zMin) / log(zMax/zMin);
+			float zMinF, zMaxF;
+
+			if(z < zFocus)
+			{		
+				zMinF = zFocus - zMin;
+				zMaxF = zFocus - zMax;
+				D = 1 - log(z/zMinF) / log(zMaxF/zMinF);
+			}
+			else
+			{
+				zMinF = zFocus + zMin;
+				zMaxF = zFocus + zMax;
+				D = log(z/zMaxF) / log(zMinF/zMaxF);
+			}
 		}
 		break;
 	case 1: // silhouette-backlighting
