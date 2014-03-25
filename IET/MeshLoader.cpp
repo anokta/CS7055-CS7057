@@ -196,7 +196,7 @@ XToonMesh * MeshLoader::LoadXToonMesh(const std::string &path, const string &tex
 		}
 
 		XToonMesh * modelMesh =  new XToonMesh(vertices, indices, normals);
-		modelMesh->SetTexture(loadTexture(texturePath));
+		//modelMesh->SetTexture(loadTexture(texturePath));
 
 		return modelMesh;
 	}

@@ -7,16 +7,11 @@
 #include "EntityManager.h"
 
 #include "Camera.h"
-#include "Skybox.h"
 
 #include "RigidBodyModel.h"
-#include "Box.h"
-#include "Plane.h"
 #include "Terrain.h"
 #include "ModelBody.h"
 #include "Image2D.h"
-
-#include "MeshLoader.h"
 
 #include "HelperFunctions.h"
 
@@ -30,9 +25,7 @@ GLUI_RadioGroup *xtoonTexturesGroup;
 GLUI_RadioButton * xtoonTextureButtons[4];
 GLUI_Panel *xtoonDistancePanel, *xtoonBacklightPanel, *xtoonSpecularPanel; 
 GLUI_Spinner *magnitude_spinner, *shininess_spinner, *focusZ_spinner;
-
-int xtoonTextureIndices[4];
-int xtoonCurrentTexture;
+GLUI_Rotation *bodyRotation;
 
 // Update interval
 const int FrameRate = 40;
@@ -43,15 +36,13 @@ vector<GenericShader*> shaders;
 int currentShaderIndex;
 
 vec3 directionalLightDirection;
-float lightDirectionRotation[16];
-
-float ambientLightIntensity;
-float directionalLightIntensity;
-float specularIntensity;
+mat4 lightDirectionRotation;
 
 float shininess;
 
 float minZ, maxZ, focusZ;
+
+const int textureCount = 16;
 string xtoonTexturePaths[] = 
 {
 	"default.png",
@@ -71,20 +62,30 @@ string xtoonTexturePaths[] =
 	"highlighting_2.png",
 	"highlighting_3.png"
 };
+int xtoonTextureIDs[textureCount];
+int xtoonTextureIndices[4];
+int xtoonCurrentTexture;
 
 // Camera
 Camera * camera; 
-float cameraXY[2], cameraZ;
 int freeMode;
 vec2 currentTarget;
 
 vector<RigidBodyModel*> rigidBodies;
 int currentBodyIndex;
-float currentBodyRotation[16];
+mat4 currentBodyRotation;
 //int spinning;
 
 Image2D *textureThumb, *textureLabel;
 GenericShader *imageShader;
+
+void preloadXtoonTextures()
+{
+	for(int i=0; i<textureCount; ++i)
+	{
+		xtoonTextureIDs[i] = MeshLoader::loadTexture("xtoon\\" + xtoonTexturePaths[i]);
+	}
+}
 
 void restart()
 {
@@ -93,22 +94,22 @@ void restart()
 		delete rigidBodies[i];
 	}
 	rigidBodies.clear();
-	
+
 	rigidBodies.push_back(new RigidBodyModel(new ModelBody(string("suzanne.obj"), vec3(2.0f, 0.0f, 0.0f), quat(), vec3(12.0f, 9.0f, 8.0f)), shaders[0]));
-	rigidBodies.push_back(new RigidBodyModel(new ModelBody(string("bunny.obj"), vec3(102.0f, 0.0f, 0.0f), quat(), vec3(11.0f, 12.0f, 10.0f)), shaders[0]));
-	rigidBodies.push_back(new RigidBodyModel(new Terrain(vec3(202.0f, 0.0f, 0.0f), quat(), vec3(64.0f, 16.0f, 64.0f)), shaders[0]));
-	rigidBodies.push_back(new RigidBodyModel(new ModelBody(string("elephal.obj"), vec3(302.0f, 0.0f, 0.0f), quat(), vec3(8.0f, 10.0f, 15.0f)), shaders[0]));
+	rigidBodies.push_back(new RigidBodyModel(new ModelBody(string("bunny.obj"), vec3(202.0f, 0.0f, 0.0f), quat(), vec3(11.0f, 12.0f, 10.0f)), shaders[0]));
+	rigidBodies.push_back(new RigidBodyModel(new Terrain(vec3(402.0f, 0.0f, 0.0f), quat(), vec3(64.0f, 16.0f, 64.0f)), shaders[0]));
+	rigidBodies.push_back(new RigidBodyModel(new ModelBody(string("elephal.obj"), vec3(602.0f, 0.0f, 0.0f), quat(), vec3(8.0f, 10.0f, 15.0f)), shaders[0]));
+
+	for(unsigned int i=0; i<rigidBodies.size(); ++i)
+	{
+		((XToonMesh*)(rigidBodies[i]->GetModel()))->SetTexture(xtoonTextureIDs[0]);
+	}
 
 	xtoonTextureIndices[0] = xtoonTextureIndices[1] = xtoonTextureIndices[2] = xtoonTextureIndices[3] = 0;
-	textureThumb = new Image2D(string("xtoon\\default.png"), vec2(1.25f, 0.875f), 0.25f);
+	textureThumb = new Image2D(vec2(1.25f, 0.875f), 0.25f, xtoonTextureIDs[0]);
 	textureThumb->SetShader(imageShader);
 	textureLabel = new Image2D(string("xtoon\\label.png"), vec2(1.0f, 0.875f), 0.25f);
 	textureLabel->SetShader(imageShader);
-}
-
-void translateBody(float x, float y, float z)
-{
-	rigidBodies[currentBodyIndex]->GetBody()->SetLinearMomentum(12.0f * vec3(x, y, z) * rigidBodies[currentBodyIndex]->GetBody()->GetMass());
 }
 
 // Mouse & Keyboard Handler Functions
@@ -202,59 +203,17 @@ void keyPressed(unsigned char key, int x, int y)
 	case ',':
 		shininess = std::max(8.0f, shininess / 2.0f);
 		for(unsigned int i=0; i<shaders.size(); ++i)
-			shaders[i]->SetSpecularComponent(vec3(1, 1, 1), specularIntensity, shininess);
+			shaders[i]->SetSpecularShininess(shininess);
 		break;
 
 	case '.':
 		shininess = std::min(128.0f, shininess * 2.0f);
 		for(unsigned int i=0; i<shaders.size(); ++i)
-			shaders[i]->SetSpecularComponent(vec3(1, 1, 1), specularIntensity, shininess);
+			shaders[i]->SetSpecularShininess(shininess);
 		break;
 
 	case 'c':
 		freeMode = !freeMode;
-		break;
-
-	case 'a':
-		translateBody(-0.1f, 0.0f, 0.0f);
-		break;
-	case 'd':
-		translateBody(0.1f, 0.0f, 0.0f);
-		break;
-	case 'w':
-		translateBody(0.0f, 0.1f, 0.0f);
-		break;
-	case 's':
-		translateBody(0.0f, -0.1f, 0.0f);
-		break;
-	case 'q':
-		translateBody(0.0f, 0.0f, 0.1f);
-		break;
-	case 'e':
-		translateBody(0.0f, 0.0f, -0.1f);
-		break;
-	case 'r':
-		translateBody(0.0f, 0.0f, 0.0f);
-		break;
-
-	case ' ':
-		if(!freeMode)
-		{
-			if(currentTarget == vec2())
-			{
-				currentTarget = vec2(40, 0); 
-				currentBodyIndex = 1;
-			}
-			else
-			{
-				currentTarget = vec2();
-				currentBodyIndex = 0;
-			}
-		}
-		break;
-
-	case '\\':
-		restart();
 		break;
 	}
 }
@@ -263,58 +222,51 @@ void valueModified(int id)
 {
 	switch((GUI_CONTROLLER_TYPE)id)
 	{
-	case GUI_CONTROLLER_TYPE::CAMERA_TRANSLATION:
-		camera->SetEyeVector(vec3(cameraXY[0], cameraXY[1], -cameraZ + 20));
-		camera->SetTargetVector(vec3(cameraXY[0], cameraXY[1], -cameraZ));
-	
-		break;
-
 	case GUI_CONTROLLER_TYPE::TARGET_CHANGE:
 		freeMode = false;
-		currentTarget = vec2(currentBodyIndex * 100.0f, 0.0f);
+		currentTarget = vec2(currentBodyIndex * 200.0f, 0.0f);
 
-		for(unsigned int i=0; i<shaders.size(); ++i)
-			shaders[i]->SetXtoonType(currentBodyIndex);
+		currentBodyRotation = toMat4(rigidBodies[currentBodyIndex]->GetBody()->GetOrientation());
+		bodyRotation->set_float_array_val(&currentBodyRotation[0][0]);
 
-		if(currentBodyIndex % 2 == 0)
+		shaders[currentShaderIndex]->SetXtoonType(currentBodyIndex);
+		switch(currentBodyIndex)
 		{
+		case 0:
 			xtoonDistancePanel->enable();
+			focusZ_spinner->enable();
+			focusZ_spinner->set_float_limits(minZ + 0.5f, maxZ - 0.5f);
 			
-			if(currentBodyIndex == 0)
-			{
-				focusZ_spinner->enable();
-			
-				focusZ_spinner->set_float_limits(minZ + 0.5f, maxZ - 0.5f);
-				for(unsigned int i=0; i<shaders.size(); ++i)
-					shaders[i]->SetDistanceFocus(focusZ);
-			}
-			else
-				focusZ_spinner->disable();
+			shaders[currentShaderIndex]->SetDistanceThresholds(minZ, maxZ);
+			shaders[currentShaderIndex]->SetDistanceFocus(focusZ);
 
 			xtoonBacklightPanel->disable();
 			xtoonSpecularPanel->disable();
-		}
-		else
-		{
-			xtoonDistancePanel->disable();
-			
-			if(currentBodyIndex == 1)
-			{
-				xtoonBacklightPanel->enable();
-				xtoonSpecularPanel->disable();
+			break;
+		case 1:		
+			xtoonDistancePanel->disable();		
+			xtoonBacklightPanel->enable();
+			xtoonSpecularPanel->disable();
 
-				shininess = magnitude_spinner->get_float_val();
-			}
-			else if (currentBodyIndex == 3)
-			{
-				xtoonBacklightPanel->disable();
-				xtoonSpecularPanel->enable();
-				
-				shininess = shininess_spinner->get_float_val();
-			}
-			
-			for(unsigned int i=0; i<shaders.size(); ++i)
-				shaders[i]->SetSpecularComponent(vec3(), 1.0f, shininess);
+			shininess = magnitude_spinner->get_float_val();
+			shaders[currentShaderIndex]->SetSpecularComponent(vec3(), 1.0f, shininess);
+			break;
+		case 2:
+			xtoonDistancePanel->enable();
+			focusZ_spinner->disable();
+			xtoonBacklightPanel->disable();
+			xtoonSpecularPanel->disable();
+
+			shaders[currentShaderIndex]->SetDistanceThresholds(minZ, maxZ);
+			break;
+		case 3:
+			xtoonDistancePanel->disable();		
+			xtoonBacklightPanel->disable();
+			xtoonSpecularPanel->enable();
+
+			shininess = shininess_spinner->get_float_val();
+			shaders[currentShaderIndex]->SetSpecularComponent(vec3(), 1.0f, shininess);
+			break;
 		}
 
 		xtoonCurrentTexture = xtoonTextureIndices[currentBodyIndex];
@@ -326,60 +278,44 @@ void valueModified(int id)
 
 			xtoonTextureButtons[i]->set_name(path.c_str());
 		}
-		textureThumb->ChangeTexture("xtoon\\" + xtoonTexturePaths[currentBodyIndex * 4 + xtoonCurrentTexture]);
+
+		textureThumb->SetTexture(xtoonTextureIDs[currentBodyIndex * 4 + xtoonCurrentTexture]);
 		break;
 
 	case GUI_CONTROLLER_TYPE::BODY_ROTATION:
-		{
-			mat4 rotation = mat4(
-				currentBodyRotation[0],currentBodyRotation[1],currentBodyRotation[2], currentBodyRotation[3],
-				currentBodyRotation[4],currentBodyRotation[5],currentBodyRotation[6], currentBodyRotation[7],
-				currentBodyRotation[8],currentBodyRotation[9],currentBodyRotation[10], currentBodyRotation[11],
-				currentBodyRotation[12],currentBodyRotation[13],currentBodyRotation[14], currentBodyRotation[15]
-			);
-			rigidBodies[currentBodyIndex]->GetBody()->SetOrientation(quat(rotation));
-		}
+		rigidBodies[currentBodyIndex]->GetBody()->SetOrientation(quat(currentBodyRotation));
 		break;
 
 	case GUI_CONTROLLER_TYPE::LIGHT_ROTATION:
-		{
-			mat3 rotation = mat3(
-				lightDirectionRotation[0],lightDirectionRotation[1],lightDirectionRotation[2],
-				lightDirectionRotation[4],lightDirectionRotation[5],lightDirectionRotation[6],
-				lightDirectionRotation[8],lightDirectionRotation[9],lightDirectionRotation[10]
-			);
-			directionalLightDirection = normalize(rotation * vec3(1, 1, 1));
-		}
-		for(unsigned int i=0; i<shaders.size(); ++i)
-			shaders[i]->SetDirectionalLight(directionalLightDirection, vec3(1,1,1), directionalLightIntensity);
+		directionalLightDirection = normalize(mat3(lightDirectionRotation) * vec3(1, 1, 1));
+		shaders[currentShaderIndex]->SetDirectionalLightDirection(directionalLightDirection);
 		break;
-	
+
 	case GUI_CONTROLLER_TYPE::XTOON_TEXTURE:
-		((XToonMesh*)(rigidBodies[currentBodyIndex])->GetModel())->ChangeTexture("xtoon\\" + xtoonTexturePaths[currentBodyIndex * 4 + xtoonCurrentTexture]);
-		textureThumb->ChangeTexture("xtoon\\" + xtoonTexturePaths[currentBodyIndex * 4 + xtoonCurrentTexture]);
-		xtoonTextureIndices[currentBodyIndex] = xtoonCurrentTexture;
+		{
+			int id = xtoonTextureIDs[currentBodyIndex * 4 + xtoonCurrentTexture];
+			((XToonMesh*)(rigidBodies[currentBodyIndex])->GetModel())->SetTexture(id);
+			textureThumb->SetTexture(id);
+			xtoonTextureIndices[currentBodyIndex] = xtoonCurrentTexture;
+		}
 		break;
-	
+
 	case GUI_CONTROLLER_TYPE::XTOON_SHININESS:
-		for(unsigned int i=0; i<shaders.size(); ++i)
-			shaders[i]->SetSpecularComponent(vec3(), 1.0f, shininess);
+		shaders[currentShaderIndex]->SetSpecularComponent(vec3(), 1.0f, shininess);
 		break;
 
 	case GUI_CONTROLLER_TYPE::XTOON_DISTANCE:
-		for(unsigned int i=0; i<shaders.size(); ++i)
-			shaders[i]->SetDistanceThresholds(minZ, maxZ);
+		shaders[currentShaderIndex]->SetDistanceThresholds(minZ, maxZ);
 
 		if(focusZ_spinner->enabled)
 		{
 			focusZ_spinner->set_float_limits(minZ + 0.5f, maxZ - 0.5f);
-			for(unsigned int i=0; i<shaders.size(); ++i)
-				shaders[i]->SetDistanceFocus(focusZ);
+			shaders[currentShaderIndex]->SetDistanceFocus(focusZ);
 		}
 		break;
 
 	case GUI_CONTROLLER_TYPE::XTOON_FOCUS:
-		for(unsigned int i=0; i<shaders.size(); ++i)
-			shaders[i]->SetDistanceFocus(focusZ);
+		shaders[currentShaderIndex]->SetDistanceFocus(focusZ);
 		break;
 	}
 }
@@ -388,11 +324,11 @@ void valueModified(int id)
 
 void display(){
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
+
 	EntityManager::GetInstance()->DrawEntities();
-		
+
 	textureThumb->Render(imageShader);
-	
+
 	glEnable(GL_BLEND);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	textureLabel->Render(imageShader);
@@ -444,10 +380,10 @@ void init()
 	// Set up the shaders
 	imageShader = new GenericShader("Textured.vert", "DefaultTextured.frag");
 	imageShader->SetProjectionMatrix( perspective(
-			60.0f, 
-			4.0f / 3.0f, 
-			1.0f, 10.0f
-			) );
+		60.0f, 
+		4.0f / 3.0f, 
+		1.0f, 10.0f
+		) );
 	imageShader->SetModelMatrix(mat4(1.0f));
 	imageShader->SetViewMatrix(lookAt(vec3(0,0,2.0f),vec3(0,0,0), vec3(0,1,0))); 
 
@@ -467,17 +403,11 @@ void init()
 		shaders[i]->SetModelMatrix(mat4(1.0f));
 
 		// Lighting
-		ambientLightIntensity = 0.2f;
-		directionalLightIntensity = 0.6f;
-		specularIntensity = 0.8f;
-
-		shaders[i]->SetAmbientLight(vec3(1,1,1), ambientLightIntensity);
-
 		directionalLightDirection = vec3(1, 1, 1);
-		shaders[i]->SetDirectionalLight(directionalLightDirection, vec3(1,1,1), directionalLightIntensity);
+		shaders[i]->SetDirectionalLightDirection(directionalLightDirection);
 
 		shininess = 64.0f;
-		shaders[i]->SetSpecularComponent(vec3(1, 1, 1), specularIntensity, shininess);
+		shaders[i]->SetSpecularShininess(shininess);
 
 		minZ = 10.0f;
 		maxZ = 30.0f;
@@ -496,6 +426,7 @@ void init()
 
 	currentBodyIndex = 0;
 
+	preloadXtoonTextures();
 	restart();
 
 	// OpenGL initial setup
@@ -510,13 +441,7 @@ void initGUI()
 {
 	GLUI *glui = GLUI_Master.create_glui_subwindow(main_window, GLUI_SUBWINDOW_LEFT);
 	glui->set_main_gfx_window( main_window );
-	// Controls  
-	//GLUI_Panel *cameraPanel = glui->add_panel ("Camera Controls");
-	//GLUI_Translation * xyTranslation = glui->add_translation_to_panel(cameraPanel, "Move", GLUI_TRANSLATION_XY, cameraXY, GUI_CONTROLLER_TYPE::CAMERA_TRANSLATION, valueModified);
-	//GLUI_Translation * zTranslation = glui->add_translation_to_panel(cameraPanel, "Zoom", GLUI_TRANSLATION_Z, &cameraZ, GUI_CONTROLLER_TYPE::CAMERA_TRANSLATION, valueModified);
-	//
-	//glui->add_separator();
-	
+
 	GLUI_Panel *entityPanel = glui->add_panel ("Scene Controls");
 	GLUI_Rollout *bodyIndexRollout = glui->add_rollout_to_panel(entityPanel, "Shading Examples", 1);
 	GLUI_RadioGroup *bodyIndex_selector = glui->add_radiogroup_to_panel(bodyIndexRollout, &currentBodyIndex, TARGET_CHANGE, valueModified);
@@ -526,29 +451,29 @@ void initGUI()
 	glui->add_radiobutton_to_group(bodyIndex_selector, "Highlighting");
 
 	GLUI_Panel *objectPanel = glui->add_panel_to_panel (entityPanel, "Current Entity");
-	GLUI_Rotation *bodyRotation = glui->add_rotation_to_panel(objectPanel, "Orientation", currentBodyRotation, GUI_CONTROLLER_TYPE::BODY_ROTATION, valueModified);
+	bodyRotation = glui->add_rotation_to_panel(objectPanel, "Orientation", &currentBodyRotation[0][0], GUI_CONTROLLER_TYPE::BODY_ROTATION, valueModified);
 	bodyRotation->reset();
 
 	glui->add_separator();
 
 	GLUI_Panel *lightPanel = glui->add_panel_to_panel (entityPanel, "Light Source");
-	GLUI_Rotation *lightRotation = glui->add_rotation_to_panel(lightPanel, "Direction", lightDirectionRotation, GUI_CONTROLLER_TYPE::LIGHT_ROTATION, valueModified);
+	GLUI_Rotation *lightRotation = glui->add_rotation_to_panel(lightPanel, "Direction", &lightDirectionRotation[0][0], GUI_CONTROLLER_TYPE::LIGHT_ROTATION, valueModified);
 	lightRotation->reset();
 
 	glui->add_separator();
 
 	GLUI_Panel *xtoonPanel = glui->add_panel ("X-Toon Controls");
-	
+
 	xtoonDistancePanel = glui->add_panel_to_panel(xtoonPanel, "Distance");
 	GLUI_Spinner *minZ_spinner = glui->add_spinner_to_panel(xtoonDistancePanel, "Min Z", GLUI_SPINNER_FLOAT, &minZ, GUI_CONTROLLER_TYPE::XTOON_DISTANCE, valueModified);
 	minZ_spinner->set_float_limits( 1.0f, 20.0f );
-	
+
 	focusZ_spinner = glui->add_spinner_to_panel(xtoonDistancePanel, "Focus Z", GLUI_SPINNER_FLOAT, &focusZ, GUI_CONTROLLER_TYPE::XTOON_FOCUS, valueModified);
 	focusZ_spinner->set_float_limits( 11.0f, 29.0f );
 
 	GLUI_Spinner *maxZ_spinner = glui->add_spinner_to_panel(xtoonDistancePanel, "Max Z", GLUI_SPINNER_FLOAT, &maxZ, GUI_CONTROLLER_TYPE::XTOON_DISTANCE, valueModified);
 	maxZ_spinner->set_float_limits( 21.0f, 100.0f );
-	
+
 	xtoonBacklightPanel = glui->add_panel_to_panel(xtoonPanel, "Backlight");
 	magnitude_spinner = glui->add_spinner_to_panel(xtoonBacklightPanel, "Magnitude", GLUI_SPINNER_FLOAT, &shininess, GUI_CONTROLLER_TYPE::XTOON_SHININESS, valueModified);
 	magnitude_spinner->set_float_limits( 1.0f, 10.0f );
@@ -558,7 +483,7 @@ void initGUI()
 	shininess_spinner = glui->add_spinner_to_panel(xtoonSpecularPanel, "Shininess", GLUI_SPINNER_FLOAT, &shininess, GUI_CONTROLLER_TYPE::XTOON_SHININESS, valueModified);
 	shininess_spinner->set_float_limits( 4.0f, 128.0f );
 	xtoonSpecularPanel->disable();
-	
+
 	GLUI_Panel *textureLabel = glui->add_panel_to_panel(xtoonPanel, "Current Texture");
 	GLUI_Rollout *xtoonTextureRollout = glui->add_rollout_to_panel(textureLabel, "Texture Types", 1);
 	xtoonTexturesGroup = glui->add_radiogroup_to_panel(xtoonTextureRollout, &xtoonCurrentTexture, GUI_CONTROLLER_TYPE::XTOON_TEXTURE, valueModified);	
@@ -587,10 +512,14 @@ void releaseResources()
 		delete shaders[i];
 	shaders.clear();
 
+	delete imageShader;
+
 	delete textureThumb;
 	delete textureLabel;
 
 	EntityManager::Destroy();
+
+	GLUI_Master.close_all();
 }
 
 int main(int argc, char** argv){
@@ -600,7 +529,7 @@ int main(int argc, char** argv){
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGB);
 	glutInitWindowSize(1024, 768);
-	main_window = glutCreateWindow("[IET] CS7055");
+	main_window = glutCreateWindow("[IET] CS7055 - Assignment 4");
 
 	// Tell glut where the display function is
 	glutDisplayFunc(display);
@@ -609,12 +538,8 @@ int main(int argc, char** argv){
 	glutTimerFunc(1000/FrameRate, update, 0);
 
 	// Input handling functions
-	//glutMouseFunc(mousePressed);
 	glutMouseWheelFunc(mouseWheel);
 	glutMotionFunc(mouseDragged);
-
-	//glutKeyboardFunc(keyPressed);
-	//glutSpecialFunc(specialKeyPressed);
 
 	// A call to glewInit() must be done after glut is initialized!
 	GLenum res = glewInit();

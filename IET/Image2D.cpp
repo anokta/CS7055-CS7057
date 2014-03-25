@@ -7,27 +7,21 @@
 using namespace glm;
 
 Image2D::Image2D(std::string &path, vec2 &p, float s)
-{
-	position = p;
-	size = s;
-	
+{	
 	textureID = MeshLoader::loadTexture(path);
 
-	vertices.push_back(vec3(p.x, p.y, 0.0f));
-	vertices.push_back(vec3(p.x + size, p.y, 0.0f));
-	vertices.push_back(vec3(p.x, p.y + size, 0.0f));
-	vertices.push_back(vec3(p.x, p.y + size, 0.0f));
-	vertices.push_back(vec3(p.x + size, p.y, 0.0f));
-	vertices.push_back(vec3(p.x + size, p.y + size, 0.0f));
-	
-	uvs.push_back(vec2(0.0f, 0.0f));
-	uvs.push_back(vec2(1.0f, 0.0f));
-	uvs.push_back(vec2(0.0f, 1.0f));
-	uvs.push_back(vec2(0.0f, 1.0f));
-	uvs.push_back(vec2(1.0f, 0.0f));
-	uvs.push_back(vec2(1.0f, 1.0f));
+	position = p;
+	size = s;
+	generateMesh();
+}
 
-	GenerateBuffer();
+Image2D::Image2D(vec2 &p, float s, GLuint texture)
+{
+	textureID = texture;
+
+	position = p;
+	size = s;
+	generateMesh();
 }
 
 Image2D::~Image2D()
@@ -97,4 +91,23 @@ void Image2D::ChangeTexture(std::string &texturePath)
 	glDeleteTextures( 1, &textureID );
 
 	textureID = MeshLoader::loadTexture(texturePath);
+}
+
+void Image2D::generateMesh()
+{
+	vertices.push_back(vec3(position.x, position.y, 0.0f));
+	vertices.push_back(vec3(position.x + size, position.y, 0.0f));
+	vertices.push_back(vec3(position.x, position.y + size, 0.0f));
+	vertices.push_back(vec3(position.x, position.y + size, 0.0f));
+	vertices.push_back(vec3(position.x + size, position.y, 0.0f));
+	vertices.push_back(vec3(position.x + size, position.y + size, 0.0f));
+	
+	uvs.push_back(vec2(0.0f, 0.0f));
+	uvs.push_back(vec2(1.0f, 0.0f));
+	uvs.push_back(vec2(0.0f, 1.0f));
+	uvs.push_back(vec2(0.0f, 1.0f));
+	uvs.push_back(vec2(1.0f, 0.0f));
+	uvs.push_back(vec2(1.0f, 1.0f));
+
+	GenerateBuffer();
 }

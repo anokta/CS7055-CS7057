@@ -176,11 +176,23 @@ void GenericShader::SetDirectionalLight(glm::vec3 direction, glm::vec3 color, fl
 	glUniform3f(diffuseDirectionID, direction.x, direction.y, direction.z);
 }
 
+void GenericShader::SetDirectionalLightDirection(glm::vec3 direction)
+{
+	glUseProgram(programID);;
+	glUniform3f(diffuseDirectionID, direction.x, direction.y, direction.z);
+}
+
 void GenericShader::SetSpecularComponent(glm::vec3 color, float intensity, float shininess)
 {
 	glUseProgram(programID);
 	glUniform3f(specularColorID, color.r, color.g, color.b);
 	glUniform1f(specularIntensityID, intensity);
+	glUniform1f(specularShininessID, shininess);
+}
+
+void GenericShader::SetSpecularShininess(float shininess)
+{	
+	glUseProgram(programID);
 	glUniform1f(specularShininessID, shininess);
 }
 

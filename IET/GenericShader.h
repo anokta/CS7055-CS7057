@@ -42,7 +42,9 @@ public:
 
 	void SetAmbientLight(glm::vec3 color, float intensity);
 	void SetDirectionalLight(glm::vec3 direction, glm::vec3 color, float intensity);
+	void SetDirectionalLightDirection(glm::vec3 direction);
 	void SetSpecularComponent(glm::vec3 color, float intensity, float shininess);
+	void SetSpecularShininess(float shininess);
 	void SetRoughness(float roughness);
 
 	void SetXtoonType(int type);
