@@ -1,7 +1,7 @@
-CS7055-CS7057
+CS7055
 =============
 
-MSc. IET - Real Time Physics &amp; Rendering
+MSc. IET - Real Time Rendering Final Project
 
 Referenced Paper
 -
